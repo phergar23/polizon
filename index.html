@@ -440,6 +440,9 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
       <button class="btn ghost" id="lLeave">Salir</button>
       <button class="btn mint" id="lStart">Empezar</button>
     </div>
+    <div class="row">
+      <button class="btn sky" id="lShare" type="button" hidden>Copiar enlace de la sala</button>
+    </div>
   </div>
 </section>
 
@@ -499,6 +502,7 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -1236,9 +1240,40 @@ const crisisKey = () => S && S.sab ? S.sab.k : null;
 function fixNeeded() { const s = S && S.sab; if (!s) return []; if (s.k === 'lights') return [0]; if (s.k === 'comms') return [3]; if (s.k === 'reactor') return [1, 2].filter(k => !s.f[k - 1]); return []; }
 
 /* ================== RED ================== */
-async function initNet() { try { if (window.claude && typeof window.claude.use === 'function') { const r = await window.claude.use('room'); if (r) { NET.lobbyRoom = r; NET.avail = true; } } } catch (e) {} }
+// Online: dentro de Claude se usa su sala en directo; fuera (GitHub Pages, archivo) se conecta directamente entre dispositivos con PeerJS
+const QS = new URLSearchParams(location.search);
+const PEER_OPTS = QS.get('peerhost') ? { host: QS.get('peerhost'), port: +(QS.get('peerport') || 9000), path: '/', secure: false, config: { iceServers: [] } } : {};
+function p2pReady() { return typeof window.Peer === 'function'; }
+async function initNet() {
+  if (!(window.claude && typeof window.claude.use === 'function')) { if (p2pReady()) { NET.p2p = true; NET.avail = true; } return; }
+  try { const r = await window.claude.use('room'); if (r) { NET.lobbyRoom = r; NET.avail = true; NET.p2p = false; return; } } catch (e) {}
+  if (p2pReady()) { NET.p2p = true; NET.avail = true; }
+}
 initNet();
-async function openRoom(code) {
+function openP2P(code, host) {
+  return new Promise(resolve => {
+    const hostId = 'polizon-a-bordo-' + code.toLowerCase(), self = { pres: {}, map: new Map(), conns: new Map(), myId: null, dead: false, hc: null };
+    let done = false; const fin = () => { if (!done) { done = true; resolve(api); } };
+    const api = {
+      err: null, ok: false,
+      presence(p) { self.pres = p; try { if (host) self.conns.forEach(c => { if (c.open) c.send(p); }); else if (self.hc && self.hc.open) self.hc.send(p); } catch (e) {} },
+      peers() { const out = [{ peer: self.myId || 'yo', sameTab: true, isMe: true, kind: 'viewer', presence: self.pres }]; self.map.forEach((v, k) => out.push({ peer: k, sameTab: false, isMe: false, kind: 'viewer', presence: v })); return out; },
+      leave() { self.dead = true; try { peer.destroy(); } catch (e) {} } };
+    let peer; try { peer = host ? new Peer(hostId, PEER_OPTS) : new Peer(PEER_OPTS); } catch (e) { api.err = 'init'; fin(); return; }
+    peer.on('open', id => { self.myId = id; api.ok = true;
+      if (!host) { const c = peer.connect(hostId, { reliable: true, serialization: 'json' }); self.hc = c;
+        c.on('data', d => { if (d && typeof d === 'object') self.map.set(hostId, d); }); c.on('close', () => self.map.delete(hostId)); c.on('error', () => {}); }
+      fin(); });
+    if (host) peer.on('connection', c => { self.conns.set(c.peer, c);
+      c.on('data', d => { if (d && typeof d === 'object') self.map.set(c.peer, d); });
+      c.on('close', () => { self.conns.delete(c.peer); self.map.delete(c.peer); }); c.on('error', () => {}); });
+    peer.on('disconnected', () => { if (!self.dead) setTimeout(() => { try { if (!self.dead && peer.disconnected) peer.reconnect(); } catch (e) {} }, 1500); });
+    peer.on('error', e => { api.err = e && e.type || 'error'; fin(); });
+    setTimeout(fin, 9000);
+  });
+}
+async function openRoom(code, host) {
+  if (NET.p2p) return openP2P(code, host);
   const name = 'pz-' + code.toLowerCase();
   try { const nr = await NET.lobbyRoom.join(name); return { presence: p => nr.presence(p).catch(() => {}), peers: () => nr.peers(), leave: () => nr.leave().catch(() => {}) }; }
   catch (e) { const lr = NET.lobbyRoom; return { presence: p => lr.presence(p).catch(() => {}), peers: () => lr.peers().filter(x => x.sameTab || (x.presence && x.presence.k === code)), leave: () => lr.presence({ k: null, g: null, h: null, n: null, c: null, p: null, a: null, vt: null, ch: null, td: null, v: null, w: null }).catch(() => {}) }; }
@@ -2398,7 +2433,7 @@ qs('#pMinus').onclick = () => { settings.prN = Math.max(1, settings.prN - 1); sn
 qs('#pBack').onclick = () => showScreen('menu');
 function startPractice() { if (NET.R) { try { NET.R.leave(); } catch (e) {} } NET.R = null; NET.online = false; NET.isHost = true; NET.myPeer = 'yo'; NET.code = ''; hostStart(true); }
 qs('#pGo').onclick = () => { snd('click'); startPractice(); };
-qs('#bJoin').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('join'); joinMsg(NET.avail ? '' : 'El multijugador solo funciona al abrir el juego desde su enlace de Claude. Desde el archivo descargado puedes jugar en solitario con NPCs.'); qs('#codeIn').focus(); };
+qs('#bJoin').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('join'); joinMsg(NET.avail ? '' : 'No se ha podido cargar el sistema online. Comprueba tu conexión a internet y recarga la página.'); qs('#codeIn').focus(); };
 function renderCreate() { qs('#nOut').textContent = settings.N; qs('#npcTog').setAttribute('aria-checked', settings.npc ? 'true' : 'false'); qs('#iOut').textContent = settings.imp;
   const eff = Math.min(settings.imp, maxImp(settings.N)); qs('#impHint').textContent = maxImp(settings.N) === 0 ? 'Con menos de 3 jugadores no hay polizón' : eff < settings.imp ? `Con ${settings.N} jugadores habrá ${eff}` : 'Impostores escondidos'; store.set('settings', settings); }
 qs('#nMinus').onclick = () => { settings.N = Math.max(1, settings.N - 1); snd('click'); renderCreate(); };
@@ -2409,16 +2444,22 @@ qs('#npcTog').onclick = () => { settings.npc = !settings.npc; snd('click'); rend
 qs('#cBack').onclick = () => showScreen('menu'); qs('#jBack').onclick = () => showScreen('menu');
 qs('#cOpen').onclick = async () => {
   snd('click'); NET.isHost = true; NET.code = genCode(); H.order = [];
-  if (NET.avail) { NET.R = await openRoom(NET.code); NET.online = true; } else { NET.online = false; NET.myPeer = 'yo'; }
+  NET.netErr = '';
+  if (NET.avail) { qs('#cOpen').disabled = true;
+    for (let t = 0; t < 3; t++) { const R = await openRoom(NET.code, true); if (!R.err || !NET.p2p) { NET.R = R; break; } try { R.leave(); } catch (e) {} if (R.err !== 'unavailable-id') { NET.netErr = R.err; break; } NET.code = genCode(); }
+    qs('#cOpen').disabled = false; NET.online = !!NET.R; if (!NET.R) NET.myPeer = 'yo'; }
+  else { NET.online = false; NET.myPeer = 'yo'; }
   S = newLobbyState(); showScreen('lobby'); renderLobby();
 };
 qs('#codeIn').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
 qs('#codeIn').addEventListener('keydown', e => { if (e.key === 'Enter') qs('#jGo').click(); });
 qs('#jGo').onclick = async () => {
   const code = qs('#codeIn').value.toUpperCase().trim(); if (code.length !== 5) { joinMsg('El código tiene 5 caracteres.'); return; }
-  if (!NET.avail) { joinMsg('El multijugador solo funciona al abrir el juego desde su enlace de Claude.'); return; }
+  if (!NET.avail) { joinMsg('No se ha podido cargar el sistema online. Comprueba tu conexión a internet y recarga la página.'); return; }
   joinMsg(''); snd('click'); NET.isHost = false; NET.code = code; NET.hadHost = false; NET.joinT = performance.now(); NET.pres = { k: code, n: profile.name, c: profile.color };
-  NET.R = await openRoom(code); NET.online = true; S = null; showScreen('lobby'); renderLobby();
+  qs('#jGo').disabled = true; const R = await openRoom(code, false); qs('#jGo').disabled = false;
+  if (NET.p2p && R.err && !R.ok) { try { R.leave(); } catch (e) {} joinMsg('No se ha podido conectar con el servicio online. Comprueba tu conexión a internet.'); return; }
+  NET.R = R; NET.joinT = performance.now(); NET.online = true; S = null; showScreen('lobby'); renderLobby();
 };
 function renderLobby() {
   qs('#lCode').replaceChildren(); [...(NET.code || '')].forEach(ch => qs('#lCode').append(el('span', null, ch)));
@@ -2426,14 +2467,19 @@ function renderLobby() {
   if (!S) { qs('#lTitle').textContent = 'Buscando partida…'; note.textContent = 'Conectando con la sala ' + NET.code + '.'; qs('#lCount').textContent = 'Tripulación'; start.hidden = true; return; }
   const set = S.set || settings, lob = S.lob || [];
   qs('#lTitle').textContent = NET.isHost ? 'Tu sala' : 'Sala de espera';
-  if (NET.isHost) note.innerHTML = NET.online ? 'Los demás entran con <b>Unirse</b> y este código desde sus dispositivos.' : '<b>Partida local.</b> Para jugar online abre el juego desde su enlace de Claude.';
+  if (NET.isHost) note.innerHTML = NET.online ? 'Los demás entran con <b>Unirse</b> y este código desde sus dispositivos.' + (NET.p2p ? ' También puedes enviarles el enlace de la sala.' : '') : (NET.netErr ? '<b>Sin conexión online.</b> No se ha podido contactar con el servicio de salas; puedes jugar con NPCs.' : '<b>Partida local.</b> No hay conexión online disponible; puedes jugar con NPCs.');
   else note.textContent = 'Esperando a que el anfitrión empiece la partida.';
+  qs('#lShare').hidden = !(NET.isHost && NET.online && NET.p2p && /^https?:/.test(location.protocol));
   const humans = lob.slice(0, set.N); const npcN = set.npc ? Math.max(0, set.N - humans.length) : 0; const total = humans.length + npcN; const ei = Math.min(set.imp, maxImp(total));
   qs('#lCount').textContent = `Tripulación · ${total} de ${set.N}${set.npc ? '' : ' (sin NPCs)'} · ${ei} ${ei === 1 ? 'polizón' : 'polizones'}`;
   humans.forEach(h => { const d = el('div', 'pchip'); const a = el('span'); a.innerHTML = avatarSVG(h.c, false, 32); d.append(a, el('span', null, h.n + (h.pe === NET.myPeer || (!NET.online && h.pe === 'yo') ? ' (tú)' : ''))); list.append(d); });
   for (let i = 0; i < npcN; i++) { const d = el('div', 'pchip npc'); const a = el('span'); a.innerHTML = avatarSVG(9 - (i % 10), false, 32); d.append(a, el('span', null, 'NPC')); list.append(d); }
   start.hidden = !NET.isHost;
 }
+qs('#lShare').onclick = async () => { const u = location.origin + location.pathname + '?sala=' + NET.code; const b = qs('#lShare');
+  try { await navigator.clipboard.writeText(u); b.textContent = '¡Enlace copiado!'; } catch (e) { b.textContent = u; } setTimeout(() => b.textContent = 'Copiar enlace de la sala', 2500); };
+// abrir directamente la pantalla de unirse si el enlace trae ?sala=CÓDIGO
+(() => { const c = (QS.get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); if (c.length === 5) { showScreen('join'); qs('#codeIn').value = c; } })();
 qs('#lStart').onclick = () => { if (!NET.isHost || !S) return; snd('click'); hostStart(); };
 qs('#lLeave').onclick = () => leaveToMenu(null);
 if (!profile.name) nameIn.focus();
@@ -2460,7 +2506,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-if (location.protocol === 'file:' && /pztest/.test(location.search)) window.__pz = { get S() { return S; }, P, local, ST, FIX, VENTS, openTask, openFix, openCams, closeCams, toggleSabo, enterVent, startMeeting: (a, b) => startMeeting(a, b), hostKill: (a, b) => hostKill(a, b), hostSabotage: (a, b) => hostSabotage(a, b), get AV() { return AV; }, freeSpot, ROOMS, CRECTS, CORR, NODES, navPath, nearestNode, movePos, inWalk, losClear, stepToward, wallSegs, hostVote: (a, b) => hostVote(a, b), DUCTS, ductMove, inDuct, get interact() { return interact; }, get ME() { return ME; }, sim: (sec) => { for (let i = 0; i < sec * 20; i++) hostTick(.05); }, info: () => renderer.info.render, MG };
+if ((location.protocol === 'file:' || location.hostname === '127.0.0.1') && /pztest/.test(location.search)) window.__pz = { get S() { return S; }, P, local, ST, FIX, VENTS, openTask, openFix, openCams, closeCams, toggleSabo, enterVent, startMeeting: (a, b) => startMeeting(a, b), hostKill: (a, b) => hostKill(a, b), hostSabotage: (a, b) => hostSabotage(a, b), get AV() { return AV; }, freeSpot, ROOMS, CRECTS, CORR, NODES, navPath, nearestNode, movePos, inWalk, losClear, stepToward, wallSegs, hostVote: (a, b) => hostVote(a, b), sendVote: x => sendVote(x), NET, DUCTS, ductMove, inDuct, get interact() { return interact; }, get ME() { return ME; }, sim: (sec) => { for (let i = 0; i < sec * 20; i++) hostTick(.05); }, info: () => renderer.info.render, MG };
 })();
 </script>
 

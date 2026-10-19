@@ -8,7 +8,9 @@ Abre `index.html` en el navegador (o la página de GitHub Pages del repositorio)
 
 - **Crear partida:** de 1 a 10 jugadores, con opción de rellenar los huecos con NPCs y elegir cuántos polizones hay.
 - **Modo práctica:** juegas solo, eligiendo ser tripulante o polizón, con NPCs quietos repartidos por la nave.
-- **Unirse:** el modo multijugador por código solo funciona al abrir el juego desde su enlace de Claude; desde este repositorio se juega en solitario con NPCs o en modo práctica.
+- **Unirse:** cada jugador entra desde su dispositivo con el código de 5 letras que aparece en la pantalla de quien crea la partida, o con el enlace de la sala que este puede copiar y enviar.
+
+El multijugador conecta los dispositivos directamente entre sí con [PeerJS](https://peerjs.com/), sin servidor propio. Hace falta conexión a internet; en alguna red muy restringida (por ejemplo, algunas redes de empresa o de centros educativos) la conexión entre dispositivos puede no establecerse.
 
 ### Controles
 
