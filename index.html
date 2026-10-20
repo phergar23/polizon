@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
-<meta name="description" content="Polizón a Bordo: juego 3D de tripulantes y polizones en el navegador."><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
 <title>Polizón a Bordo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -625,6 +624,7 @@ LAYOUT.forEach((L, i) => {
     ROOMS.push({ n: L.n || o.n, r: L.r, f: o.f, a: o.a, l: o.l, node: L.ring ? L.ring[0] : f(o.node[0], o.node[1]), ctr: o.ctr ? f(o.ctr[0], o.ctr[1]) : null, ch: L.ch || null, ring: L.ring || null });
   } else ROOMS.push({ n: L.n, r: L.r, f: L.f, a: L.a, l: L.l, node: L.ring ? L.ring[0] : L.node, ctr: L.ring ? [(L.r[0] + L.r[2]) / 2, (L.r[1] + L.r[3]) / 2] : null, ch: L.ch || null, hall: L.hall || 0, ring: L.ring || null });
 });
+const FLOORCOL = { 'Comedor': 0xffffff, 'Navegación': 0x93a3b6, 'Médico': 0xc6d3dc, 'Reactor': 0x8e88aa, 'Electricidad': 0x938a72, 'Comunicaciones': 0x8495a2, 'Administración': 0xa8767a, 'Observatorio': 0x93a896, 'Sala de armas': 0xcfbf9f, 'Seguridad': 0x86ab92, 'Taquillas': 0xaaa5c2, 'Cruce este': 0xb4c0c9, 'Zona de carga': 0x8c9196 };
 function inShape(i, x, z, m = 0) { const R = ROOMS[i], r = R.r; if (x < r[0] + m || x > r[2] - m || z < r[1] + m || z > r[3] - m) return false; const ch = R.ch; if (!ch) return true; const k = m * 1.4142;
   return !((ch[0] && (x - r[0]) + (z - r[1]) < ch[0] + k) || (ch[1] && (r[2] - x) + (z - r[1]) < ch[1] + k) || (ch[2] && (r[2] - x) + (r[3] - z) < ch[2] + k) || (ch[3] && (x - r[0]) + (r[3] - z) < ch[3] + k)); }
 const xfPt = (x, z) => { const i = origRoomAt(x, z); return i >= 0 && XF[i] ? XF[i].f(x, z) : null; };
@@ -747,8 +747,8 @@ function seat(i, n) { const a = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2
 const canvas = qs('#c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a0d18); scene.fog = new THREE.Fog(0x262c3c, 28, 80);
-const FOG_C = new THREE.Color(0x262c3c), FOG_D = new THREE.Color(0x04050e);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x15191c); scene.fog = new THREE.Fog(0x2a3034, 30, 85);
+const FOG_C = new THREE.Color(0x2a3034), FOG_D = new THREE.Color(0x04050e);
 const camera = new THREE.PerspectiveCamera(72, 1, .05, 220); camera.rotation.order = 'YXZ';
 const IS_TOUCH = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches);
 const APP = document.getElementById('app'); let ROT = false;
@@ -766,7 +766,7 @@ function resize() {
 async function goLandscape() { if (!IS_TOUCH) return; try { const el3 = document.documentElement; if (!document.fullscreenElement && el3.requestFullscreen) await el3.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {} try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) {} setTimeout(resize, 300); }
 addEventListener('orientationchange', () => setTimeout(resize, 250));
 addEventListener('resize', resize); resize();
-const hemi = new THREE.HemisphereLight(0xe6eeff, 0x5a6478, .55); scene.add(hemi);
+const hemi = new THREE.HemisphereLight(0xf2f4f6, 0x5c6266, .6); scene.add(hemi);
 const amb = new THREE.AmbientLight(0xffffff, .12); scene.add(amb);
 const sun = new THREE.DirectionalLight(0xfff4e6, .38); sun.position.set(8, 20, 10); scene.add(sun);
 const LIGHTS = [];
@@ -796,11 +796,15 @@ function cvs(w, h, f) { const c = document.createElement('canvas'); c.width = w;
 function rr(g, x, y, w, h, r) { r = Math.max(0, Math.min(r, w / 2, h / 2)); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 
 const FLOOR_T = new THREE.CanvasTexture(cvs(256, 256, (g) => {
-  g.fillStyle = '#c9ced8'; g.fillRect(0, 0, 256, 256);
-  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { const x = i * 128, y = j * 128; g.fillStyle = (i + j) % 2 ? '#e3e7ee' : '#eef1f5'; g.fillRect(x + 4, y + 4, 120, 120);
-    g.fillStyle = 'rgba(40,50,70,.08)'; for (let a = 0; a < 6; a++) for (let b = 0; b < 6; b++) { g.save(); g.translate(x + 14 + a * 20, y + 14 + b * 20); g.rotate((a + b) % 2 ? .6 : -.6); g.fillRect(-5, -1.5, 10, 3); g.restore(); }
-    g.fillStyle = '#a7aebb'; [[10, 10], [118, 10], [10, 118], [118, 118]].forEach(([u, v]) => { g.beginPath(); g.arc(x + u, y + v, 3.5, 0, 7); g.fill(); }); }
+  g.fillStyle = '#8d959e'; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { const x = i * 64, y = j * 64; g.fillStyle = (i * 7 + j * 3) % 5 ? '#eef0f2' : '#e6e9ec'; g.fillRect(x + 2, y + 2, 60, 60);
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(x + 4, y + 4, 56, 3); g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(x + 4, y + 57, 56, 3); }
 }));
+const CHECK_T = new THREE.CanvasTexture(cvs(256, 256, (g) => {
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { g.fillStyle = (i + j) % 2 ? '#9aa3aa' : '#e4e7ea'; g.fillRect(i * 64, j * 64, 64, 64); }
+  g.strokeStyle = 'rgba(80,90,100,.35)'; g.lineWidth = 2; for (let k = 0; k <= 256; k += 64) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 256); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(256, k); g.stroke(); }
+}));
+CHECK_T.wrapS = CHECK_T.wrapT = THREE.RepeatWrapping;
 FLOOR_T.wrapS = FLOOR_T.wrapT = THREE.RepeatWrapping; FLOOR_T.anisotropy = 4;
 const WALL_T = new THREE.CanvasTexture(cvs(256, 256, (g) => {
   g.fillStyle = '#eef0f4'; g.fillRect(0, 0, 256, 256);
@@ -855,22 +859,22 @@ function buildShip() {
   allR.forEach((R, idx) => {
     const [x0, z0, x1, z1] = R, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, isRoom = idx < NR, room = isRoom ? ROOMS[idx] : null, dy = isRoom ? 0 : .002 * (1 + idx % 9);
     const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); scaleUV(fg, w / 2, d / 2);
-    const fm = new THREE.Mesh(fg, toon(isRoom && !room.hall ? mix(0x8e97a6, room.a, .14) : 0x7f8899, { map: FLOOR_T })); fm.position.set(cx, dy, cz); world.add(fm);
-    const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x3a4150 : 0x323846)); cm.position.set(cx, WALL_H - dy, cz); world.add(cm);
+    const fm = new THREE.Mesh(fg, toon(isRoom ? (FLOORCOL[room.n] ?? 0xb4c0c9) : 0xb4c0c9, { map: isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(cx, dy, cz); world.add(fm);
+    const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(cx, WALL_H - dy, cz); world.add(cm);
     const lampM = basic(0xfff3d6);
     if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
     else { const vert = CRECTS[idx - NR].vert, L = vert ? d : w; for (let s2 = 2; s2 < L - 1; s2 += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(vert ? 1.2 : .5, vert ? .5 : 1.2), lampM); l.rotation.x = Math.PI / 2; l.position.set(vert ? cx : x0 + s2, WALL_H - .01 - dy, vert ? z0 + s2 : cz); world.add(l); }
-      const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .18 : w, vert ? d : .18), basic(0x7ff6ff)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .012 + dy, cz); world.add(strip); }
+      const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .14 : w, vert ? d : .14), basic(0x8fa8b5)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .012 + dy, cz); world.add(strip); }
   });
-  const corrWall = toon(0xaab2c0, { map: WALL_T }), corrAcc = toon(0x3fd0e0, { e: 0x3fd0e0, ei: .35 }), corrBase = toon(0x4a5263);
+  const corrWall = toon(0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
   // paredes diagonales de las esquinas achaflanadas
-  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(0xb3bac7, R.a, .1), { map: WALL_T }), accM = R.hall ? corrAcc : toon(R.a, { e: R.a, ei: .3 }), baseM = R.hall ? corrBase : toon(mix(0x4a5263, R.a, .2));
+  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(0x78838b, R.a, .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
     [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
       const L = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, th = Math.atan2(n[0], n[1]), g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
       const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m);
       const ix = n[0] * .03 / 1.414, iz = n[1] * .03 / 1.414; box(L, .16, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L, .26, .07, baseM, mx + ix, .13, mz + iz, null, false).rotation.y = th; }); });
   wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
-    const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(0xb3bac7, room.a, .1), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(room.a, { e: room.a, ei: .3 }) : corrAcc, baseM = isRoom && !hl ? toon(mix(0x4a5263, room.a, .2)) : corrBase;
+    const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(0x78838b, room.a, .06), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(mix(room.a, 0x8a9399, .35), { e: room.a, ei: .18 }) : corrAcc, baseM = isRoom && !hl ? toon(0x3c444a) : corrBase;
     const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
     const m = new THREE.Mesh(g, wallM); m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
     if (e.ax === 'z') m.position.set(mid, WALL_H / 2, e.v); else m.position.set(e.v, WALL_H / 2, mid); world.add(m);
@@ -1931,9 +1935,9 @@ function drawMap(cv, big, opt = {}) {
   const g = cv.getContext('2d'), W = cv.width, Hh = cv.height; const { sc, ox, oz } = mapXf(cv, big);
   const X = x => ox + (x - MB.x0) * sc, Z = z => oz + (z - MB.z0) * sc; const t = performance.now() / 1000;
   g.clearRect(0, 0, W, Hh);
-  g.fillStyle = '#3a4384'; CRECTS.forEach(c => g.fillRect(X(c.r[0]), Z(c.r[1]), (c.r[2] - c.r[0]) * sc, (c.r[3] - c.r[1]) * sc));
+  g.fillStyle = hex(darker(0xb4c0c9, .45)); CRECTS.forEach(c => g.fillRect(X(c.r[0]), Z(c.r[1]), (c.r[2] - c.r[0]) * sc, (c.r[3] - c.r[1]) * sc));
   const doors = (S && S.doors) || {}, dcs = (S && S.dc) || {};
-  ROOMS.forEach((r, i) => { g.fillStyle = r.hall ? '#3a4384' : hex(darker(r.a, .55)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
+  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(FLOORCOL[r.n] ?? 0xb4c0c9, .45)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
     if (big) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * 1.7)}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
     if (opt.sabo) { const cx = X((r.r[0] + r.r[2]) / 2), cz = Z((r.r[1] + r.r[3]) / 2) + sc * .8; const closed = doors[i], cd = dcs[i]; g.save(); g.translate(cx, cz); g.scale(1.6, 1.6); g.translate(-cx, -cz);
       g.fillStyle = closed ? '#ff5a6e' : cd ? 'rgba(255,255,255,.25)' : '#c9a0ff'; rr(g, cx - sc * 1.6, cz - sc * 1.1, sc * 3.2, sc * 2.4, sc * .6); g.fill();
