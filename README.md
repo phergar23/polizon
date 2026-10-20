@@ -27,11 +27,12 @@ En el móvil el juego se pone en horizontal automáticamente.
 
 ## Qué incluye
 
-- Nave de 15 salas con pasillo en anillo alrededor del Comedor.
-- 22 tareas con su propio objeto 3D y 20 minijuegos animados.
+- Nave de 12 salas según un plano dibujado a mano: Comedor octogonal con el botón de emergencia en la mesa central, Sala de armas, Navegación, Observatorio, Administración, Almacén redondo, Comunicaciones, Reactor, Médico, Seguridad, Electricidad y Taquillas.
+- 22 tareas con su propio objeto 3D y minijuegos animados.
 - Polizones con alcantarillas que se recorren andando por conductos y sabotajes (luces, reactor, comunicaciones y cierre de puertas).
 - Sala de Seguridad con cuatro cámaras en directo.
 - Reuniones con chat, votación, recuento de votos y animaciones.
 - NPCs que hacen tareas, arreglan sabotajes, reportan cuerpos y votan.
+- El polizón tiene que esperar 22 segundos entre eliminación y eliminación.
 
 Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño original.

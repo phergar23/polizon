@@ -215,7 +215,7 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 #end .card{width:min(560px,100%)}
 #end h1{font-family:var(--fd);font-weight:400;font-size:clamp(36px,calc(var(--aw,100vw) * 0.08),58px);margin:0;text-align:center;line-height:1;text-wrap:balance}
 #end p.r{text-align:center;margin:0;color:var(--mute);font-size:17px}
-#bigmap .mapc{width:min(720px,100%,calc((calc(var(--ah,100vh) * 1) - 40px) * .93));background:rgba(12,15,52,.95);border:4px solid #4552c4;border-radius:26px;padding:12px;box-sizing:border-box;position:relative}
+#bigmap .mapc{width:min(960px,100%,calc((calc(var(--ah,100vh) * 1) - 40px) * 1.45));background:rgba(12,15,52,.95);border:4px solid #4552c4;border-radius:26px;padding:12px;box-sizing:border-box;position:relative}
 #bigmap canvas{width:100%;height:auto;display:block}
 #bigmap .x{position:absolute;top:10px;right:10px}
 #confirm .card{width:min(360px,100%);text-align:center}
@@ -495,9 +495,9 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 <div id="splash" hidden><div class="rays"></div><div class="stage" id="spStage"></div><h1 id="spTitle"></h1><p id="spSub"></p></div>
 <div id="hitFlash"></div>
 <section class="screen" id="end" hidden><div class="card" id="endCard"></div></section>
-<div class="ov dim" id="bigmap" hidden><div class="mapc"><canvas id="mapC" width="1260" height="1352"></canvas><button class="ib x" id="mapX" aria-label="Cerrar mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
+<div class="ov dim" id="bigmap" hidden><div class="mapc"><canvas id="mapC" width="1400" height="940"></canvas><button class="ib x" id="mapX" aria-label="Cerrar mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 <div id="cams" hidden><div id="camBar"><span>Cámaras de seguridad · <span id="camClock"></span></span><button class="btn coral" id="camX" type="button">Salir (E)</button></div></div>
-<div class="ov dim" id="sabo" hidden><div class="sbox" role="dialog" aria-modal="true" aria-labelledby="sbT"><div class="shead"><h3 id="sbT">Sabotaje</h3><button class="ib" id="sbX" aria-label="Cerrar sabotaje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><canvas id="sbMap" width="1000" height="1073" aria-label="Mapa: toca una sala para cerrar sus puertas"></canvas><p class="note">Toca una sala del mapa para cerrar sus puertas durante 10 segundos.</p><div id="sbBtns"></div></div></div>
+<div class="ov dim" id="sabo" hidden><div class="sbox" role="dialog" aria-modal="true" aria-labelledby="sbT"><div class="shead"><h3 id="sbT">Sabotaje</h3><button class="ib" id="sbX" aria-label="Cerrar sabotaje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><canvas id="sbMap" width="1150" height="770" aria-label="Mapa: toca una sala para cerrar sus puertas"></canvas><p class="note">Toca una sala del mapa para cerrar sus puertas durante 10 segundos.</p><div id="sbBtns"></div></div></div>
 <div class="screen" id="confirm" hidden><div class="card"><h2 id="cfT">¿Salir?</h2><p class="note" id="cfP"></p><div class="row"><button class="btn ghost" id="cfNo">Cancelar</button><button class="btn coral" id="cfYes">Salir</button></div></div></div>
 
 </div>
@@ -522,9 +522,9 @@ const wrapA = a => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) 
 const COLORS = [
   { n: 'Rojo', h: 0xff4757 }, { n: 'Azul', h: 0x3d7bff }, { n: 'Verde', h: 0x2ed573 }, { n: 'Rosa', h: 0xff7ac6 }, { n: 'Naranja', h: 0xff9f1a },
   { n: 'Amarillo', h: 0xffd93d }, { n: 'Morado', h: 0x9b5cff }, { n: 'Cian', h: 0x2ee6e6 }, { n: 'Blanco', h: 0xeef0ff }, { n: 'Marrón', h: 0xa86f45 }];
-const WALL_H = 3.2, EYE = 1.12, PR = 0.36, SPEED = 4.2, KILL_CD = 24, KILL_R = 2.0, USE_R = 1.5, REPORT_R = 2.8, MEET_T = 60, EJECT_T = 7;
+const WALL_H = 3.2, EYE = 1.12, PR = 0.36, SPEED = 4.2, KILL_CD = 22, KILL_R = 2.0, USE_R = 1.5, REPORT_R = 2.8, MEET_T = 60, EJECT_T = 7;
 const SAB_CD = 30, DOOR_T = 10, DOOR_CD = 22, REACTOR_T = 45, TASKS_PER = 6;
-const BTN = { x: 0, z: 0 };
+const BTN = { x: 0, z: -12 };
 
 const ROOMS = [
   { n: 'Comedor', r: [-9, -8, 9, 8], f: 0xffe7b5, a: 0xff9f43, l: 0xffd59a, node: [0, -3.2], ctr: [0, 0] },
@@ -595,53 +595,71 @@ const VENTS = [
   { p: [-7.5, -6.8], net: 1, via: [-7.3, 0] }, { p: [11.5, 16.5], net: 1 }, { p: [23.5, 21.5], net: 1 }, { p: [-5.8, 25.5], net: 1 },
   { p: [-24, -20.5], net: 2 }, { p: [-4.5, -21.5], net: 2 }, { p: [6.5, -44.5], net: 2 },
   { p: [30.8, -5.6], net: 3 }, { p: [31, -24], net: 3 }, { p: [12.5, -11.2], net: 3 }];
-// ---- trazado ampliado: cada sala original se desplaza y se añaden dos salas nuevas
-const OFFS = [[0, 0], [0, -10.5], [-18, 0], [18, 0], [0, 14], [-18, -11.5], [18, -11.5], [-18, 14], [18, 14], [-10.5, 6.5], [10.5, -6.5], [10.5, 6.5], [0, -16]];
+// ---- trazado según el plano dibujado: las salas que se conservan se trasladan (y giran) con todo su contenido
 const ORIG = ROOMS.map(r => r.r.slice());
 function origRoomAt(x, z, m = .9) { for (let i = 0; i < ORIG.length; i++) { const r = ORIG[i]; if (x >= r[0] - m && x <= r[2] + m && z >= r[1] - m && z <= r[3] + m) return i; } return -1; }
-const offAt = (x, z) => { const i = origRoomAt(x, z); return i < 0 ? [0, 0] : OFFS[i]; };
-function remapXZ(x, z) { const o = offAt(x, z); return [x + o[0], z + o[1]]; }
-ROOMS.forEach((r, i) => { const [dx, dz] = OFFS[i]; r.r = [r.r[0] + dx, r.r[1] + dz, r.r[2] + dx, r.r[3] + dz]; r.node = [r.node[0] + dx, r.node[1] + dz]; if (r.ctr) r.ctr = [r.ctr[0] + dx, r.ctr[1] + dz]; });
-OBS.forEach(o => { [o.x, o.z] = remapXZ(o.x, o.z); });
-[...ST, ...FIX].forEach(s => { const [dx, dz] = offAt(s.c[0], s.c[1]); s.c = [s.c[0] + dx, s.c[1] + dz]; if (s.via) s.via = [s.via[0] + dx, s.via[1] + dz]; });
-CAMS.forEach(c => { const [dx, dz] = offAt(c.p[0], c.p[2]); c.p[0] += dx; c.p[2] += dz; c.t[0] += dx; c.t[2] += dz; });
-CAM_DESK.p = remapXZ(CAM_DESK.p[0], CAM_DESK.p[1]);
-VENTS.forEach(v => { const [dx, dz] = offAt(v.p[0], v.p[1]); v.p = [v.p[0] + dx, v.p[1] + dz]; if (v.via) v.via = [v.via[0] + dx, v.via[1] + dz]; });
-// salas nuevas
-ROOMS.push({ n: 'Taquillas', r: [-30, -26, -22, -18], f: 0xe6e0ff, a: 0x7a6bff, l: 0xe0d8ff, node: [-26, -22] },
-  { n: 'Depósito', r: [20, 36, 28, 44], f: 0xd2f2ff, a: 0x1fa3c9, l: 0xc8f0ff, node: [24, 40] });
-for (let k = 0; k < 7; k++) OBS.push({ x: -29 + k, z: -25.5, r: .5 });
-OBS.push({ x: -23.1, z: -19.1, r: .45 }, { x: 22.2, z: 37.6, r: 1.3 }, { x: 25.8, z: 37.6, r: 1.3 });
-ST.push({ c: [-26, -18.55], t: 'sort', n: 'Ordenar taquillas' }, { c: [24, 43.45], t: 'fuel', n: 'Purificar agua' });
-VENTS.splice(6, 0, { p: [26.9, 42.7], net: 1 });
-VENTS.splice(9, 0, { p: [-28.9, -19.3], net: 2 });
+const HP = Math.PI / 2;
+// [sala original, nombre, rectángulo nuevo, giro, chaflanes tl,tr,br,bl]; el orden fija el índice (Seguridad debe ser la 9)
+const LAYOUT = [
+  { src: 0, r: [-10, -20, 10, -4], rot: 0, ch: [4, 4, 4, 4] },
+  { src: 1, n: 'Navegación', r: [46.5, -4, 57.5, 8], rot: -HP, ch: [0, 3, 3, 0] },
+  { src: 5, n: 'Médico', r: [-32, -8, -20, 5], rot: Math.PI },
+  { src: 7, r: [-52, -4, -40, 8], rot: 0 },
+  { src: 8, r: [-32, 18, -20, 30], rot: Math.PI },
+  { src: 10, r: [20, 38, 29, 45], rot: Math.PI },
+  { src: 11, r: [7.5, 3.5, 16.5, 12.5], rot: 0 },
+  { src: 12, r: [28, -12, 36, 4], rot: HP },
+  { src: -1, n: 'Sala de armas', r: [34, -26, 46, -14], f: 0xffd9c2, a: 0xe85d3a, l: 0xffc8a8, node: [38, -17] },
+  { src: 9, r: [-32, 7, -25, 16], rot: HP },
+  { src: -1, n: 'Almacén', r: [33, 27, 47, 41], ch: [4, 4, 4, 4], f: 0xeedcc2, a: 0xc9873e, l: 0xffe0b0, node: [37, 31] },
+  { src: -1, n: 'Taquillas', r: [-48, 30, -40, 38], f: 0xe6e0ff, a: 0x7a6bff, l: 0xe0d8ff, node: [-44, 34] }];
+const XF = {}; // transformación de cada sala original conservada
+const OLDROOMS = ROOMS.slice(); ROOMS.length = 0;
+LAYOUT.forEach((L, i) => {
+  const c = [(L.r[0] + L.r[2]) / 2, (L.r[1] + L.r[3]) / 2];
+  if (L.src >= 0) { const o = OLDROOMS[L.src], oc = [(o.r[0] + o.r[2]) / 2, (o.r[1] + o.r[3]) / 2], cs = Math.cos(L.rot), sn = Math.sin(L.rot);
+    const f = (x, z) => { const dx = x - oc[0], dz = z - oc[1]; return [c[0] + dx * cs + dz * sn, c[1] - dx * sn + dz * cs]; };
+    const m = new THREE.Matrix4().makeTranslation(c[0], 0, c[1]).multiply(new THREE.Matrix4().makeRotationY(L.rot)).multiply(new THREE.Matrix4().makeTranslation(-oc[0], 0, -oc[1]));
+    XF[L.src] = { f, m, rot: L.rot, room: i };
+    ROOMS.push({ n: L.n || o.n, r: L.r, f: o.f, a: o.a, l: o.l, node: f(o.node[0], o.node[1]), ctr: o.ctr ? f(o.ctr[0], o.ctr[1]) : null, ch: L.ch || null });
+  } else ROOMS.push({ n: L.n, r: L.r, f: L.f, a: L.a, l: L.l, node: L.node, ctr: null, ch: L.ch || null });
+});
+function inShape(i, x, z, m = 0) { const R = ROOMS[i], r = R.r; if (x < r[0] + m || x > r[2] - m || z < r[1] + m || z > r[3] - m) return false; const ch = R.ch; if (!ch) return true; const k = m * 1.4142;
+  return !((ch[0] && (x - r[0]) + (z - r[1]) < ch[0] + k) || (ch[1] && (r[2] - x) + (z - r[1]) < ch[1] + k) || (ch[2] && (r[2] - x) + (r[3] - z) < ch[2] + k) || (ch[3] && (x - r[0]) + (r[3] - z) < ch[3] + k)); }
+const xfPt = (x, z) => { const i = origRoomAt(x, z); return i >= 0 && XF[i] ? XF[i].f(x, z) : null; };
+// obstáculos, tareas, arreglos, alcantarillas y cámaras de las salas conservadas
+const OBS0 = OBS.splice(0); OBS0.forEach(o => { const q = xfPt(o.x, o.z); if (!q) return; const ri = roomAt(q[0], q[1]); if (ri >= 0 && inShape(ri, q[0], q[1], .2)) OBS.push({ x: q[0], z: q[1], r: o.r }); });
+const ST_OVR = { 2: { t: 'gauge', n: 'Fijar rumbo' }, 3: { t: 'shields', n: 'Revisar escudos' }, 4: { t: 'gauge', n: 'Calibrar telescopio' }, 5: { t: 'download', n: 'Descargar mapa estelar' } };
+const ST0 = ST.splice(0);
+ST.push({ c: [-4, -19.45], t: 'trash', n: 'Vaciar basura' }, { c: [4, -19.45], t: 'download', n: 'Descargar datos' });
+ST0.forEach((t, k) => { if (k < 2) return; const i = origRoomAt(t.c[0], t.c[1]); if (i < 0 || !XF[i]) return; const q = XF[i].f(t.c[0], t.c[1]); const v = t.via ? XF[i].f(t.via[0], t.via[1]) : null; ST.push(Object.assign({}, t, ST_OVR[k] || {}, { c: q, via: v || undefined })); });
+ST.push({ c: [37.5, -25.45], t: 'asteroids', n: 'Destruir asteroides' }, { c: [43, -25.45], t: 'power', n: 'Cargar cañones' },
+  { c: [40, 40.45], t: 'sort', n: 'Ordenar cajas' }, { c: [46.45, 34], t: 'fuel', n: 'Cargar combustible' }, { c: [-44, 37.45], t: 'sort', n: 'Ordenar taquillas' });
+FIX.forEach(t => { const i = origRoomAt(t.c[0], t.c[1]); t.c = XF[i].f(t.c[0], t.c[1]); if (t.via) t.via = XF[i].f(t.via[0], t.via[1]); });
+{ const c0 = CAMS[0], i = origRoomAt(c0.p[0], c0.p[2]); const p0 = XF[i].f(c0.p[0], c0.p[2]), t0 = XF[i].f(c0.t[0], c0.t[2]); c0.p = [p0[0], c0.p[1], p0[1]]; c0.t = [t0[0], c0.t[1], t0[1]];
+  CAMS.length = 1; CAMS.push({ n: 'Pasillo oeste', p: [-35, 2.85, -11], t: [-36, .4, 8] }, { n: 'Sala de armas', p: [34.6, 2.85, -25.4], t: [41, .4, -18] }, { n: 'Almacén', p: [38, 2.85, 27.6], t: [40, .4, 36] }); }
+CAM_DESK.p = xfPt(CAM_DESK.p[0], CAM_DESK.p[1]);
+{ const V0 = VENTS.splice(0), pickV = (k, net) => { const v = V0[k], i = origRoomAt(v.p[0], v.p[1]); return { p: XF[i].f(v.p[0], v.p[1]), net }; };
+  VENTS.push(pickV(1, 0), pickV(7, 0), pickV(2, 0), pickV(5, 0), { p: [-46.8, 36.6], net: 0 },
+    { p: [-8.2, -6.6], net: 1, via: [-8.3, -12] }, pickV(4, 1), pickV(12, 1),
+    { p: [44.6, -24.6], net: 2 }, pickV(9, 2), pickV(8, 2), { p: [36.5, 30.5], net: 2 }); }
+for (let k = 0; k < 7; k++) OBS.push({ x: -47 + k, z: -0 + 30.5, r: .5 });
+OBS.push({ x: -41.2, z: 37.1, r: .45 }, { x: 42, z: -19.5, r: 1.45 }, { x: 44.6, z: -15.4, r: .8 }, { x: 43.4, z: 30.6, r: 1.2 }, { x: 43.4, z: 37.4, r: 1.2 }, { x: 36.4, z: 38.2, r: .5 }, { x: -4.5, z: -4.4, r: .7 }, { x: 4.5, z: -4.4, r: .7 });
 // pasillos: polilíneas; a/b = sala en cada extremo (-1 si enlaza con otro pasillo)
 const CORR = [
-  { p: [[-16, 14], [-16, 0], [-16, -14], [0, -14], [16, -14], [16, 0], [16, 14]], a: -1, b: -1 },
-  { p: [[16, 14], [0, 14], [-16, 14]], a: -1, b: -1 },
-  { p: [[0, -8], [0, -14]], a: 0, b: -1 }, { p: [[-9, 0], [-16, 0]], a: 0, b: -1 }, { p: [[9, 0], [16, 0]], a: 0, b: -1 }, { p: [[0, 8], [0, 14]], a: 0, b: -1 },
-  { p: [[0, -14], [0, -22], [-5, -22], [-5, -27], [0, -27], [0, -30.5]], a: -1, b: 1 },
-  { p: [[0, -41.5], [0, -54]], a: 1, b: 12, w: 3 },
-  { p: [[-16, -14], [-16, -22], [-22, -22]], a: -1, b: 13 },
-  { p: [[-30, -22], [-34, -22], [-34, -36.5], [-40, -36.5]], a: 13, b: 5 },
-  { p: [[-46, -29.5], [-46, -14], [-46, -7]], a: 5, b: 2 },
-  { p: [[-6, -35.5], [-20, -35.5], [-20, -30], [-34, -30]], a: 1, b: -1 },
-  { p: [[6, -35.5], [20, -35.5], [20, -30], [34, -30]], a: 1, b: -1 },
-  { p: [[40, -36.5], [34, -36.5], [34, -30]], a: 6, b: -1 },
-  { p: [[46, -29.5], [46, -14], [46, -7]], a: 6, b: 3 },
-  { p: [[26, -16.5], [26, -14], [16, -14]], a: 10, b: -1 },
-  { p: [[26, -14], [46, -14]], a: -1, b: -1 },
-  { p: [[-16, -14], [-46, -14]], a: -1, b: -1 },
-  { p: [[-26, 16.5], [-26, 14], [-16, 14]], a: 9, b: -1 },
-  { p: [[-46, 7], [-46, 32]], a: 2, b: 7 },
-  { p: [[-16, 0], [-40, 0]], a: -1, b: 2 },
-  { p: [[-40, 40], [-28, 40], [-28, 30], [-14, 30], [-14, 40], [-7, 40]], a: 7, b: 4 },
-  { p: [[0, 14], [0, 34]], a: -1, b: 4 },
-  { p: [[20.5, 20], [16, 20], [16, 14]], a: 11, b: -1 },
-  { p: [[16, 0], [40, 0]], a: -1, b: 3 },
-  { p: [[46, 7], [46, 32]], a: 3, b: 8 },
-  { p: [[40, 40], [28, 40]], a: 8, b: 14 },
-  { p: [[20, 40], [7, 40]], a: 14, b: 4 }];
+  { p: [[-10, -12], [-26, -12], [-36, -12], [-36, 4], [-36, 11.5], [-36, 34]], a: 0, b: -1 },
+  { p: [[-26, -12], [-26, -8]], a: -1, b: 2 },
+  { p: [[-40, 4], [-36, 4]], a: 3, b: -1 },
+  { p: [[-36, 11.5], [-32, 11.5]], a: -1, b: 9 },
+  { p: [[-26, 30], [-26, 34]], a: 4, b: -1 },
+  { p: [[-40, 34], [-36, 34], [-26, 34], [0, 34], [24.5, 34], [33, 34]], a: 11, b: 10 },
+  { p: [[0, -4], [0, 8], [0, 34]], a: 0, b: -1 },
+  { p: [[0, 8], [7.5, 8]], a: -1, b: 6 },
+  { p: [[24.5, 34], [24.5, 38]], a: -1, b: 5 },
+  { p: [[10, -12], [22, -12], [22, -20], [34, -20]], a: 0, b: 8 },
+  { p: [[40, -14], [40, -4], [40, 2], [40, 27]], a: 8, b: 10 },
+  { p: [[36, -4], [40, -4]], a: 7, b: -1 },
+  { p: [[40, 2], [46.5, 2]], a: -1, b: 1 }];
 const CRECTS = [], WALK = ROOMS.map(r => r.r), DOORS = [];
 CORR.forEach((c, ci) => { const w = c.w || 4, h = w / 2, n = c.p.length;
   for (let i = 0; i < n - 1; i++) { const A = c.p[i], B = c.p[i + 1], vert = Math.abs(A[0] - B[0]) < 1e-6, sR = i === 0 && c.a >= 0, eR = i === n - 2 && c.b >= 0;
@@ -652,10 +670,10 @@ CORR.forEach((c, ci) => { const w = c.w || 4, h = w / 2, n = c.p.length;
     DOORS.push({ room: ri, pt, vert, w, x0: pt[0] - h, x1: pt[0] + h, z0: pt[1] - h, z1: pt[1] + h, rect: vert ? [pt[0] - h, pt[1] - .16, pt[0] + h, pt[1] + .16] : [pt[0] - .16, pt[1] - h, pt[0] + .16, pt[1] + h], o: 1 }); });
 });
 // paredes: abre los tramos que dan a otra zona transitable y no repite paredes coincidentes
-function wallSegs(rects) {
+function wallSegs(rects, chs) {
   const seen = new Map(), out = [], eps = 1e-3;
-  rects.forEach((R, ri) => { const [x0, z0, x1, z1] = R;
-    [{ ax: 'z', v: z0, a: x0, b: x1, out: -1 }, { ax: 'z', v: z1, a: x0, b: x1, out: 1 }, { ax: 'x', v: x0, a: z0, b: z1, out: -1 }, { ax: 'x', v: x1, a: z0, b: z1, out: 1 }].forEach(e => {
+  rects.forEach((R, ri) => { const [x0, z0, x1, z1] = R, c = (chs && chs[ri]) || [0, 0, 0, 0];
+    [{ ax: 'z', v: z0, a: x0 + c[0], b: x1 - c[1], out: -1 }, { ax: 'z', v: z1, a: x0 + c[3], b: x1 - c[2], out: 1 }, { ax: 'x', v: x0, a: z0 + c[0], b: z1 - c[3], out: -1 }, { ax: 'x', v: x1, a: z0 + c[1], b: z1 - c[2], out: 1 }].forEach(e => {
       const open = [];
       rects.forEach((B, bi) => { if (bi === ri) return; const lo = e.ax === 'z' ? B[1] : B[0], hi = e.ax === 'z' ? B[3] : B[2], a0 = e.ax === 'z' ? B[0] : B[1], a1 = e.ax === 'z' ? B[2] : B[3];
         const outward = e.out < 0 ? (lo < e.v - eps && hi >= e.v - eps) : (hi > e.v + eps && lo <= e.v + eps); if (!outward) return;
@@ -692,7 +710,7 @@ const NODES = ROOMS.map(r => r.node.slice()), ADJ = ROOMS.map(() => []);
 const link = (a, b) => { ADJ[a].push(b); ADJ[b].push(a); };
 const addNode = p => { NODES.push(p.slice()); ADJ.push([]); return NODES.length - 1; };
 // el comedor tiene la mesa del botón en el centro: los NPC lo rodean por un anillo de puntos
-const CAF = [0, addNode([3.2, 0]), addNode([0, 3.2]), addNode([-3.2, 0])]; link(CAF[0], CAF[1]); link(CAF[1], CAF[2]); link(CAF[2], CAF[3]); link(CAF[3], CAF[0]);
+const CAF = [0, addNode([BTN.x + 3.2, BTN.z]), addNode([BTN.x, BTN.z + 3.2]), addNode([BTN.x - 3.2, BTN.z])]; link(CAF[0], CAF[1]); link(CAF[1], CAF[2]); link(CAF[2], CAF[3]); link(CAF[3], CAF[0]);
 const nearCaf = (x, z) => CAF.reduce((b, k) => Math.hypot(NODES[k][0] - x, NODES[k][1] - z) < Math.hypot(NODES[b][0] - x, NODES[b][1] - z) ? k : b, CAF[0]);
 const NK = new Map(); const nodeAt = q => { const k = q[0].toFixed(2) + ',' + q[1].toFixed(2); if (!NK.has(k)) NK.set(k, addNode(q)); return NK.get(k); };
 CORR.forEach(c => { const ids = c.p.map(nodeAt); for (let i = 0; i < ids.length - 1; i++) link(ids[i], ids[i + 1]);
@@ -710,7 +728,7 @@ let DOOR_ON = new Set();
 function doorBlocked(x, z, rad) { if (!DOOR_ON.size) return false; for (const d of DOORS) { if (!DOOR_ON.has(d.room)) continue; const r = d.rect; if (x > r[0] - rad && x < r[2] + rad && z > r[1] - rad && z < r[3] + rad) return true; } return false; }
 const BUMP = .82; // distancia mínima entre dos personajes
 function freeSpot(x, z) { if (!inWalk(x, z, PR) || doorBlocked(x, z, PR)) return false; for (const o of OBS) if (Math.hypot(x - o.x, z - o.z) < o.r + PR - .03) return false; return true; }
-function inWalk(x, z, rad) { for (const w of WALK) if (x > w[0] + rad && x < w[2] - rad && z > w[1] + rad && z < w[3] - rad) return true; return false; }
+function inWalk(x, z, rad) { for (let i = 0; i < WALK.length; i++) { const w = WALK[i]; if (x > w[0] + rad && x < w[2] - rad && z > w[1] + rad && z < w[3] - rad && (i >= ROOMS.length || !ROOMS[i].ch || inShape(i, x, z, rad))) return true; } return false; }
 function movePos(p, dx, dz, rad, ghost) {
   const dchk = !ghost && DOOR_ON.size && !doorBlocked(p.x, p.z, rad);
   const ok = (x, z) => inWalk(x, z, rad) && !(dchk && doorBlocked(x, z, rad));
@@ -720,7 +738,7 @@ function movePos(p, dx, dz, rad, ghost) {
     if (d < m) { if (d < 1e-4) { nx = p.x; nz = p.z; continue; } const px = o.x + ex / d * m, pz = o.z + ez / d * m; if (ok(px, pz)) { nx = px; nz = pz; } else { nx = p.x; nz = p.z; } } }
   p.x = nx; p.z = nz;
 }
-function seat(i, n) { const a = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2, x = Math.cos(a) * 3, z = Math.sin(a) * 3; return { x, z, yaw: Math.atan2(x, z) }; }
+function seat(i, n) { const a = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2, x = Math.cos(a) * 3, z = Math.sin(a) * 3; return { x: BTN.x + x, z: BTN.z + z, yaw: Math.atan2(x, z) }; }
 
 /* ================== THREE ================== */
 const canvas = qs('#c');
@@ -833,12 +851,18 @@ function buildShip() {
     const fm = new THREE.Mesh(fg, toon(isRoom ? mix(room.f, room.a, .28) : 0x9aa2d8, { map: FLOOR_T })); fm.position.set(cx, dy, cz); world.add(fm);
     const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const cm = new THREE.Mesh(cg, toon(isRoom ? 0x3d4282 : 0x34386e)); cm.position.set(cx, WALL_H - dy, cz); world.add(cm);
     const lampM = basic(0xfff3d6);
-    if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
+    if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
     else { const vert = CRECTS[idx - NR].vert, L = vert ? d : w; for (let s2 = 2; s2 < L - 1; s2 += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(vert ? 1.2 : .5, vert ? .5 : 1.2), lampM); l.rotation.x = Math.PI / 2; l.position.set(vert ? cx : x0 + s2, WALL_H - .01 - dy, vert ? z0 + s2 : cz); world.add(l); }
       const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .18 : w, vert ? d : .18), basic(0x7ff6ff)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .012 + dy, cz); world.add(strip); }
   });
   const corrWall = toon(0xc3c8ea, { map: WALL_T }), corrAcc = toon(0x52c7ff, { e: 0x52c7ff, ei: .25 }), corrBase = toon(0x5a609a);
-  wallSegs(allR).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
+  // paredes diagonales de las esquinas achaflanadas
+  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = toon(mix(R.f, 0xc8ccec, .35), { map: WALL_T }), accM = toon(R.a, { e: R.a, ei: .25 }), baseM = toon(darker(R.a, .45));
+    [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
+      const L = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, th = Math.atan2(n[0], n[1]), g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
+      const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m);
+      const ix = n[0] * .03 / 1.414, iz = n[1] * .03 / 1.414; box(L, .16, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L, .26, .07, baseM, mx + ix, .13, mz + iz, null, false).rotation.y = th; }); });
+  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
     const wallM = isRoom ? toon(mix(room.f, 0xc8ccec, .35), { map: WALL_T }) : corrWall, accM = isRoom ? toon(room.a, { e: room.a, ei: .25 }) : corrAcc, baseM = isRoom ? toon(darker(room.a, .45)) : corrBase;
     const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
     const m = new THREE.Mesh(g, wallM); m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
@@ -856,8 +880,7 @@ function buildShip() {
     m.userData.dyn = 1; m.visible = false; d.mesh = m; d.h = h; });
   // ventanas
   const winM = basic(0xffffff, { map: STAR_T });
-  [[-4.3, -31, 2.4, 1.6, 'n'], [4.3, -31, 2.4, 1.6, 'n'], [34, 0, 4.4, 1.6, 'e'], [-34, -21.8, 4, 1.2, 'w'], [30, -31, 4, 1.6, 'n'], [34, -23, 4, 1.6, 'e'], [34, 22, 3.5, 1.5, 'e'], [-34, 23.5, 3, 1.5, 'w'], [0, 32, 4.5, 1.5, 's'],
-    [0, -46, 11, 2.1, 'n'], [-8, -42, 4, 1.8, 'w'], [8, -42, 4, 1.8, 'e']].map(q => { const [x, z] = remapXZ(q[0], q[1]); return [x, z, q[2], q[3], q[4]]; }).forEach(([x, z, w, h, f]) => {
+  [[57.5, 2, 5, 1.8, 'e'], [46, -20, 6, 1.8, 'e'], [28, -4, 10, 2.1, 'w'], [-52, 2, 3.4, 1.5, 'w'], [24.5, 45, 4, 1.5, 's'], [-48, 34, 3, 1.2, 'w'], [-20, -1.5, 3, 1.4, 'e']].forEach(([x, z, w, h, f]) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), winM); const y = f === 'w' && h < 1.4 ? 2.2 : 1.85;
     m.rotation.y = { n: 0, s: Math.PI, e: -Math.PI / 2, w: Math.PI / 2 }[f];
     const nx = { n: 0, s: 0, e: -1, w: 1 }[f], nz = { n: 1, s: -1, e: 0, w: 0 }[f];
@@ -866,12 +889,15 @@ function buildShip() {
     if (f === 'n' || f === 's') { box(w + .3, t, .16, frM, x + fx, y + h / 2, z + fz); box(w + .3, t, .16, frM, x + fx, y - h / 2, z + fz); box(t, h, .16, frM, x - w / 2, y, z + fz); box(t, h, .16, frM, x + w / 2, y, z + fz); if (w > 6) { box(t * .8, h, .14, frM, x - w / 6, y, z + fz); box(t * .8, h, .14, frM, x + w / 6, y, z + fz); } }
     else { box(.16, t, w + .3, frM, x + fx, y + h / 2, z); box(.16, t, w + .3, frM, x + fx, y - h / 2, z); box(.16, h, t, frM, x + fx, y, z - w / 2); box(.16, h, t, frM, x + fx, y, z + w / 2); }
   });
-  [[0, 0, 5, 5, 0xff9f43], [0, -58, 6, 4, 0x5b6cff]].forEach(([x, z, w, d, c]) => { const sky = new THREE.Mesh(new THREE.PlaneGeometry(w, d), winM); sky.rotation.x = Math.PI / 2; sky.position.set(x, WALL_H - .02, z); world.add(sky);
+  [[0, -12, 5, 5, 0xff9f43], [...XF[12].f(0, -42), 4, 6, 0x5b6cff]].forEach(([x, z, w, d, c]) => { const sky = new THREE.Mesh(new THREE.PlaneGeometry(w, d), winM); sky.rotation.x = Math.PI / 2; sky.position.set(x, WALL_H - .02, z); world.add(sky);
     const F = toon(c); box(w + .4, .2, .3, F, x, WALL_H - .1, z - d / 2 - .1); box(w + .4, .2, .3, F, x, WALL_H - .1, z + d / 2 + .1); box(.3, .2, d + .4, F, x - w / 2 - .1, WALL_H - .1, z); box(.3, .2, d + .4, F, x + w / 2 + .1, WALL_H - .1, z); });
   ROOMS.forEach(r => { const L = new THREE.PointLight(r.l, .42, 20, 1.6); L.position.set((r.ctr || r.node)[0], 2.7, (r.ctr || r.node)[1]); L.userData.base = .42; world.add(L); LIGHTS.push(L);
     const s = sprText(r.n, { size: 58, bg: hex(darker(r.a, .15)), w: 2.5 }); s.position.set((r.ctr || r.node)[0], 2.78, (r.ctr || r.node)[1]); world.add(s); });
   const s0 = world.children.length; decorate(); decorate2();
-  world.children.slice(s0).forEach(o => { const i = origRoomAt(o.position.x, o.position.z, 1); if (i > 0) { o.position.x += OFFS[i][0]; o.position.z += OFFS[i][1]; } });
+  world.children.slice(s0).forEach(o => { const i = origRoomAt(o.position.x, o.position.z, 1); if (i < 0) return;
+    if (!XF[i]) { world.remove(o); return; }
+    o.updateMatrix(); o.applyMatrix4(XF[i].m); if (!inShape(XF[i].room, o.position.x, o.position.z, -.4) || (ROOMS[XF[i].room].ch && !inShape(XF[i].room, o.position.x, o.position.z, .25))) world.remove(o); });
+  for (let k = LIGHTS.length - 1; k >= 0; k--) if (!LIGHTS[k].parent) LIGHTS.splice(k, 1);
   decorateNew();
   ST.forEach(s => consoleAt(s, false)); FIX.forEach(s => consoleAt(s, true));
   CAMS.forEach(buildCam); VENTS.forEach(buildVent); buildDucts();
@@ -1102,7 +1128,7 @@ function decorate() {
   const eng = cyl(1.3, 1.4, 2.8, toon(0x7f88c4), -32.4, 1.4, 0); hull(eng, 1.04);
   [.6, 1.4, 2.2].forEach((y, i) => { const r = new THREE.Mesh(new THREE.TorusGeometry(1.42, .1, 10, 36), toon(0xff7a2f, { e: 0xff5a00, ei: .8 })); r.rotation.x = Math.PI / 2; r.position.set(-32.4, y, 0); world.add(r); ANIM.rings.push({ m: r, s: .5 + i * .3, ax: 'z' }); });
   const core = sph(.55, toon(0xffb347, { e: 0xff7a00, ei: 1 }), -32.4, 2.95, 0); ANIM.pulse.push(core);
-  EMIT.push({ k: 'steam', p: [-50.4, 3.15, 0] }, { k: 'steam', p: [-41.2, 1.9, -5.8] }, { k: 'steam', p: [-41.2, 1.9, 5.8] }, { k: 'glow', p: [-46, 3.0, 38], c: 0x9ae8ff }, { k: 'glow', p: [0, 2.6, -58], c: 0xb0b8ff }, { k: 'spark', p: [41.5, 2.2, 32.6] }, { k: 'spark', p: [50.5, 2.2, 32.6] });
+  { const r = XF[7].f(-28, 24), o = XF[12].f(0, -42), e1 = XF[8].f(23.5, 18.75), e2 = XF[8].f(32.5, 18.75); EMIT.push({ k: 'glow', p: [r[0], 3.0, r[1]], c: 0x9ae8ff }, { k: 'glow', p: [o[0], 2.6, o[1]], c: 0xb0b8ff }, { k: 'spark', p: [e1[0], 2.2, e1[1]] }, { k: 'spark', p: [e2[0], 2.2, e2[1]] }, { k: 'steam', p: [45.6, 2.0, -19.5] }); }
   const eL = new THREE.PointLight(0xff8a3d, .7, 9, 2); eL.position.set(-31, 2, 0); eL.userData.base = .7; world.add(eL); LIGHTS.push(eL);
   [-5.8, 5.8].forEach(z => { const t = cyl(.55, .55, 1.6, toon(0xff5a6e), -23.2, .8, z); hull(t, 1.06); cyl(.3, .4, .25, G, -23.2, 1.72, z); });
   [0, 1].forEach(i => { const p = cyl(.18, .18, 12, D, -33.6, 2.7 - i * .45, 0, null, 12); p.rotation.x = Math.PI / 2; });
@@ -1151,15 +1177,23 @@ function decorate2() {
   [[-6.3, -45], [6.3, -45]].forEach(([x, z]) => { box(1.6, .45, .6, W, x, .25, z); box(1.6, .5, .12, toon(0x5b6cff), x, .6, z - .26); });
 }
 function decorateNew() {
+  const G = toon(0x7a80aa), D = toon(0x2a2f5e), M = toon(0x5a6296);
+  // Comedor: máquinas expendedoras en la pared sur
+  [[-4.5, 0xff5a6e], [4.5, 0x3d7bff]].forEach(([x, c]) => { box(1.2, 2.2, .7, toon(c), x, 1.1, -4.4); const f = new THREE.Mesh(new THREE.PlaneGeometry(.8, 1.2), basic(lighter(c, .6))); f.rotation.y = Math.PI; f.position.set(x + .1, 1.35, -4.76); world.add(f); box(.2, .5, .05, toon(0x222244), x - .4, 1.1, -4.76, null, false); });
   // Taquillas
-  for (let k = 0; k < 7; k++) { const x = -29 + k, c = k % 2 ? 0x9a8cff : 0x7a6bff; box(.92, 2.2, .6, toon(c), x, 1.1, -25.62); box(.5, .05, .02, toon(0x2a2450), x, 1.75, -25.31, null, false); box(.5, .05, .02, toon(0x2a2450), x, 1.65, -25.31, null, false); box(.06, .22, .04, toon(0xffcc33), x + .3, 1.15, -25.3, null, false); }
-  const bk = cyl(.42, .34, .62, toon(0xff9f43), -23.1, .31, -19.1, null, 16); hull(bk, 1.06); sph(.2, toon(0xffffff), -23.2, .66, -19.0, null, 10); sph(.17, toon(0x5ab8ff), -22.95, .64, -19.2, null, 10);
-  box(1.6, .9, .06, toon(0xbfe6ff, { e: 0x5ab8ff, ei: .15 }), -26, 1.7, -25.98, null, false);
-  // Depósito de agua
-  [22.2, 25.8].forEach(x => { cyl(1.25, 1.3, .3, toon(0x2f3a72), x, .15, 37.6, null, 24); const t = cyl(1.15, 1.15, 2.5, toon(0x9fe0ff, { op: .45 }), x, 1.55, 37.6, null, 24); cyl(1.0, 1.0, 1.7, toon(0x2fa8e0, { e: 0x1a7fd0, ei: .35 }), x, 1.15, 37.6, null, 22); cyl(1.2, 1.2, .22, toon(0x1fa3c9), x, 2.9, 37.6, null, 24);
-    const pp = cyl(.12, .12, .5, toon(0x7a80aa), x, 3.05, 37.6, null, 10);
-    for (let k = 0; k < 2; k++) { const b = sph(.12, basic(0xffffff, { op: .7 }), x - .3 + k * .55, 1 + k * .4, 37.6 + (k ? .3 : -.2), null, 10); ANIM.rings.push({ m: b, s: 0, ax: 'y', bob: 1 + k * .4 }); } });
-  const pipe = cyl(.14, .14, 3.6, toon(0x1fa3c9), 24, 2.9, 37.6, null, 10); pipe.rotation.z = Math.PI / 2;
+  for (let k = 0; k < 7; k++) { const x = -47 + k, c = k % 2 ? 0x9a8cff : 0x7a6bff; box(.92, 2.2, .6, toon(c), x, 1.1, 30.38); box(.5, .05, .02, toon(0x2a2450), x, 1.75, 30.69, null, false); box(.5, .05, .02, toon(0x2a2450), x, 1.65, 30.69, null, false); box(.06, .22, .04, toon(0xffcc33), x + .3, 1.15, 30.7, null, false); }
+  const bk = cyl(.42, .34, .62, toon(0xff9f43), -41.2, .31, 37.1, null, 16); hull(bk, 1.06); sph(.2, toon(0xffffff), -41.3, .66, 37.2, null, 10); sph(.17, toon(0x5ab8ff), -41.05, .64, 37.0, null, 10);
+  // Sala de armas: torreta con dos cañones apuntando a la ventana
+  const tb = cyl(1.3, 1.45, .5, D, 42, .25, -19.5, null, 26); hull(tb, 1.03); cyl(.5, .7, .9, M, 42, .95, -19.5, null, 18);
+  const dome = sph(.95, toon(0xe85d3a), 42, 1.75, -19.5, null, 22); dome.scale.y = .75; hull(dome, 1.04); sph(.38, toon(0x9ae8ff, { e: 0x3cc8ff, ei: .4 }), 41.35, 1.95, -19.5, null, 14);
+  [-.35, .35].forEach(dz => { const b = cyl(.14, .17, 2.2, toon(0x4b5296), 43.6, 1.85, -19.5 + dz, null, 12); b.rotation.z = Math.PI / 2 - .12; hull(b, 1.06); cyl(.2, .2, .2, toon(0xffcc33), 44.7, 1.98, -19.5 + dz, null, 12).rotation.z = Math.PI / 2; });
+  [[44.6, -15.4], [43.4, -15.2]].forEach(([x, z], k) => { box(.9, .7, .9, toon(k ? 0x8a6a42 : 0x9a7a52), x, .35, z); box(.92, .12, .92, toon(0xffcc33), x, .55, z, null, false); });
+  sph(.18, toon(0xffcc33), 44.6, .9, -15.4, null, 10); cyl(.18, .18, .5, toon(0xffcc33), 44.6, .95, -15.4, null, 10);
+  // Almacén redondo: columna central de carga, cajas y barriles
+  const col = cyl(.55, .6, WALL_H, toon(0xc9873e), 40, WALL_H / 2, 34, null, 16); hull(col, 1.04); for (let k = 0; k < 3; k++) { const r = new THREE.Mesh(new THREE.TorusGeometry(.62, .06, 8, 24), toon(0x2a2450)); r.rotation.x = Math.PI / 2; r.position.set(40, .6 + k * 1, 34); world.add(r); }
+  OBS.push({ x: 40, z: 34, r: .7 });
+  [[43.4, 30.6], [43.4, 37.4]].forEach(([x, z]) => { [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]].forEach(([dx, dz], i) => crate(x + dx, .5, z + dz, i % 2 ? 0xd9a35e : 0xc98a42)); crate(x, 1.5, z, 0xe0b06c); });
+  [[36.4, 38.2, 0x5ab8ff], [37.2, 38.9, 0xff5a6e]].forEach(([x, z, c]) => { const b = cyl(.4, .4, 1, toon(c), x, .5, z); hull(b, 1.06); });
 }
 function crate(x, y, z, c) { box(1.0, 1.0, 1.0, toon(c), x, y, z); box(1.02, .16, 1.02, toon(darker(c, .35)), x, y, z, null, false); }
 function plant(x, z, s) { cyl(.32 * s, .25 * s, .5 * s, toon(0xff7a5a), x, .25 * s, z, null, 14); [[0, .75, 0, .34], [.2, .62, .12, .24], [-.18, .66, -.1, .26]].forEach(([dx, y, dz, r]) => { const m = sph(r * s, toon(0x3dbb5a), x + dx * s, y * s, z + dz * s, null, 14); hull(m, 1.1); }); }
@@ -1175,7 +1209,6 @@ function makeChar(ci, opt = {}) {
   const base = mk(col), dk = mk(darker(col, .3)), lt = mk(lighter(col, .55)), white = mk(0xffffff), black = mk(0x1d1640), pink = mk(0xff9db8);
   const inner = new THREE.Group(); g.add(inner);
   const body = sph(.48, base, 0, .74, 0, inner, 26); body.scale.set(1, 1.12, .96); if (!op) hull(body, 1.055);
-  const belly = sph(.3, lt, 0, .62, .34, inner, 18); belly.scale.set(1, 1.05, .45);
   const pupils = [], xs = [];
   [-.16, .16].forEach(x => { const e = sph(.13, white, x, .99, .38, inner, 16); if (!op) hull(e, 1.12); const p = sph(.066, black, x, 1.0, .49, inner, 12); pupils.push(p);
     const xg = new THREE.Group(); xg.position.set(x, .99, .5); inner.add(xg); [.8, -.8].forEach(r => { const b = new THREE.Mesh(new THREE.BoxGeometry(.2, .045, .03), black); b.rotation.z = r; xg.add(b); }); xg.visible = false; xs.push(xg); });
@@ -1202,7 +1235,7 @@ function avatarSVG(ci, dead = false, size = 46) {
   const c = hex(COLORS[ci].h), d = hex(darker(COLORS[ci].h, .3)), l = hex(lighter(COLORS[ci].h, .5));
   const eyes = dead ? `<path d="M18 27l8 8M26 27l-8 8M34 27l8 8M42 27l-8 8" stroke="#1d1640" stroke-width="3.4" stroke-linecap="round"/>`
     : `<circle cx="22" cy="31" r="7.5" fill="#fff" stroke="#1d1640" stroke-width="2.4"/><circle cx="38" cy="31" r="7.5" fill="#fff" stroke="#1d1640" stroke-width="2.4"/><circle cx="23" cy="32" r="3.6" fill="#1d1640"/><circle cx="39" cy="32" r="3.6" fill="#1d1640"/>`;
-  return `<svg viewBox="0 0 60 66" width="${size}" height="${size}" aria-hidden="true"><line x1="30" y1="10" x2="30" y2="4" stroke="#1d1640" stroke-width="3"/><circle cx="30" cy="5" r="4.5" fill="${l}" stroke="#1d1640" stroke-width="2.4"/><ellipse cx="20" cy="59" rx="9" ry="5.5" fill="${d}" stroke="#1d1640" stroke-width="2.6"/><ellipse cx="40" cy="59" rx="9" ry="5.5" fill="${d}" stroke="#1d1640" stroke-width="2.6"/><ellipse cx="30" cy="35" rx="24" ry="25" fill="${c}" stroke="#1d1640" stroke-width="3.2"/><ellipse cx="30" cy="45" rx="12" ry="9" fill="#fff" opacity=".28"/>${eyes}<circle cx="15" cy="40" r="2.8" fill="#ff9db8"/><circle cx="45" cy="40" r="2.8" fill="#ff9db8"/></svg>`;
+  return `<svg viewBox="0 0 60 66" width="${size}" height="${size}" aria-hidden="true"><line x1="30" y1="10" x2="30" y2="4" stroke="#1d1640" stroke-width="3"/><circle cx="30" cy="5" r="4.5" fill="${l}" stroke="#1d1640" stroke-width="2.4"/><ellipse cx="20" cy="59" rx="9" ry="5.5" fill="${d}" stroke="#1d1640" stroke-width="2.6"/><ellipse cx="40" cy="59" rx="9" ry="5.5" fill="${d}" stroke="#1d1640" stroke-width="2.6"/><ellipse cx="30" cy="35" rx="24" ry="25" fill="${c}" stroke="#1d1640" stroke-width="3.2"/>${eyes}<circle cx="15" cy="40" r="2.8" fill="#ff9db8"/><circle cx="45" cy="40" r="2.8" fill="#ff9db8"/></svg>`;
 }
 
 /* ================== SONIDO ================== */
@@ -1352,7 +1385,7 @@ function hostStart(practice) {
 // práctica: cada NPC se queda quieto en una sala distinta
 function placePractice() {
   const spots = shuffle(ROOMS.map((r, i) => i).filter(i => i !== 0)).map(i => { const r = ROOMS[i], c = r.ctr || r.node; return [c[0], c[1]]; });
-  spots.unshift([4.2, 4.2], [-4.2, -4.2]);
+  spots.unshift([BTN.x + 4.2, BTN.z + 4.2], [BTN.x - 4.2, BTN.z - 4.2]);
   let k = 0; S.pl.forEach(p => { if (!p.npc) return; let [x, z] = spots[k++ % spots.length];
     for (let t = 0; t < 30 && !freeSpot(x, z); t++) { x += rand(-1.2, 1.2); z += rand(-1.2, 1.2); }
     p.x = x; p.z = z; p.y = rand(-Math.PI, Math.PI); p.tt = 0; p.tk = []; p.cd = 99; });
@@ -1570,11 +1603,11 @@ function updateAvatars(dt, t) {
 }
 function buildMenuBlobs() {
   MENU_BLOBS.forEach(b => scene.remove(b.c.g)); MENU_BLOBS.length = 0;
-  [0, 1, 2, 3, 4, 5, 6, 7].forEach(ci => { const c = makeChar(ci); const p = { x: rand(-6, 6), z: rand(-6, 6), y: rand(0, 6), w: rand(0, 2) }; scene.add(c.g); MENU_BLOBS.push({ c, p }); });
+  [0, 1, 2, 3, 4, 5, 6, 7].forEach(ci => { const c = makeChar(ci); const p = { x: BTN.x + rand(-5, 5), z: BTN.z + rand(-5, 5), y: rand(0, 6), w: rand(0, 2) }; scene.add(c.g); MENU_BLOBS.push({ c, p }); });
 }
 function menuFrame(dt, t) {
-  const a = t * .08; camera.position.set(Math.sin(a) * 6.4, 2.5, Math.cos(a) * 5.6); camera.lookAt(0, 1.1, 0);
-  MENU_BLOBS.forEach(b => { const p = b.p; if (p.w > 0) { p.w -= dt; animChar(b.c, 0, t); } else { if (!p.has) { p.tx = rand(-7.5, 7.5); p.tz = rand(-6.5, 6.5); p.has = true; }
+  const a = t * .08; camera.position.set(BTN.x + Math.sin(a) * 6.4, 2.5, BTN.z + Math.cos(a) * 5.6); camera.lookAt(BTN.x, 1.1, BTN.z);
+  MENU_BLOBS.forEach(b => { const p = b.p; if (p.w > 0) { p.w -= dt; animChar(b.c, 0, t); } else { if (!p.has) { p.tx = BTN.x + rand(-7, 7); p.tz = BTN.z + rand(-6, 6); p.has = true; }
       const bx = p.x, bz = p.z; const dx = p.tx - p.x, dz = p.tz - p.z, d = Math.hypot(dx, dz);
       if (d < .2) { p.has = false; p.w = rand(1, 4); } else { movePos(p, dx / d * 2.4 * dt, dz / d * 2.4 * dt, PR, false); if (Math.hypot(p.x - bx, p.z - bz) < .2 * 2.4 * dt) { p.has = false; p.w = rand(.3, 1); }
         p.y += wrapA(Math.atan2(-dx, -dz) - p.y) * Math.min(1, dt * 8); }
@@ -1824,7 +1857,7 @@ function teardownGame() {
   local.light = 1; hemi.intensity = .52; amb.intensity = .12; sun.intensity = .38; LIGHTS.forEach(l => l.intensity = l.userData.base); scene.fog.near = 28; scene.fog.far = 80; scene.fog.color.copy(FOG_C);
   buildMenuBlobs(); ME = -1; local.lastRd = 0;
 }
-function placeAtSeat() { exitVent(true); if (ME >= 0) { const st = seat(ME, S.pl.length); P.x = st.x; P.z = st.z; P.yaw = st.yaw; } else { P.x = 0; P.z = 0; P.yaw = 0; } P.pitch = 0; }
+function placeAtSeat() { exitVent(true); if (ME >= 0) { const st = seat(ME, S.pl.length); P.x = st.x; P.z = st.z; P.yaw = st.yaw; } else { P.x = BTN.x; P.z = BTN.z + 4; P.yaw = 0; } P.pitch = 0; }
 function showIntro() {
   const me = S.pl[ME], ov = qs('#intro'); ov.replaceChildren(); local.introT = 3.8;
   const h = el('h1', 'pop'); const p = el('p'); const mates = el('div', 'mates pop');
@@ -1880,7 +1913,7 @@ function updateHUD(t) {
   qs('#lockhint').hidden = isTouch || document.pointerLockElement === canvas || !canLook(); canvas.style.cursor = lockFail && canLook() ? 'none' : '';
   drawMap(mini, false);
 }
-const MB = { x0: -55, z0: -65, w: 110, h: 118 };
+const MB = { x0: -55, z0: -29, w: 115, h: 77 };
 function mapXf(cv, big) { const W = cv.width, Hh = cv.height; const sc = Math.min(W / MB.w, Hh / MB.h) * (big ? .96 : 1); return { sc, ox: (W - MB.w * sc) / 2, oz: (Hh - MB.h * sc) / 2 }; }
 function mapInv(cv, x, y) { const { sc, ox, oz } = mapXf(cv, true); return { x: (x - ox) / sc + MB.x0, z: (y - oz) / sc + MB.z0 }; }
 function drawMap(cv, big, opt = {}) {
@@ -1889,7 +1922,7 @@ function drawMap(cv, big, opt = {}) {
   g.clearRect(0, 0, W, Hh);
   g.fillStyle = '#3a4384'; CRECTS.forEach(c => g.fillRect(X(c.r[0]), Z(c.r[1]), (c.r[2] - c.r[0]) * sc, (c.r[3] - c.r[1]) * sc));
   const doors = (S && S.doors) || {}, dcs = (S && S.dc) || {};
-  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(r.a, .55)); rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
+  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(r.a, .55)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
     if (big) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * 1.7)}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
     if (opt.sabo) { const cx = X((r.r[0] + r.r[2]) / 2), cz = Z((r.r[1] + r.r[3]) / 2) + sc * .8; const closed = doors[i], cd = dcs[i]; g.save(); g.translate(cx, cz); g.scale(1.6, 1.6); g.translate(-cx, -cz);
       g.fillStyle = closed ? '#ff5a6e' : cd ? 'rgba(255,255,255,.25)' : '#c9a0ff'; rr(g, cx - sc * 1.6, cz - sc * 1.1, sc * 3.2, sc * 2.4, sc * .6); g.fill();
@@ -1954,7 +1987,6 @@ function shake(c) { c.classList.remove('shake'); void c.offsetWidth; c.classList
 function blob(g, x, y, s, col) { const c = hex(COLORS[col].h), d = hex(darker(COLORS[col].h, .3));
   g.lineWidth = 3 * s; g.strokeStyle = '#1d1640'; g.fillStyle = d; [-1, 1].forEach(k => { g.beginPath(); g.ellipse(x + k * 12 * s, y + 30 * s, 11 * s, 6 * s, 0, 0, 7); g.fill(); g.stroke(); });
   g.fillStyle = c; g.beginPath(); g.ellipse(x, y, 30 * s, 32 * s, 0, 0, 7); g.fill(); g.stroke();
-  g.fillStyle = 'rgba(255,255,255,.28)'; g.beginPath(); g.ellipse(x, y + 10 * s, 16 * s, 12 * s, 0, 0, 7); g.fill();
   [-1, 1].forEach(k => { circ(g, x + k * 10 * s, y - 6 * s, 8 * s, '#fff', '#1d1640', 2.4 * s); circ(g, x + k * 10 * s + 1, y - 5 * s, 4 * s, '#1d1640'); circ(g, x + k * 18 * s, y + 4 * s, 3 * s, '#ff9db8'); });
   g.strokeStyle = '#1d1640'; g.lineWidth = 3 * s; g.beginPath(); g.moveTo(x, y - 32 * s); g.lineTo(x, y - 42 * s); g.stroke(); circ(g, x, y - 44 * s, 5 * s, hex(lighter(COLORS[col].h, .5)), '#1d1640', 2.4 * s); }
 const myColor = () => (S && S.pl[ME]) ? S.pl[ME].c : profile.color;
