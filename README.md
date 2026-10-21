@@ -36,3 +36,19 @@ En el móvil el juego se pone en horizontal automáticamente.
 - El polizón tiene que esperar 25 segundos entre eliminación y eliminación.
 
 Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño original.
+
+## Roles especiales
+
+Al crear la partida, el botón **Elegir** de "Roles especiales" abre un menú para activar los roles. Cada rol activado lo recibe un jugador al azar de su bando. La habilidad se usa con la tecla **C** (o el botón de habilidad en móvil).
+
+**Tripulación**
+- **Ingeniero**: puede viajar por las alcantarillas y reparar un sabotaje a distancia una vez por partida.
+- **Mecánico de puertas**: cierra o abre las puertas de la sala más cercana (también las saboteadas).
+- **Detective**: ve durante 8 s las huellas de colores que deja cada jugador.
+
+**Polizón**
+- **Cambiaformas**: copia el aspecto del jugador más cercano durante 15 s.
+- **Fantasma de conductos**: salta entre todas las redes de conductos y las cámaras no le ven.
+- **Limpiador**: hace desaparecer cuerpos para que nadie los reporte.
+
+En el modo práctica también se puede elegir un rol especial para probar su habilidad.
