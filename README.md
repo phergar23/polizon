@@ -56,6 +56,15 @@ Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detec
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
 
+## Paseos espaciales
+
+En la **Sala de armas** y en **Taquillas** hay una **esclusa**. Al usarla sales al espacio atado a una cuerda de 24 m:
+
+- Flotas en gravedad cero: avanzas hacia donde miras (en ordenador, Espacio sube y Mayúsculas baja).
+- El botón **Volver** (o la tecla R) hace que la cuerda tire de ti hasta dentro de la nave.
+- Cada jugador tiene una **tarea exterior**: limpiar paneles solares, reparar la antena, soldar el casco o cambiar la baliza.
+- Fuera no se puede eliminar ni reportar. Si empieza una reunión, vuelves dentro automáticamente.
+
 ## Pantalla completa en iPhone
 
 En el iPhone, Safari y Chrome no permiten poner una web a pantalla completa. Para jugar sin barras del navegador, instala el juego como app:
