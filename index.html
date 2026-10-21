@@ -232,6 +232,8 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 #alarm{position:fixed;inset:0;pointer-events:none;z-index:8;box-shadow:inset 0 0 140px 40px rgba(255,30,60,.6);opacity:0}
 #alarm.on{animation:alarmP 1s infinite}
 @keyframes alarmP{0%,100%{opacity:.15}50%{opacity:1}}
+#vig{position:fixed;inset:0;pointer-events:none;z-index:6;background:radial-gradient(ellipse at center,transparent 58%,rgba(4,6,18,.38));opacity:0;transition:opacity .6s}
+#vig.on{opacity:1}
 #darkV{position:fixed;inset:0;pointer-events:none;z-index:7;background:radial-gradient(circle at center,transparent 14%,rgba(2,3,12,.88) 46%,rgba(2,3,12,.97));opacity:0;transition:opacity 1.2s}
 #ventTint{position:fixed;inset:0;pointer-events:none;z-index:9;background:radial-gradient(ellipse at center,rgba(20,60,40,.05) 30%,rgba(5,30,20,.85));opacity:0;transition:opacity .3s}
 #ventUI{position:absolute;left:50%;top:calc(64px + env(safe-area-inset-top,0px));width:min(380px,calc(calc(var(--aw,100vw) * 1) - 32px));gap:4px!important;padding:6px 12px!important;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:auto;background:rgba(8,32,24,.9);border:3px solid #36e0ad;border-radius:20px;padding:12px 16px;max-width:calc(calc(var(--aw,100vw) * 1) - 32px);box-sizing:border-box}
@@ -358,7 +360,7 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 <div id="ghostTint"></div>
 <div id="alarm"></div>
 <div id="ventTint"></div>
-<div id="darkV"></div>
+<div id="vig"></div><div id="darkV"></div>
 
 <!-- MENÚ PRINCIPAL -->
 <section class="screen" id="s-menu">
@@ -784,7 +786,7 @@ function seat(i, n) { const a = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2
 
 /* ================== THREE ================== */
 const canvas = qs('#c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x15191c); scene.fog = new THREE.Fog(0x2a3034, 30, 85);
 const FOG_C = new THREE.Color(0x2a3034), FOG_D = new THREE.Color(0x04050e);
@@ -830,6 +832,7 @@ function box(w, h, d, mat, x, y, z, parent, edges = true) { const m = new THREE.
 function cyl(rt, rb, h, mat, x, y, z, parent, seg = 22) { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat); m.position.set(x, y, z); (parent || world).add(m); return m; }
 function sph(r, mat, x, y, z, parent, seg = 20) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, seg, Math.max(8, seg * .7 | 0)), mat); m.position.set(x, y, z); (parent || world).add(m); return m; }
 function hull(m, s = 1.06) { const o = new THREE.Mesh(m.geometry, OUT_M); o.scale.setScalar(s); m.add(o); return m; }
+function worldUV(g, x0, z1, w, d, k) { const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (x0 + uv.getX(i) * w) / k, (-z1 + uv.getY(i) * d) / k); uv.needsUpdate = true; }
 function scaleUV(g, su, sv) { const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * su, uv.getY(i) * sv); uv.needsUpdate = true; }
 function cvs(w, h, f) { const c = document.createElement('canvas'); c.width = w; c.height = h; f(c.getContext('2d'), w, h); return c; }
 function rr(g, x, y, w, h, r) { r = Math.max(0, Math.min(r, w / 2, h / 2)); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
@@ -844,7 +847,7 @@ const CHECK_T = new THREE.CanvasTexture(cvs(256, 256, (g) => {
   g.strokeStyle = 'rgba(80,90,100,.35)'; g.lineWidth = 2; for (let k = 0; k <= 256; k += 64) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 256); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(256, k); g.stroke(); }
 }));
 CHECK_T.wrapS = CHECK_T.wrapT = THREE.RepeatWrapping;
-FLOOR_T.wrapS = FLOOR_T.wrapT = THREE.RepeatWrapping; FLOOR_T.anisotropy = 4;
+FLOOR_T.wrapS = FLOOR_T.wrapT = THREE.RepeatWrapping;
 const WALL_T = new THREE.CanvasTexture(cvs(256, 256, (g) => {
   g.fillStyle = '#eef0f4'; g.fillRect(0, 0, 256, 256);
   g.fillStyle = '#c5cad4'; g.fillRect(0, 0, 5, 256); g.fillRect(251, 0, 5, 256); g.fillRect(0, 150, 256, 5); g.fillRect(0, 0, 256, 4);
@@ -893,33 +896,44 @@ function sprText(text, opt = {}) {
 }
 const RT = CAMS.map(() => new THREE.WebGLRenderTarget(320, 200));
 const MON = [];
+function sharpTex() { const an = Math.min(8, renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1); [FLOOR_T, CHECK_T, WALL_T, DWALL_T, DFLOOR_T, DOOR_T_TEX].forEach(t => { if (t) { t.anisotropy = an; t.needsUpdate = true; } }); }
+// sombra suave en las uniones pared-suelo y pared-techo
+const AO_T = new THREE.CanvasTexture(cvs(8, 64, (g) => { const gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(0,0,0,.6)'); gr.addColorStop(.3, 'rgba(0,0,0,.26)'); gr.addColorStop(.7, 'rgba(0,0,0,.06)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 8, 64); }));
+const AO_F = new THREE.MeshBasicMaterial({ map: AO_T, transparent: true, depthWrite: false }), AO_C = new THREE.MeshBasicMaterial({ map: AO_T, transparent: true, depthWrite: false, opacity: .8 });
+function aoStrip(x, z, L, th) { // th: dirección hacia el interior
+  [[.009, AO_F, 1.0], [WALL_H - .02, AO_C, .7]].forEach(([y, m, wd], ci) => { const g = new THREE.PlaneGeometry(L, wd); g.rotateX(ci ? Math.PI / 2 : -Math.PI / 2); if (ci) g.rotateY(Math.PI);
+    const o = new THREE.Mesh(g, m); o.rotation.y = th; const ox = Math.sin(th) * wd / 2, oz = Math.cos(th) * wd / 2; o.position.set(x + ox, y, z + oz); o.renderOrder = 1; world.add(o); });
+}
 function buildShip() {
+  sharpTex();
   const allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], NR = ROOMS.length;
   allR.forEach((R, idx) => {
-    const [x0, z0, x1, z1] = R, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, isRoom = idx < NR, room = isRoom ? ROOMS[idx] : null, dy = isRoom ? 0 : .002 * (1 + idx % 9);
-    const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); scaleUV(fg, w / 2, d / 2);
+    const [x0, z0, x1, z1] = R, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, isRoom = idx < NR, room = isRoom ? ROOMS[idx] : null, dy = isRoom ? .004 : 0;
+    const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 2);
     const fm = new THREE.Mesh(fg, toon(isRoom ? (FLOORCOL[room.n] ?? 0xb4c0c9) : 0xb4c0c9, { map: isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(cx, dy, cz); world.add(fm);
     const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(cx, WALL_H - dy, cz); world.add(cm);
     const lampM = basic(0xfff3d6);
     if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
-    else { const vert = CRECTS[idx - NR].vert, L = vert ? d : w; for (let s2 = 2; s2 < L - 1; s2 += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(vert ? 1.2 : .5, vert ? .5 : 1.2), lampM); l.rotation.x = Math.PI / 2; l.position.set(vert ? cx : x0 + s2, WALL_H - .01 - dy, vert ? z0 + s2 : cz); world.add(l); }
-      const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .14 : w, vert ? d : .14), basic(0x8fa8b5)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .012 + dy, cz); world.add(strip); }
+    else { const vert = CRECTS[idx - NR].vert, L = vert ? d : w; for (let s2 = 2; s2 < L - 1; s2 += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(vert ? 1.2 : .5, vert ? .5 : 1.2), lampM); l.rotation.x = Math.PI / 2; l.position.set(vert ? cx : x0 + s2, WALL_H - .012, vert ? z0 + s2 : cz); world.add(l); }
+      const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .14 : w, vert ? d : .14), basic(0x8fa8b5)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .014, cz); world.add(strip); }
   });
   const corrWall = toon(0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
   // paredes diagonales de las esquinas achaflanadas
   ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(0x78838b, R.a, .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
     [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
       const L = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, th = Math.atan2(n[0], n[1]), g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
-      const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m);
-      const ix = n[0] * .03 / 1.414, iz = n[1] * .03 / 1.414; box(L, .16, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L, .26, .07, baseM, mx + ix, .13, mz + iz, null, false).rotation.y = th; }); });
+      const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m); aoStrip(mx, mz, L, th);
+      const q = R.hall ? .03 : .036, hA = R.hall ? .16 : .168, hB = R.hall ? .26 : .272, ix = n[0] * q / 1.414, iz = n[1] * q / 1.414; box(L - .02, hA, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L - .02, hB, .07, baseM, mx + ix, hB / 2, mz + iz, null, false).rotation.y = th; }); });
   wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
     const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(0x78838b, room.a, .06), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(mix(room.a, 0x8a9399, .35), { e: room.a, ei: .18 }) : corrAcc, baseM = isRoom && !hl ? toon(0x3c444a) : corrBase;
     const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
     const m = new THREE.Mesh(g, wallM); m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
     if (e.ax === 'z') m.position.set(mid, WALL_H / 2, e.v); else m.position.set(e.v, WALL_H / 2, mid); world.add(m);
-    const inX = e.ax === 'x' ? -e.out * .03 : 0, inZ = e.ax === 'z' ? -e.out * .03 : 0, sx = e.ax === 'z' ? L : .07, sz = e.ax === 'z' ? .07 : L;
+    if (e.ax === 'z') aoStrip(mid, e.v, L, e.out > 0 ? Math.PI : 0); else aoStrip(e.v, mid, L, e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
+    const rm = isRoom && !hl, q = rm ? .036 : .03, hA = rm ? .168 : .16, hB = rm ? .272 : .26, ax2 = e.ax === 'z' ? 0 : .002;
+    const inX = e.ax === 'x' ? -e.out * q : 0, inZ = e.ax === 'z' ? -e.out * q : 0, sx = e.ax === 'z' ? L : .07, sz = e.ax === 'z' ? .07 : L;
     const px = e.ax === 'z' ? mid : e.v + inX, pz = e.ax === 'z' ? e.v + inZ : mid;
-    box(sx, .16, sz, accM, px, 1.2, pz, null, false); box(sx, .26, sz, baseM, px, .13, pz, null, false); });
+    box(sx, hA + ax2, sz, accM, px, 1.2, pz, null, false); box(sx, hB + ax2, sz, baseM, px, (hB + ax2) / 2, pz, null, false); });
   DOORS.forEach(d => { const room = ROOMS[d.room], frM = toon(room.a), glow = basic(lighter(room.l, .3)), w = d.w, pt = d.pt;
     if (d.vert) { box(.36, WALL_H, .6, frM, d.x0 + .18, WALL_H / 2, pt[1]); box(.36, WALL_H, .6, frM, d.x1 - .18, WALL_H / 2, pt[1]); box(w, .5, .6, frM, pt[0], WALL_H - .25, pt[1]); box(w - .8, .07, .45, glow, pt[0], WALL_H - .54, pt[1], null, false); }
     else { box(.6, WALL_H, .36, frM, pt[0], WALL_H / 2, d.z0 + .18); box(.6, WALL_H, .36, frM, pt[0], WALL_H / 2, d.z1 - .18); box(.6, .5, w, frM, pt[0], WALL_H - .25, pt[1]); box(.45, .07, w - .8, glow, pt[0], WALL_H - .54, pt[1], null, false); } });
@@ -1242,10 +1256,10 @@ function decorateNew() {
   // Zona de carga: cajas metálicas en el centro
   const MET = toon(0x8f9bb0), MET2 = toon(0x6f7a90), RIV = toon(0x4d566b), STR = toon(0xe8b923);
   const mcrate = (x, y, z, s2, rot) => { const g2 = new THREE.Group(); g2.position.set(x, y, z); g2.rotation.y = rot; world.add(g2);
-    box(s2, s2, s2, MET, 0, 0, 0, g2); [-1, 1].forEach(k => { box(s2 + .04, .12, .12, MET2, 0, k * (s2 / 2 - .06), s2 / 2 - .04, g2, false); box(s2 + .04, .12, .12, MET2, 0, k * (s2 / 2 - .06), -s2 / 2 + .04, g2, false); box(.12, s2 + .04, .12, MET2, k * (s2 / 2 - .06), 0, s2 / 2 - .04, g2, false); box(.12, s2 + .04, .12, MET2, k * (s2 / 2 - .06), 0, -s2 / 2 + .04, g2, false); });
-    box(s2 * .5, .1, .02, STR, 0, s2 * .18, s2 / 2 + .01, g2, false); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => sph(.045, RIV, a * (s2 / 2 - .12), b * (s2 / 2 - .12), s2 / 2 + .01, g2, 6)); };
+    box(s2, s2, s2, MET, 0, 0, 0, g2); [-1, 1].forEach(k => { box(s2 + .04, .12, .12, MET2, 0, k * (s2 / 2 - .06), s2 / 2 - .04, g2, false); box(s2 + .04, .12, .12, MET2, 0, k * (s2 / 2 - .06), -s2 / 2 + .04, g2, false); box(.13, s2 + .04, .14, MET2, k * (s2 / 2 - .06), 0, s2 / 2 - .04, g2, false); box(.13, s2 + .04, .14, MET2, k * (s2 / 2 - .06), 0, -s2 / 2 + .04, g2, false); });
+    box(s2 * .5, .1, .02, STR, 0, s2 * .18, s2 / 2 + .015, g2, false); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => sph(.045, RIV, a * (s2 / 2 - .12), b * (s2 / 2 - .12), s2 / 2 + .01, g2, 6)); };
   mcrate(-.7, .55, 29.3, 1.1, .1); mcrate(.75, .55, 29.6, 1.1, -.15); mcrate(0, .55, 30.95, 1.1, .3); mcrate(0, 1.65, 29.9, 1.05, .6);
-  box(3.6, .08, 3.4, toon(0xe8b923), 0, .015, 30, null, false); box(3.2, .09, 3.0, toon(0x5a6276), 0, .02, 30, null, false);
+  box(3.6, .08, 3.4, toon(0xe8b923), 0, .015, 30, null, false); box(3.2, .09, 3.0, toon(0x5a6276), 0, .03, 30, null, false);
   // Cruce este: tanque y señales
   [[27.2, 37.7], [28.1, 38.5]].forEach(([x, z], k) => { const b = cyl(.4, .4, 1, toon(k ? 0xff5a6e : 0x5ab8ff), x, .5, z); hull(b, 1.06); });
 }
@@ -1789,7 +1803,9 @@ function gameFrame(dt, t) {
   const moving = free && (!inD || (local.dropT <= 0 && local.exitT <= 0));
   let f = 0, s = 0;
   if (moving) { if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1; if (keys.KeyD || keys.ArrowRight) s += 1; if (keys.KeyA || keys.ArrowLeft) s -= 1; f += joy.y; s += joy.x;
-    const L = Math.hypot(f, s); if (L > 1) { f /= L; s /= L; }
+    const L = Math.hypot(f, s); if (L > 1) { f /= L; s /= L; } }
+  { const k = 1 - Math.exp(-dt * (f || s ? 13 : 18)); local.mf = moving ? (local.mf || 0) + (f - (local.mf || 0)) * k : 0; local.ms = moving ? (local.ms || 0) + (s - (local.ms || 0)) * k : 0; if (Math.abs(local.mf) < .003) local.mf = 0; if (Math.abs(local.ms) < .003) local.ms = 0; f = local.mf; s = local.ms; }
+  if (moving && (f || s)) {
     const sp = SPEED * (inD ? .95 : ghost ? 1.15 : 1) * dt, sy = Math.sin(P.yaw), cy = Math.cos(P.yaw), dx = (-sy * f + cy * s) * sp, dz = (-cy * f - sy * s) * sp;
     if (inD) ductMove(P, dx, dz, local.duct); else movePos(P, dx, dz, PR, ghost); }
   const onCeil = !!(me && me.al && me.ce > 0 && S.ph === 'play');
@@ -2013,11 +2029,11 @@ function startGameLocal() {
   mode = 'game'; hideScreens(); MENU_BLOBS.forEach(b => scene.remove(b.c.g)); MENU_BLOBS.length = 0; clearAvatars();
   ME = S.pl.findIndex(p => p.pe && p.pe === (NET.online ? NET.myPeer : 'yo')); if (NET.isHost && !NET.online) ME = 0;
   local.done = new Set(); local.lastRd = 0; local.lastPh = ''; local.lastMid = S.mid; local.kfN = S.kf ? S.kf.n : 0; local.vent = -1; local.duct = -1; local.dropT = 0; local.exitT = 0; local.camView = false; local.pv = {}; local.lastSab = null; local.light = 1; local.clN = S.cl ? S.cl.n : 0; local.detT = 0; local.fp = {}; FOOT.length = 0; NET.pres.a = null; NET.pres.vt = null;
-  qs('#hud').hidden = false; qs('#joy').hidden = !isTouch; qs('#lockhint').hidden = isTouch;
+  qs('#vig').classList.add('on'); qs('#hud').hidden = false; qs('#joy').hidden = !isTouch; qs('#lockhint').hidden = isTouch;
   showIntro();
 }
 function teardownGame() {
-  mode = 'menu'; clearAvatars(); closeTask(); toggleMap(false); exitVent(true); closeCams(); local.saboOpen = false;
+  mode = 'menu'; qs('#vig').classList.remove('on'); clearAvatars(); closeTask(); toggleMap(false); exitVent(true); closeCams(); local.saboOpen = false;
   hideSplash(); ['#hud', '#meeting', '#eject', '#intro', '#death', '#end', '#sabo', '#cams'].forEach(s => qs(s).hidden = true); qs('#ghostTint').style.opacity = 0; qs('#darkV').style.opacity = 0; qs('#alarm').classList.remove('on');
   try { if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {} canvas.style.cursor = '';
   DOOR_ON = new Set(); DOORS.forEach(d => { d.o = 1; d.mesh.visible = false; });
@@ -2727,7 +2743,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-if ((location.protocol === 'file:' || location.hostname === '127.0.0.1') && /pztest/.test(location.search)) window.__pz = { get S() { return S; }, P, local, ST, FIX, VENTS, openTask, openFix, openCams, closeCams, toggleSabo, enterVent, startMeeting: (a, b) => startMeeting(a, b), hostKill: (a, b) => hostKill(a, b), hostSabotage: (a, b) => hostSabotage(a, b), get AV() { return AV; }, freeSpot, ROOMS, CRECTS, CORR, NODES, navPath, nearestNode, movePos, inWalk, losClear, stepToward, wallSegs, hostVote: (a, b) => hostVote(a, b), sendVote: x => sendVote(x), NET, DUCTS, ductMove, inDuct, get interact() { return interact; }, doAbility: () => doAbility(), leave: () => leaveToMenu(null), DOORS, get H() { return H; }, doUse: () => doUse(), doKill: () => doKill(), hostAbility: (a, b) => hostAbility(a, b), FOOT, FOOT_POOL, AV, get ME() { return ME; }, sim: (sec) => { for (let i = 0; i < sec * 20; i++) hostTick(.05); }, info: () => renderer.info.render, MG };
+if ((location.protocol === 'file:' || location.hostname === '127.0.0.1') && /pztest/.test(location.search)) window.__pz = { get S() { return S; }, P, local, ST, FIX, VENTS, openTask, openFix, openCams, closeCams, toggleSabo, enterVent, startMeeting: (a, b) => startMeeting(a, b), hostKill: (a, b) => hostKill(a, b), hostSabotage: (a, b) => hostSabotage(a, b), get AV() { return AV; }, freeSpot, ROOMS, CRECTS, CORR, NODES, navPath, nearestNode, movePos, inWalk, losClear, stepToward, wallSegs, hostVote: (a, b) => hostVote(a, b), sendVote: x => sendVote(x), NET, DUCTS, ductMove, inDuct, get interact() { return interact; }, doAbility: () => doAbility(), leave: () => leaveToMenu(null), DOORS, snap2: (x, y, z, yw, pt) => { const r = []; [[0, 0, 0, 0], [.004, .001, .003, .0004]].forEach(([a, b2, c, d]) => { camera.position.set(x + a, y + b2, z + c); camera.rotation.set(pt, yw + d, 0); camera.updateMatrixWorld(); renderer.render(scene, camera); r.push(canvas.toDataURL('image/png')); }); return r; }, snap: (x, y, z, yw, pt) => { camera.position.set(x, y, z); camera.rotation.set(pt, yw, 0); camera.updateMatrixWorld(); renderer.render(scene, camera); return canvas.toDataURL('image/png'); }, get H() { return H; }, doUse: () => doUse(), doKill: () => doKill(), hostAbility: (a, b) => hostAbility(a, b), FOOT, FOOT_POOL, AV, get ME() { return ME; }, sim: (sec) => { for (let i = 0; i < sec * 20; i++) hostTick(.05); }, info: () => renderer.info.render, MG };
 })();
 </script>
 
