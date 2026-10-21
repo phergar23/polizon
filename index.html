@@ -1329,7 +1329,7 @@ const ROLES = {
   tre: { n: 'Araña', side: 'imp', col: '#7ad14a', d: 'Anda por el techo durante 20 s, por encima de todos. Desde arriba no puede eliminar.' } };
 const ROLE_KEYS = Object.keys(ROLES);
 const AB_CD = { mec: 25, det: 30, cam: 35, fan: 15, lim: 20, tre: 45, start: 12 };
-const CEIL_T = 20, CEIL_Y = WALL_H - .02;
+const CEIL_T = 20, CEIL_Y = WALL_H - .02, CEIL_LOOK = .6;
 const roleIcon = (k, size = 26) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${RIC[k] || RIC.none}</svg>`;
 const canVent = p => !!p && (p.im || p.ro === 'ing');
 const settings = Object.assign({ N: 6, npc: true, imp: 1, prRole: 'crew', prN: 6, ro: ROLE_KEYS.slice(), prSub: '' }, store.get('settings', {}));
@@ -1703,8 +1703,10 @@ function updateAvatars(dt, t) {
     const k = 1 - Math.exp(-14 * dt); const ox = a.rx, oz = a.rz; a.rx += (tx - a.rx) * k; a.rz += (tz - a.rz) * k; a.ry += wrapA(ty - a.ry) * k;
     const ceT = p.al && p.ce > 0 ? 1 : 0; const pc = a.cl || 0; a.cl = pc + (ceT - pc) * Math.min(1, dt * 5); if (Math.abs(a.cl - ceT) < .01) a.cl = ceT;
     if ((pc < .5) !== (a.cl < .5) && a.g.visible) burst('glow', a.rx, a.cl > .5 ? 2.4 : .6, a.rz, 10, 0x7ad14a);
-    const up = a.cl > .5; a.g.scale.y = up ? -1 : 1; if (a.ns === undefined) a.ns = a.g.children.find(c => c.isSprite) || null; if (a.ns) a.ns.visible = !up; const hy = up ? CEIL_Y - (1 - a.cl) * 1.6 : a.cl * 1.6;
-    a.g.position.set(a.rx, hy, a.rz); a.g.rotation.y = a.ry + Math.PI;
+    const up = a.cl > .02; if (a.ns === undefined) a.ns = a.g.children.find(c => c.isSprite) || null; if (a.ns) a.ns.visible = !up; if (a.shadow) a.shadow.visible = !up;
+    // pegada al techo boca abajo: solo se ve mirando claramente hacia arriba
+    if (a.cl > .5 && p.i !== ME && P.pitch < CEIL_LOOK) a.g.visible = false;
+    a.g.rotation.order = 'YXZ'; a.g.position.set(a.rx, a.cl * (CEIL_Y - .5), a.rz); a.g.rotation.set(a.cl * Math.PI / 2, a.ry + Math.PI, 0);
     const sp = Math.hypot(a.rx - ox, a.rz - oz) / Math.max(dt, 1e-3); a.sp = (a.sp || 0) * .8 + (p.i === ME ? (local.moveSp || 0) : sp) * .2; animChar(a, a.sp, t);
   });
   const bids = new Set((S.b || []).map(b => b.id));
@@ -1799,7 +1801,7 @@ function gameFrame(dt, t) {
     else if (local.dropT > 0) ey = low + (EYE - low) * (local.dropT / .4);
     else ey = low + Math.sin(local.bob) * .03 * Math.min(1, mv); }
   else ey = EYE + (ghost ? .35 + Math.sin(t * 2) * .05 : Math.sin(local.bob) * .035 * Math.min(1, mv));
-  local.ceil = (local.ceil || 0) + ((onCeil ? 1 : 0) - (local.ceil || 0)) * Math.min(1, dt * 5); if (!inD) ey += (CEIL_Y - .5 - EYE) * local.ceil;
+  local.ceil = (local.ceil || 0) + ((onCeil ? 1 : 0) - (local.ceil || 0)) * Math.min(1, dt * 5); if (!inD) ey += (CEIL_Y - .3 - EYE) * local.ceil;
   if (onCeil !== !!local.wasCeil) { local.wasCeil = onCeil; snd(onCeil ? 'vent' : 'click'); if (onCeil) toast('¡Estás en el techo! ' + CEIL_T + ' s', '#a8f07a'); }
   camera.position.set(P.x, ey, P.z); camera.rotation.set(P.pitch, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25);
   // iluminación (sabotaje de luces)
@@ -1950,7 +1952,7 @@ function renderMonitors() {
   CAMS.forEach((c, i) => { renderer.setRenderTarget(RT[i]); renderer.render(scene, c.cam); }); renderer.setRenderTarget(null); camHide(false);
   if (sa) sa.g.visible = false;
 }
-function camHide(on) { if (!S || !S.pl) return; S.pl.forEach(p => { const a = AV[p.i]; if (p.ro !== 'fan' || !a) return; if (on) { a._cv = a.g.visible; a.g.visible = false; } else a.g.visible = a._cv; }); FOOT_POOL.forEach(m => { if (on) { m._cv = m.visible; m.visible = false; } else m.visible = m._cv; }); }
+function camHide(on) { if (!S || !S.pl) return; S.pl.forEach(p => { const a = AV[p.i]; if (!(p.ro === 'fan' || p.ce > 0) || !a) return; if (on) { a._cv = a.g.visible; a.g.visible = false; } else a.g.visible = a._cv; }); FOOT_POOL.forEach(m => { if (on) { m._cv = m.visible; m.visible = false; } else m.visible = m._cv; }); }
 const _v2 = new THREE.Vector2();
 function renderCamsView() {
   const sa = AV[ME]; if (sa) sa.g.visible = local.vent < 0; camHide(true);
