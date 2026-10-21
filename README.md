@@ -55,3 +55,13 @@ Al crear la partida, el botón **Elegir** de "Roles especiales" abre un menú pa
 Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detective 30 s, Cambiaformas 35 s, Fantasma 15 s, Limpiador 20 s y Araña 45 s. Al empezar la partida todas tardan 12 s en estar listas. El Ingeniero solo puede reparar a distancia una vez.
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
+
+## Pantalla completa en iPhone
+
+En el iPhone, Safari y Chrome no permiten poner una web a pantalla completa. Para jugar sin barras del navegador, instala el juego como app:
+
+1. Abre el juego en Safari (o Chrome) desde la página de GitHub.
+2. Pulsa **Compartir** y elige **Añadir a pantalla de inicio**.
+3. Abre **Polizón** desde el icono: se abre a pantalla completa.
+
+El botón **Jugar a pantalla completa** del menú muestra estos pasos en el propio móvil. En Android ese botón pone el juego a pantalla completa directamente.

@@ -1,5 +1,15 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Polizón">
+<meta name="theme-color" content="#0b0e2a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+</head><body>
 <title>Polizón a Bordo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -232,6 +242,7 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 #alarm{position:fixed;inset:0;pointer-events:none;z-index:8;box-shadow:inset 0 0 140px 40px rgba(255,30,60,.6);opacity:0}
 #alarm.on{animation:alarmP 1s infinite}
 @keyframes alarmP{0%,100%{opacity:.15}50%{opacity:1}}
+html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #vig{position:fixed;inset:0;pointer-events:none;z-index:6;background:radial-gradient(ellipse at center,transparent 58%,rgba(4,6,18,.38));opacity:0;transition:opacity .6s}
 #vig.on{opacity:1}
 #darkV{position:fixed;inset:0;pointer-events:none;z-index:7;background:radial-gradient(circle at center,transparent 14%,rgba(2,3,12,.88) 46%,rgba(2,3,12,.97));opacity:0;transition:opacity 1.2s}
@@ -243,6 +254,16 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 .act.sab{background:linear-gradient(#b46bff,#7a3ad8)}
 .act.abil{background:linear-gradient(#36e0ad,#119a73)}
 .act.abil.impab{background:linear-gradient(#ff9a5a,#d8582a)}
+#fsHelp{z-index:80}
+.fscard{width:min(520px,100%);max-height:100%;overflow:auto}
+@media (max-height:480px){.fscard{padding:16px 20px;gap:10px}.fscard h2{font-size:22px}.fssteps{gap:6px}.fssteps li{padding:6px 10px;font-size:14px}.fssteps .ic{width:32px;height:32px}}
+.fssteps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:st}
+.fssteps li{display:flex;align-items:center;gap:12px;background:#121747;border:2px solid #2c3590;border-radius:16px;padding:10px 12px;font-weight:700;font-size:15px;line-height:1.35;counter-increment:st}
+.fssteps li::before{content:counter(st);flex:none;width:30px;height:30px;border-radius:50%;background:var(--sun);color:#2b1a00;display:grid;place-items:center;font-family:var(--fd);font-size:18px}
+.fssteps .ic{flex:none;width:38px;height:38px;border-radius:10px;background:#2a3272;display:grid;place-items:center}
+.fssteps .ic svg{width:24px;height:24px}
+.fsframe{background:rgba(255,179,64,.12);border:2px solid #ffb340;border-radius:14px;padding:10px 12px;color:#ffe2b0}
+.fsframe a{color:#ffd166;font-weight:800;word-break:break-all}
 .rolecard{width:min(600px,100%);max-height:100%;overflow:auto}
 .rgrp h4{margin:0 0 8px;font-family:var(--fd);font-weight:400;font-size:19px}
 .rgrp h4.crewh{color:var(--sky)} .rgrp h4.imph{color:var(--coral)}
@@ -380,6 +401,7 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
       <button class="btn sky" id="bJoin">Unirse</button>
     </div>
     <button class="btn mint" id="bPractice">Modo práctica</button>
+    <button class="btn ghost" id="bFull" type="button" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:6px"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Jugar a pantalla completa</button>
     <div class="keys" aria-label="Controles">
       <kbd>W A S D</kbd><span>Moverse · ratón para mirar</span>
       <kbd>E</kbd><span>Usar / hacer tarea</span>
@@ -530,6 +552,14 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 <section class="screen" id="end" hidden><div class="card" id="endCard"></div></section>
 <div class="ov dim" id="bigmap" hidden><div class="mapc"><canvas id="mapC" width="1400" height="984"></canvas><button class="ib x" id="mapX" aria-label="Cerrar mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 <div id="cams" hidden><div id="camBar"><span>Cámaras de seguridad · <span id="camClock"></span></span><button class="btn coral" id="camX" type="button">Salir (E)</button></div></div>
+<div class="ov dim" id="fsHelp" hidden><div class="card fscard" role="dialog" aria-modal="true" aria-labelledby="fsT">
+  <h2 id="fsT" style="margin:0">Pantalla completa en iPhone</h2>
+  <p class="note" id="fsWhy">En el iPhone, Safari y Chrome no dejan poner una web a pantalla completa. Instala el juego como app: se abrirá sin barras del navegador.</p>
+  <div class="note fsframe" id="fsFrame" hidden>Ahora mismo el juego está dentro de otra app. Ábrelo primero en Safari: <a id="fsLink" href="https://phergar23.github.io/polizon/" target="_blank" rel="noopener">phergar23.github.io/polizon</a></div>
+  <ol class="fssteps" id="fsSteps"></ol>
+  <p class="note" id="fsAlt"></p>
+  <div class="row"><button class="btn mint" id="fsOk" type="button">Entendido</button></div>
+</div></div>
 <div class="ov dim" id="roles" hidden><div class="card rolecard" role="dialog" aria-modal="true" aria-labelledby="roT">
   <h2 id="roT" style="margin:0">Roles especiales</h2>
   <p class="note">Marca los roles que puede haber en la partida. Cada rol activado lo recibe un jugador al azar de su bando (si hay suficientes). La habilidad se usa con la tecla C y, después de usarla, hay que esperar a que se recargue.</p>
@@ -792,6 +822,9 @@ const scene = new THREE.Scene(); scene.background = new THREE.Color(0x15191c); s
 const FOG_C = new THREE.Color(0x2a3034), FOG_D = new THREE.Color(0x04050e);
 const camera = new THREE.PerspectiveCamera(72, 1, .05, 220); camera.rotation.order = 'YXZ';
 const IS_TOUCH = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches);
+const IS_IOS = /iPhone|iPod|iPad/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const IS_STANDALONE = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
+const IN_FRAME = (() => { try { return window.top !== window; } catch (e) { return true; } })();
 const APP = document.getElementById('app'); let ROT = false;
 if (IS_TOUCH) APP.classList.add('touch');
 // en móvil vertical se gira toda la interfaz 90° para jugar en horizontal
@@ -806,6 +839,23 @@ function resize() {
 }
 async function goLandscape() { if (!IS_TOUCH) return; try { const el3 = document.documentElement; if (!document.fullscreenElement && el3.requestFullscreen) await el3.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {} try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) {} setTimeout(resize, 300); }
 addEventListener('orientationchange', () => setTimeout(resize, 250));
+// pantalla completa: en iPhone solo es posible instalando el juego en la pantalla de inicio
+const IC_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="#5ab8ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+const IC_ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+const IC_APP = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff8a98" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="4" fill="#ff4d5e" stroke="none"/><circle cx="10" cy="11" r="1.6" fill="#fff" stroke="none"/><circle cx="14" cy="11" r="1.6" fill="#fff" stroke="none"/></svg>';
+function fsStep(ic, html) { const li = el('li'); const i = el('span', 'ic'); i.innerHTML = ic; const t = el('span'); t.innerHTML = html; li.append(i, t); return li; }
+function showFsHelp() {
+  const ov = qs('#fsHelp'); if (ov.parentElement !== document.body) document.body.appendChild(ov); // fuera de la zona girada: se lee con el móvil en vertical
+  const chrome = /CriOS/.test(navigator.userAgent), ol = qs('#fsSteps'); ol.replaceChildren();
+  qs('#fsFrame').hidden = !IN_FRAME;
+  if (chrome) { ol.append(fsStep(IC_SHARE, 'Pulsa el botón <b>Compartir</b> que hay en la barra de la dirección, arriba a la derecha.'), fsStep(IC_ADD, 'Elige <b>Añadir a pantalla de inicio</b> y luego <b>Añadir</b>.'), fsStep(IC_APP, 'Abre <b>Polizón</b> desde su icono: se abre a pantalla completa.'));
+    qs('#fsAlt').textContent = 'Si en Chrome no aparece "Añadir a pantalla de inicio", abre la página en Safari y hazlo desde allí.'; }
+  else { ol.append(fsStep(IC_SHARE, 'Pulsa el botón <b>Compartir</b> de Safari (abajo con el móvil en vertical, arriba en horizontal).'), fsStep(IC_ADD, 'Baja y elige <b>Añadir a pantalla de inicio</b>, luego <b>Añadir</b>.'), fsStep(IC_APP, 'Abre <b>Polizón</b> desde su icono: se abre a pantalla completa, sin barras.'));
+    qs('#fsAlt').textContent = 'Solo hay que hacerlo una vez. Las partidas online y los códigos de sala funcionan igual desde la app.'; }
+  qs('#fsHelp').hidden = false;
+}
+function canRealFullscreen() { const d = document.documentElement; return !IS_IOS && !!(d.requestFullscreen || d.webkitRequestFullscreen); }
+function updateFullBtn() { const b = qs('#bFull'); if (!b) return; b.hidden = !(IS_TOUCH && !IS_STANDALONE() && !document.fullscreenElement && (IS_IOS || canRealFullscreen())); }
 addEventListener('resize', resize); resize();
 const hemi = new THREE.HemisphereLight(0xf2f4f6, 0x5c6266, .6); scene.add(hemi);
 const amb = new THREE.AmbientLight(0xffffff, .12); scene.add(amb);
@@ -2649,6 +2699,11 @@ nameIn.addEventListener('input', () => { profile.name = clean(nameIn.value, 12);
 function ensureName() { if (!profile.name) { profile.name = COLORS[profile.color].n; nameIn.value = profile.name; store.set('profile', profile); } }
 qs('#bCreate').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('create'); renderCreate(); };
 qs('#bPractice').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('practice'); renderPractice(); };
+qs('#bFull').onclick = async () => { snd('click'); if (canRealFullscreen()) { await goLandscape(); updateFullBtn(); } else showFsHelp(); };
+qs('#fsOk').onclick = () => { snd('click'); qs('#fsHelp').hidden = true; };
+qs('#fsHelp').addEventListener('click', e => { if (e.target.id === 'fsHelp') qs('#fsHelp').hidden = true; });
+document.addEventListener('fullscreenchange', updateFullBtn); updateFullBtn();
+if (IS_STANDALONE()) document.documentElement.classList.add('standalone');
 function roleTog(k, side, pressed, small) { const b = el('button', 'rtog ' + side); b.type = 'button'; b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
   const ic = el('span', 'ri'); ic.innerHTML = roleIcon(k); ic.style.background = k === 'none' ? '#5a628f' : ROLES[k].col; b.append(ic, el('b', null, k === 'none' ? 'Normal' : ROLES[k].n));
   if (!small) b.append(el('small', null, ROLES[k].d)); b.append(el('span', 'ck', '✓')); if (small && k !== 'none') b.title = ROLES[k].d; return b; }
