@@ -50,5 +50,8 @@ Al crear la partida, el botón **Elegir** de "Roles especiales" abre un menú pa
 - **Cambiaformas**: copia el aspecto del jugador más cercano durante 15 s.
 - **Fantasma de conductos**: salta entre todas las redes de conductos y las cámaras no le ven.
 - **Limpiador**: hace desaparecer cuerpos para que nadie los reporte.
+- **Araña**: anda por el techo durante 20 s, por encima de todos; desde arriba no puede eliminar.
+
+Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detective 30 s, Cambiaformas 35 s, Fantasma 15 s, Limpiador 20 s y Araña 45 s. Al empezar la partida todas tardan 12 s en estar listas. El Ingeniero solo puede reparar a distancia una vez.
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
