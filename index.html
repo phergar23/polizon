@@ -1326,7 +1326,7 @@ const ROLES = {
   cam: { n: 'Cambiaformas', side: 'imp', col: '#ff6b7d', d: 'Copia el aspecto del jugador más cercano durante 15 s.' },
   fan: { n: 'Fantasma de conductos', side: 'imp', col: '#b46bff', d: 'Salta entre todas las redes de conductos y las cámaras no le ven.' },
   lim: { n: 'Limpiador', side: 'imp', col: '#ffcc33', d: 'Hace desaparecer cuerpos para que nadie los reporte.' },
-  tre: { n: 'Araña', side: 'imp', col: '#7ad14a', d: 'Anda por el techo durante 20 s, por encima de todos. Desde arriba no puede eliminar.' } };
+  tre: { n: 'Araña', side: 'imp', col: '#7ad14a', d: 'Anda pegada al techo 20 s mirando hacia abajo. Solo la ve quien mira arriba. Desde el techo no puede eliminar.' } };
 const ROLE_KEYS = Object.keys(ROLES);
 const AB_CD = { mec: 25, det: 30, cam: 35, fan: 15, lim: 20, tre: 45, start: 12 };
 const CEIL_T = 20, CEIL_Y = WALL_H - .02, CEIL_LOOK = .6;
@@ -1337,7 +1337,7 @@ if (!Array.isArray(settings.ro)) settings.ro = ROLE_KEYS.slice();
 const profile = Object.assign({ name: '', color: Math.floor(Math.random() * 10) }, store.get('profile', {}));
 let S = null; const H = {}; let ME = -1; let mode = 'menu';
 const P = { x: 0, z: 0, yaw: 0, pitch: 0 };
-const local = { done: new Set(), seq: 0, chatI: 0, lastPh: '', lastRd: 0, lastMid: 0, kfN: 0, taskOpen: null, taskTick: null, fixOpen: null, mapOpen: false, saboOpen: false, introT: 0, sel: null, vent: -1, duct: -1, dropT: 0, exitT: 0, camView: false, pv: {}, light: 1, beepT: 0, lastSab: null, lastDoors: '', detT: 0, abLock: 0, clN: 0, fp: {} };
+const local = { done: new Set(), seq: 0, chatI: 0, lastPh: '', lastRd: 0, lastMid: 0, kfN: 0, taskOpen: null, taskTick: null, fixOpen: null, mapOpen: false, saboOpen: false, introT: 0, sel: null, vent: -1, duct: -1, dropT: 0, exitT: 0, camView: false, pv: {}, light: 1, beepT: 0, lastSab: null, lastDoors: '', pT: 0, cp: 0, detT: 0, abLock: 0, clN: 0, fp: {} };
 const NET = { avail: false, lobbyRoom: null, R: null, online: false, isHost: true, code: '', myPeer: null, hostSeen: 0, hadHost: false, joinT: 0, pres: {}, peerPos: {} };
 const maxImp = n => n < 3 ? 0 : n <= 6 ? 1 : n <= 8 ? 2 : 3;
 const nm = i => (S && S.pl[i]) ? S.pl[i].n : '¿?';
@@ -1759,7 +1759,7 @@ document.addEventListener('mousemove', e => { if (mode !== 'game' || !canLook())
   else if (lockFail && e.target === canvas) look(e.movementX || 0, e.movementY || 0, .0035); });
 canvas.addEventListener('mousedown', e => { if (document.pointerLockElement !== canvas) dragLook = { x: e.clientX, y: e.clientY }; });
 addEventListener('mouseup', () => dragLook = null);
-function look(dx, dy, s) { P.yaw -= dx * s; P.pitch = Math.max(-1.2, Math.min(1.2, P.pitch - dy * s)); }
+function look(dx, dy, s) { P.yaw -= dx * s; const c = !!local.wasCeil; P.pitch = Math.max(c ? -1.56 : -1.2, Math.min(c ? -1.0 : 1.2, P.pitch - dy * s)); }
 function canLook() { return local.taskOpen == null && !local.mapOpen && !local.saboOpen && !local.camView && S && S.ph === 'play'; }
 canvas.addEventListener('touchstart', e => { for (const t of e.changedTouches) { const a = toApp(t.clientX, t.clientY); if (a.x > appW() * .35 && !lookTouch) lookTouch = { id: t.identifier, x: a.x, y: a.y }; } }, { passive: true });
 canvas.addEventListener('touchmove', e => { for (const t of e.changedTouches) if (lookTouch && t.identifier === lookTouch.id) { const a = toApp(t.clientX, t.clientY); if (canLook()) look(a.x - lookTouch.x, a.y - lookTouch.y, .0065); lookTouch.x = a.x; lookTouch.y = a.y; } }, { passive: true });
@@ -1802,8 +1802,9 @@ function gameFrame(dt, t) {
     else ey = low + Math.sin(local.bob) * .03 * Math.min(1, mv); }
   else ey = EYE + (ghost ? .35 + Math.sin(t * 2) * .05 : Math.sin(local.bob) * .035 * Math.min(1, mv));
   local.ceil = (local.ceil || 0) + ((onCeil ? 1 : 0) - (local.ceil || 0)) * Math.min(1, dt * 5); if (!inD) ey += (CEIL_Y - .3 - EYE) * local.ceil;
-  if (onCeil !== !!local.wasCeil) { local.wasCeil = onCeil; snd(onCeil ? 'vent' : 'click'); if (onCeil) toast('¡Estás en el techo! ' + CEIL_T + ' s', '#a8f07a'); }
-  camera.position.set(P.x, ey, P.z); camera.rotation.set(P.pitch, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25);
+  if (onCeil !== !!local.wasCeil) { local.wasCeil = onCeil; local.pT = .7; P.pitch = onCeil ? -1.5 : 0; snd(onCeil ? 'vent' : 'click'); if (onCeil) toast('¡Estás en el techo! ' + CEIL_T + ' s', '#a8f07a'); }
+  camera.position.set(P.x, ey, P.z); if (local.pT > 0) { local.pT -= dt; local.cp += (P.pitch - local.cp) * Math.min(1, dt * 7); } else local.cp = P.pitch;
+  camera.rotation.set(local.cp, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25);
   // iluminación (sabotaje de luces)
   const dark = crisis === 'lights' && me && me.al && !me.im;
   local.light += ((dark ? .2 : 1) - local.light) * Math.min(1, dt * 2.2); const L = local.light;
