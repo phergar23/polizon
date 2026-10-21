@@ -365,7 +365,16 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
 .touch .act{width:82px;height:82px;border-radius:22px;font-size:13px}
 .touch .act svg{width:32px;height:32px}
 .touch .act small{display:none}
-.touch .tasks{font-size:11.5px;line-height:1.35;max-height:calc(var(--ah,100vh) * 0.42);overflow:auto;padding:8px 10px}
+.touch .tasks{font-size:11.5px;line-height:1.32;max-height:max(64px,calc(var(--ah,100vh) - 232px));overflow-y:auto;overscroll-behavior:contain;padding:7px 10px;pointer-events:auto;cursor:pointer}
+.touch .tasks div{white-space:nowrap;justify-content:space-between;gap:8px}
+.touch .tasks div span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.touch .tasks div i{flex:none;font-size:10.5px}
+.touch .tasks b{font-size:14px;margin-bottom:1px}
+.touch .tasks b::after{content:" ▾";font-size:11px;opacity:.7}
+.touch .tasks.mini>:not(b){display:none}
+.touch .tasks.mini b{margin:0}
+.touch .tasks.mini b::after{content:" ▸"}
+.touch .keys{display:none}
 .touch #hud .tl{max-width:min(250px,calc(var(--aw,100vw) * 0.3))}
 .touch #hint{bottom:calc(112px + env(safe-area-inset-bottom,0px));font-size:16px}
 .touch #bar{top:calc(10px + env(safe-area-inset-top,0px));left:50%;right:auto;transform:translateX(-50%);width:min(300px,calc(var(--aw,100vw) * 0.34))}
@@ -816,12 +825,14 @@ function seat(i, n) { const a = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2
 
 /* ================== THREE ================== */
 const canvas = qs('#c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+const TOUCH0 = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: !TOUCH0 });
+let PRATIO = Math.min(window.devicePixelRatio || 1, TOUCH0 ? 1.5 : 1.75); renderer.setPixelRatio(PRATIO);
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x15191c); scene.fog = new THREE.Fog(0x2a3034, 30, 85);
 const FOG_C = new THREE.Color(0x2a3034), FOG_D = new THREE.Color(0x04050e);
-const camera = new THREE.PerspectiveCamera(72, 1, .05, 220); camera.rotation.order = 'YXZ';
+const camera = new THREE.PerspectiveCamera(72, 1, TOUCH0 ? .1 : .05, TOUCH0 ? 140 : 220); camera.rotation.order = 'YXZ';
 const IS_TOUCH = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches);
+const KB = k => IS_TOUCH ? '' : ` (${k})`;
 const IS_IOS = /iPhone|iPod|iPad/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
 const IN_FRAME = (() => { try { return window.top !== window; } catch (e) { return true; } })();
@@ -831,14 +842,17 @@ if (IS_TOUCH) APP.classList.add('touch');
 function appW() { return ROT ? innerHeight : innerWidth; } function appH() { return ROT ? innerWidth : innerHeight; }
 function toApp(cx, cy) { return ROT ? { x: cy, y: innerWidth - cx } : { x: cx, y: cy }; }
 function localPt(el2, e, w, h) { const r = el2.getBoundingClientRect(); return ROT ? { x: (e.clientY - r.top) * w / r.height, y: (r.right - e.clientX) * h / r.width } : { x: (e.clientX - r.left) * w / r.width, y: (e.clientY - r.top) * h / r.height }; }
+let lastCW = 0, lastCH = 0;
+const resizeSoon = () => { resize(); [120, 400, 900].forEach(ms => setTimeout(resize, ms)); };
 function resize() {
   ROT = IS_TOUCH && innerHeight > innerWidth * 1.05; APP.classList.toggle('rot', ROT);
   if (ROT) { APP.style.width = innerHeight + 'px'; APP.style.height = innerWidth + 'px'; APP.style.transform = `translateX(${innerWidth}px) rotate(90deg)`; }
   else { APP.style.width = APP.style.height = APP.style.transform = ''; }
-  const w = appW(), h = appH(); APP.style.setProperty('--aw', w + 'px'); APP.style.setProperty('--ah', h + 'px'); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const w = appW(), h = appH(); APP.style.setProperty('--aw', w + 'px'); APP.style.setProperty('--ah', h + 'px');
+  const cw = canvas.clientWidth || w, ch = canvas.clientHeight || h; renderer.setSize(cw, ch, false); camera.aspect = cw / ch; camera.updateProjectionMatrix(); lastCW = cw; lastCH = ch;
 }
 async function goLandscape() { if (!IS_TOUCH) return; try { const el3 = document.documentElement; if (!document.fullscreenElement && el3.requestFullscreen) await el3.requestFullscreen({ navigationUI: 'hide' }); } catch (e) {} try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) {} setTimeout(resize, 300); }
-addEventListener('orientationchange', () => setTimeout(resize, 250));
+addEventListener('orientationchange', resizeSoon); document.addEventListener('fullscreenchange', resizeSoon); document.addEventListener('webkitfullscreenchange', resizeSoon); if (window.visualViewport) visualViewport.addEventListener('resize', resizeSoon);
 // pantalla completa: en iPhone solo es posible instalando el juego en la pantalla de inicio
 const IC_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="#5ab8ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
 const IC_ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
@@ -1318,6 +1332,14 @@ function plant(x, z, s) { cyl(.32 * s, .25 * s, .5 * s, toon(0xff7a5a), x, .25 *
 function tree(x, z) { cyl(.12, .18, 1.2, toon(0x8a5a34), x, 1.2, z, null, 10); [[0, 2.0, 0, .62], [.4, 1.7, .2, .42], [-.4, 1.75, -.15, .45]].forEach(([dx, y, dz, r]) => { const m = sph(r, toon(0x55c43a), x + dx, y, z + dz, null, 16); hull(m, 1.06); });
   [[-.6, .25], [.6, -.25], [0, .4]].forEach(([dx, dz], i) => sph(.09, toon([0xff7ac6, 0xffd93d, 0xffffff][i]), x + dx, .74, z + dz, null, 10)); }
 buildShip();
+let LSLOT = null, lsT = 0; const LSPEC = [];
+function lightSlots() { LIGHTS.forEach(l => { LSPEC.push(l); if (l.parent) l.parent.remove(l); }); LIGHTS.length = 0; LSLOT = [];
+  for (let i = 0; i < 4; i++) { const L = new THREE.PointLight(0xffffff, 0, 20, 1.6); L.userData.base = 0; scene.add(L); LSLOT.push(L); LIGHTS.push(L); } lsT = 0; updateSlots(); }
+function updateSlots() { if (!LSLOT) return; const now = performance.now(); if (now < lsT) return; lsT = now + 250; const cx = camera.position.x, cz = camera.position.z;
+  const best = LSPEC.slice().sort((a, b) => Math.hypot(a.position.x - cx, a.position.z - cz) - Math.hypot(b.position.x - cx, b.position.z - cz));
+  LSLOT.forEach((L, i) => { const sp = best[i]; const k = L.userData.base ? L.intensity / L.userData.base : 1; if (!sp) { L.userData.base = 0; L.intensity = 0; return; }
+    L.position.copy(sp.position); L.color.copy(sp.color); L.distance = sp.distance; L.decay = sp.decay; L.userData.base = sp.userData.base; L.intensity = sp.userData.base * k; }); }
+if (TOUCH0) lightSlots();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { SPRS.forEach(s => { s.draw(s.c.getContext('2d'), 512, 128); s.t.needsUpdate = true; }); }).catch(() => {});
 
 /* ================== PERSONAJES ================== */
@@ -1997,8 +2019,8 @@ function updateVentUI(force) {
   const near = interact.use && interact.use.k === 'ventExit' ? interact.use.id : -1; const key = local.duct + ':' + near; if (!force && key === ventKey) return; ventKey = key;
   const dests = DUCTS[local.duct].vents.map(id => ROOMS[VENTS[id].room].n).join(' · ');
   qs('#ventHere').textContent = near >= 0 ? 'Salida: ' + ROOMS[VENTS[near].room].n : 'En los conductos';
-  const fanT = S && S.pl[ME] && S.pl[ME].ro === 'fan' ? ' · C: saltar a otra red' : '';
-  qs('#ventBtns').textContent = (near >= 0 ? 'Pulsa E para salir aquí' : 'Camina hasta una luz verde para salir · ' + dests) + fanT;
+  const fanT = S && S.pl[ME] && S.pl[ME].ro === 'fan' ? (IS_TOUCH ? ' · Saltar: otra red' : ' · C: saltar a otra red') : '';
+  qs('#ventBtns').textContent = (near >= 0 ? (IS_TOUCH ? 'Puedes salir por aquí' : 'Pulsa E para salir aquí') : 'Camina hasta una luz verde para salir · ' + dests) + fanT;
   qs('#ventOut').hidden = near < 0;
 }
 qs('#ventOut').onclick = () => { if (interact.use && interact.use.k === 'ventExit') exitVent(false, interact.use.id); };
@@ -2094,15 +2116,15 @@ function placeAtSeat() { exitVent(true); if (ME >= 0) { const st = seat(ME, S.pl
 function showIntro() {
   const me = S.pl[ME], ov = qs('#intro'); ov.replaceChildren(); local.introT = 3.8;
   const h = el('h1', 'pop'); const p = el('p'); const mates = el('div', 'mates pop');
-  if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas (E) y sabotear (F). Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre la nave y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
+  if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas' + KB('E') + ' y sabotear' + KB('F') + '. Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre la nave y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   else if (!me) { h.textContent = 'Espectador'; h.style.color = '#b9bff0'; p.textContent = 'La partida está llena. Puedes mirar como fantasma.'; }
-  else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas (E): por dentro hay que caminar por los conductos. Sabotea la nave con F.';
+  else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas' + KB('E') + ': por dentro hay que caminar por los conductos. ' + (IS_TOUCH ? 'Sabotea la nave con el botón Sabotear.' : 'Sabotea la nave con F.');
     S.pl.filter(q => q.im).forEach(q => { const d = el('div'); d.innerHTML = avatarSVG(q.c, false, 70); mates.append(d); }); }
   else { h.textContent = S.impN ? 'Tripulante' : 'Modo práctica'; h.style.color = '#5ab8ff';
     p.textContent = S.impN ? `Hay ${S.impN} ${S.impN > 1 ? 'polizones' : 'polizón'} a bordo. Completa tus tareas, vigila las cámaras y descubre quién es.` : 'No hay polizones: explora la nave y completa todas las tareas.';
     const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   ov.append(h, p);
-  if (me && me.ro) { const r = el('p', 'rolep pop'); const ic = el('span'); ic.innerHTML = roleIcon(me.ro, 30); ic.style.cssText = `display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;vertical-align:middle;margin-right:8px;background:${ROLES[me.ro].col}`; const b = el('b', null, `Rol: ${ROLES[me.ro].n}. `); r.append(ic, b, document.createTextNode(ROLES[me.ro].d + ' Habilidad con C.')); r.style.fontSize = '17px'; ov.append(r); }
+  if (me && me.ro) { const r = el('p', 'rolep pop'); const ic = el('span'); ic.innerHTML = roleIcon(me.ro, 30); ic.style.cssText = `display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;vertical-align:middle;margin-right:8px;background:${ROLES[me.ro].col}`; const b = el('b', null, `Rol: ${ROLES[me.ro].n}. `); r.append(ic, b, document.createTextNode(ROLES[me.ro].d + (IS_TOUCH ? ' Úsala con el botón verde.' : ' Habilidad con C.'))); r.style.fontSize = '17px'; ov.append(r); }
   ov.append(mates); ov.hidden = false; snd('alarm');
 }
 function showDeath(by) {
@@ -2122,10 +2144,10 @@ function updateHUD(t) {
   if (S.pr && !chip.textContent.includes('práctica')) chip.textContent += ' · práctica';
   hudT -= 1; if (hudT <= 0) { hudT = 10;
     const tl = qs('#taskList'); tl.replaceChildren();
-    if (me && me.al && me.ro) tl.append(el('div', 'rolei', `${ROLES[me.ro].n} (C): ${ROLES[me.ro].d}`));
+    if (me && me.al && me.ro && !isTouch) tl.append(el('div', 'rolei', `${ROLES[me.ro].n} (C): ${ROLES[me.ro].d}`));
     if (me && !me.im && comms) { tl.append(el('b', null, 'Comunicaciones caídas')); tl.append(el('div', null, 'Restaura la señal en Comunicaciones para ver tus tareas.')); }
     else if (me && !me.im) { tl.append(el('b', null, `Tus tareas · ${local.done.size}/${me.tk.length}`)); me.tk.forEach(sid => { const d = el('div', local.done.has(sid) ? 'done' : ''); d.append(el('span', null, ST[sid].n), el('i', null, ROOMS[ST[sid].room].n)); tl.append(d); }); }
-    else if (me && me.im) { tl.append(el('b', null, 'Misión secreta')); tl.append(el('div', null, 'Elimina a la tripulación.')); tl.append(el('div', null, 'E en una alcantarilla para bajar a los conductos y recorrerlos.')); tl.append(el('div', null, 'F para sabotear la nave.')); const mates = S.pl.filter(p => p.im && p.i !== ME); if (mates.length) tl.append(el('div', null, 'Compañeros: ' + mates.map(p => p.n).join(', '))); }
+    else if (me && me.im) { tl.append(el('b', null, 'Misión secreta')); tl.append(el('div', null, 'Elimina a la tripulación.')); if (!isTouch) { tl.append(el('div', null, 'E en una alcantarilla para bajar a los conductos y recorrerlos.')); tl.append(el('div', null, 'F para sabotear la nave.')); } const mates = S.pl.filter(p => p.im && p.i !== ME); if (mates.length) tl.append(el('div', null, 'Compañeros: ' + mates.map(p => p.n).join(', '))); }
     else tl.append(el('b', null, 'Mirando la partida'));
     const total = S.pl.reduce((s, p) => s + (p.im ? 0 : p.tt), 0); const done = S.pl.reduce((s, p) => s + (p.im ? 0 : (p.i === ME ? local.done.size : p.td)), 0);
     qs('#barFill').style.width = (comms ? 0 : (total ? Math.min(100, done / total * 100) : 0)) + '%'; qs('#barLab').textContent = comms ? 'Sin señal' : 'Tareas de la tripulación';
@@ -2150,6 +2172,7 @@ function updateHUD(t) {
   if (interact.kill != null) ht = `Q · Eliminar a ${dispN(S.pl[interact.kill])}`; else if (interact.rep != null) ht = `R · Reportar a ${nm(interact.rep)}`;
   else if (interact.use) { const iu = interact.use; ht = iu.k === 'task' ? `E · ${ST[iu.sid].n}` : iu.k === 'fix' ? `E · ${FIX[iu.id].n}` : iu.k === 'cams' ? 'E · Ver cámaras de seguridad' : iu.k === 'vent' ? 'E · Meterse en la alcantarilla' : iu.k === 'ventExit' ? `E · Salir en ${ROOMS[VENTS[iu.id].room].n}` : (S.sab ? 'No se puede convocar durante un sabotaje' : `E · Llamar a reunión (${me.em} restante)`); }
   if (!ht && interact.ab && interact.ab.ok && interact.ab.hint) ht = interact.ab.hint;
+  if (isTouch) ht = ht.replace(/^[A-Z] · /, '');
   if (S.ph === 'play' && local.taskOpen == null) { hint.textContent = ht; hint.classList.toggle('on', !!ht); } else hint.classList.remove('on');
   qs('#lockhint').hidden = isTouch || document.pointerLockElement === canvas || !canLook(); canvas.style.cursor = lockFail && canLook() ? 'none' : '';
   drawMap(mini, false);
@@ -2699,6 +2722,9 @@ nameIn.addEventListener('input', () => { profile.name = clean(nameIn.value, 12);
 function ensureName() { if (!profile.name) { profile.name = COLORS[profile.color].n; nameIn.value = profile.name; store.set('profile', profile); } }
 qs('#bCreate').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('create'); renderCreate(); };
 qs('#bPractice').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('practice'); renderPractice(); };
+if (IS_TOUCH) { qs('#ventOut').textContent = 'Salir aquí'; qs('#camX').textContent = 'Salir'; const rn = qs('#roles .note'); if (rn) rn.textContent = rn.textContent.replace('con la tecla C', 'con el botón verde de habilidad'); }
+{ const tl = qs('#taskList'); if (IS_TOUCH && store.get('tasksMini', false)) tl.classList.add('mini');
+  tl.addEventListener('click', () => { if (!IS_TOUCH) return; tl.classList.toggle('mini'); store.set('tasksMini', tl.classList.contains('mini')); }); }
 qs('#bFull').onclick = async () => { snd('click'); if (canRealFullscreen()) { await goLandscape(); updateFullBtn(); } else showFsHelp(); };
 qs('#fsOk').onclick = () => { snd('click'); qs('#fsHelp').hidden = true; };
 qs('#fsHelp').addEventListener('click', e => { if (e.target.id === 'fsHelp') qs('#fsHelp').hidden = true; });
@@ -2779,8 +2805,14 @@ if (!profile.name) nameIn.focus();
 /* ================== BUCLE ================== */
 buildMenuBlobs();
 let last = performance.now(), scrT = 0;
+let arAcc = 0, arN = 0;
+function adaptRes(raw) { if (!IS_TOUCH || mode !== 'game' || raw > .5) { arAcc = 0; arN = 0; return; } arAcc += raw; arN++; if (arAcc < 2.5) return;
+  const fps = arN / arAcc; arAcc = 0; arN = 0; const max = Math.min(window.devicePixelRatio || 1, 2); let r = PRATIO;
+  if (fps < 38) r -= .2; else if (fps < 50) r -= .1; else if (fps > 57) r += .1; r = Math.round(Math.max(.7, Math.min(max, r)) * 100) / 100;
+  if (r !== PRATIO) { PRATIO = r; renderer.setPixelRatio(r); resize(); } }
 function frame(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now; const t = now / 1000; frameN++;
+  const raw = (now - last) / 1000; adaptRes(raw); if (canvas.clientWidth !== lastCW || canvas.clientHeight !== lastCH) resize(); updateSlots();
+  const dt = Math.min(.05, raw); last = now; const t = now / 1000; frameN++;
   try {
     netTick(dt); syncPhase(dt);
     if (mode === 'game') gameFrame(dt, t); else menuFrame(dt, t);
