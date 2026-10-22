@@ -243,6 +243,12 @@ svg.wires{width:100%;max-width:330px;height:auto;touch-action:none}
 #alarm.on{animation:alarmP 1s infinite}
 @keyframes alarmP{0%,100%{opacity:.15}50%{opacity:1}}
 html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#iris{position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden;display:grid;place-items:center}
+#iris i{position:absolute;left:50%;top:50%;width:120vmax;height:120vmax;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 300vmax #000}
+#iris b{position:relative;z-index:1;font-family:var(--fd);font-weight:400;font-size:22px;color:#ffd966;background:rgba(10,8,20,.75);border:3px solid #ffb340;border-radius:16px;padding:10px 18px;display:flex;flex-direction:column;gap:8px;align-items:center;animation:irisBlink .5s ease-in-out infinite alternate;text-shadow:0 2px 0 #000}
+#iris b s{display:block;width:200px;height:10px;border-radius:6px;background:#2a2450;overflow:hidden;text-decoration:none}
+#iris b u{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a6e,#ffd966);text-decoration:none}
+@keyframes irisBlink{from{border-color:#ffb340;box-shadow:0 0 0 0 rgba(255,90,110,.0)}to{border-color:#ff5a6e;box-shadow:0 0 22px 4px rgba(255,90,110,.45)}}
 #vig{position:fixed;inset:0;pointer-events:none;z-index:6;background:radial-gradient(ellipse at center,transparent 58%,rgba(4,6,18,.38));opacity:0;transition:opacity .6s}
 #vig.on{opacity:1}
 #darkV{position:fixed;inset:0;pointer-events:none;z-index:7;background:radial-gradient(circle at center,transparent 14%,rgba(2,3,12,.88) 46%,rgba(2,3,12,.97));opacity:0;transition:opacity 1.2s}
@@ -301,7 +307,7 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
 #sabo .shead{display:flex;justify-content:space-between;align-items:center}
 #sabo h3{margin:0;font-family:var(--fd);font-weight:400;font-size:26px;color:#d9b8ff}
 #sbMap{width:100%;height:auto;display:block;border-radius:16px;cursor:pointer;background:#0b0f3a;max-height:calc(var(--ah,100vh) * 0.52);object-fit:contain}
-#sbBtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#sbBtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .sbb{border:0;border-radius:16px;background:#8a4bdc;color:#fff;padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;gap:3px;box-shadow:0 5px 0 #4a1f8a;text-align:center;font:inherit}
 .sbb b{font-family:var(--fd);font-weight:400;font-size:17px}
 .sbb small{font-size:12px;font-weight:700;opacity:.85}
@@ -391,7 +397,7 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
 <div id="ghostTint"></div>
 <div id="alarm"></div>
 <div id="ventTint"></div>
-<div id="vig"></div><div id="darkV"></div>
+<div id="iris" hidden><i></i><b hidden>Despresurizando<s><u></u></s></b></div><div id="vig"></div><div id="darkV"></div>
 
 <!-- MENÚ PRINCIPAL -->
 <section class="screen" id="s-menu">
@@ -604,7 +610,7 @@ const COLORS = [
   { n: 'Rojo', h: 0xff4757 }, { n: 'Azul', h: 0x3d7bff }, { n: 'Verde', h: 0x2ed573 }, { n: 'Rosa', h: 0xff7ac6 }, { n: 'Naranja', h: 0xff9f1a },
   { n: 'Amarillo', h: 0xffd93d }, { n: 'Morado', h: 0x9b5cff }, { n: 'Cian', h: 0x2ee6e6 }, { n: 'Blanco', h: 0xeef0ff }, { n: 'Marrón', h: 0xa86f45 }];
 const WALL_H = 3.2, EYE = 1.12, PR = 0.36, SPEED = 4.2, KILL_CD = 25, KILL_R = 2.0, USE_R = 1.5, REPORT_R = 2.8, MEET_T = 60, EJECT_T = 7;
-const SAB_CD = 30, DOOR_T = 10, DOOR_CD = 22, REACTOR_T = 45, TASKS_PER = 6;
+const GRAV_T = 40, SAB_CD = 30, DOOR_T = 10, DOOR_CD = 22, REACTOR_T = 45, TASKS_PER = 6;
 const BTN = { x: 0, z: -12 };
 
 const ROOMS = [
@@ -724,7 +730,7 @@ FIX.forEach(t => { const i = origRoomAt(t.c[0], t.c[1]); t.c = XF[i].f(t.c[0], t
 CAM_DESK.p = xfPt(CAM_DESK.p[0], CAM_DESK.p[1]);
 { const V0 = VENTS.splice(0), pickV = (k, net) => { const v = V0[k], i = origRoomAt(v.p[0], v.p[1]); return { p: XF[i].f(v.p[0], v.p[1]), net }; };
   VENTS.push(pickV(1, 0), pickV(7, 0), pickV(2, 0), pickV(5, 0), { p: [-42.8, 36.6], net: 0 },
-    { p: [-8.2, -6.6], net: 1, via: [-8.3, -12] }, pickV(4, 1), pickV(12, 1), { p: [-5.5, 36], net: 1 },
+    { p: [-6.8, -8.6], net: 1, via: [-6.8, -12] }, pickV(4, 1), pickV(12, 1), { p: [-5.5, 36], net: 1 },
     { p: [21.6, -16.6], net: 2 }, pickV(9, 2), pickV(8, 2), { p: [27.6, 30.6], net: 2 }); }
 for (let k = 0; k < 7; k++) OBS.push({ x: -43 + k, z: 30.5, r: .5 });
 OBS.push({ x: -37.2, z: 37.1, r: .45 }, { x: 30, z: -11, r: 1.45 }, { x: 21.4, z: -7.3, r: .8 }, { x: -4.5, z: -4.4, r: .7 }, { x: 4.5, z: -4.4, r: .7 }, { x: 0, z: 30, r: 1.75 });
@@ -792,6 +798,7 @@ const ROPE_L = 24;
 const ST_IN = ST.filter(s => !s.ext), ST_EXT = ST.filter(s => s.ext);
 const taskTarget = s => s.ext ? s.proxy : s;
 function pickTasks(human) { const ins = shuffle(ST_IN.map(s => s.id)); if (!human || !ST_EXT.length) return ins.slice(0, TASKS_PER); const t = ins.slice(0, TASKS_PER - 1); t.splice(Math.floor(Math.random() * TASKS_PER), 0, pick(ST_EXT).id); return t; }
+FIX.push({ k: 4, c: [23.5, -1.55], t: 'power', n: 'Generador de gravedad' });
 FIX.forEach(s => { s.kind = 'fix'; setupPoint(s); });
 VENTS.forEach((v, i) => { v.id = i; v.kind = 'vent'; v.room = roomAt(v.p[0], v.p[1]); v.links = VENTS.map((w, j) => j).filter(j => j !== i && VENTS[j].net === v.net); });
 // conductos subterráneos: cada red de alcantarillas tiene su túnel a distinta profundidad
@@ -999,9 +1006,13 @@ function hatch(a, outside) { // compuerta redonda en la pared de la esclusa
   const F = toon(0x3c434f), Y = toon(0xffcc33), D = toon(outside ? 0x9aa4b0 : 0x8b95a3);
   box(along ? 2.0 : .22, 2.5, along ? .22 : 2.0, F, x, 1.25, z);
   [-1, 1].forEach(k => box(along ? .16 : .3, 2.3, along ? .3 : .16, Y, x + (along ? k * .92 : ox * dv * .04), 1.2, z + (along ? oz * dv * .04 : k * .92), null, false));
+  const hole = new THREE.Mesh(new THREE.CircleGeometry(.74, 28), basic(0x07080f)); hole.position.set(x + ox * dv * .115, 1.2, z + oz * dv * .115); hole.rotation.y = Math.atan2(ox * dv, oz * dv); world.add(hole);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(.76, .06, 8, 28), toon(0xffcc33)); rim.position.copy(hole.position); rim.rotation.y = hole.rotation.y; world.add(rim);
   const door = cyl(.8, .8, .14, D, x + ox * dv * .17, 1.2, z + oz * dv * .17, null, 28); door.rotation[along ? 'x' : 'z'] = Math.PI / 2; hull(door, 1.04);
   const win = cyl(.22, .22, .16, toon(0x9ae8ff, { e: 0x3cc8ff, ei: .35 }), x + ox * dv * .19, 1.62, z + oz * dv * .19, null, 16); win.rotation[along ? 'x' : 'z'] = Math.PI / 2;
-  const wheel = new THREE.Mesh(new THREE.TorusGeometry(.3, .05, 8, 20), toon(0xffcc33)); wheel.position.set(x + ox * dv * .27, 1.05, z + oz * dv * .27); wheel.rotation.y = along ? 0 : Math.PI / 2; world.add(wheel);
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(.3, .05, 8, 20), toon(0xffcc33)); wheel.position.set(x + ox * dv * .27, 1.05, z + oz * dv * .27);
+  [door, win, wheel].forEach(o => { o.userData.dyn = 1; o.userData.p0 = o.position.clone(); }); const sl = along ? [1, 0] : [0, 1];
+  a.hd = a.hd || {}; a.hd[outside ? 'out' : 'in'] = { parts: [door, win, wheel], wheel, sl, o: 0, t: 0 }; wheel.rotation.y = along ? 0 : Math.PI / 2; world.add(wheel);
   const led = sph(.08, toon(0x36e0ad, { e: 0x36e0ad, ei: .9 }), x + (along ? .75 : ox * dv * .15), 2.3, z + (along ? oz * dv * .15 : .75), null, 10); ANIM.pulse.push(led);
   if (outside) { const ring = new THREE.Mesh(new THREE.TorusGeometry(.16, .05, 8, 16), toon(0xffcc33)); ring.position.set(...a.anchor); ring.rotation.y = along ? 0 : Math.PI / 2; world.add(ring); }
   else { const sg = sprText('ESCLUSA', { size: 52, bg: '#c88a00', w: 1.6 }); sg.position.set(x - ox * .1, 2.75, z - oz * .1); world.add(sg); }
@@ -1056,6 +1067,10 @@ function buildExterior() {
   const moon = new THREE.Mesh(new THREE.SphereGeometry(5, 24, 16), new THREE.MeshToonMaterial({ color: 0x9fb4ff, gradientMap: GRAD, fog: false })); moon.position.set(-75, 30, 70); SKY.add(moon);
   const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map: PART_T, color: 0xfff1c0, transparent: true, depthWrite: false, fog: false })); sunS.scale.set(34, 34, 1); sunS.position.set(40, 70, 60); SKY.add(sunS);
 }
+function animHatches(dt) { AIRLOCKS.forEach(a => { if (!a.hd) return; ['in', 'out'].forEach(k => { const h = a.hd[k]; if (!h) return; const o0 = h.o; h.o += (h.t - h.o) * Math.min(1, dt * 5); if (Math.abs(h.t - h.o) < .002) h.o = h.t; if (o0 === h.o) return;
+  h.parts.forEach(o => o.position.set(o.userData.p0.x + h.sl[0] * h.o * 1.6, o.userData.p0.y, o.userData.p0.z + h.sl[1] * h.o * 1.6)); h.wheel.rotation.z = h.o * 7; }); }); }
+function irisSet(open, label, prog) { const el2 = qs('#iris'); if (open >= 1 && !label) { el2.hidden = true; return; } el2.hidden = false; const r = Math.max(0, open) * 120;
+  el2.querySelector('i').style.width = el2.querySelector('i').style.height = r + 'vmax'; const lb = el2.querySelector('b'); lb.hidden = !label; if (label) { lb.firstChild.textContent = label; lb.querySelector('u').style.width = Math.round(prog * 100) + '%'; } }
 function spaceEnv(on) {
   if (!DUCT_MESHES) { DUCT_MESHES = []; world.traverse(o => { if (o.isMesh && DUCT_MATS.includes(o.material)) DUCT_MESHES.push(o); }); }
   DUCT_MESHES.forEach(m => m.visible = !on); if (SKY) SKY.visible = on; scene.background.setHex(on ? 0x04050d : 0x15191c);
@@ -1070,23 +1085,39 @@ function dropRope(key) { const r = ROPES[key]; if (!r) return; scene.remove(r); 
 function insideHull(x, y, z) { if (y < -.55 || y > WALL_H + .6) return false; const m = .55; return HULL_R().some(r => x > r[0] - m && x < r[2] + m && z > r[1] - m && z < r[3] + m); }
 function enterEVA(id) {
   if (local.eva) return; const a = AIRLOCKS[id]; closeTask(); toggleMap(false);
-  local.eva = { id, ph: 'out', t: 0, v: [0, 0, 0] }; P.x = a.in[0]; P.z = a.in[1]; P.ey = EYE; P.yaw = Math.atan2(-a.o[0], -a.o[1]); P.pitch = 0; local.cp = 0;
-  spaceEnv(true); snd('vent'); qs('#ventTint').style.opacity = 0;
+  local.eva = { id, ph: 'out', t: 0, v: [0, 0, 0], from: [P.x, P.z], yaw0: P.yaw, pit0: P.pitch, beep: 0 }; P.ey = EYE;
+  if (a.hd) a.hd.in.t = 1; snd('door'); qs('#ventTint').style.opacity = 0;
 }
 function finishEVA(silent) {
-  const E = local.eva; if (!E) return; const a = AIRLOCKS[E.id]; local.eva = null; dropRope('me'); spaceEnv(false);
-  P.x = a.in[0]; P.z = a.in[1]; P.ey = EYE; P.pitch = 0; local.cp = 0; P.yaw = Math.atan2(a.o[0], a.o[1]); if (!silent) { snd('vent'); toast('De vuelta en la nave', '#9cf7d8'); }
+  const E = local.eva; if (!E) return; const a = AIRLOCKS[E.id]; local.eva = null; dropRope('me'); spaceEnv(false); irisSet(1); if (a.hd) { a.hd.in.t = 0; a.hd.out.t = 0; }
+  P.x = a.in[0]; P.z = a.in[1]; P.ey = EYE; P.pitch = 0; local.cp = 0; P.yaw = Math.atan2(a.o[0], a.o[1]); if (!silent) toast('De vuelta en la nave', '#9cf7d8');
 }
 function endEVA() { if (local.eva) finishEVA(true); }
 function reelEVA() { const E = local.eva; if (!E || E.ph !== 'free') return; E.ph = 'reel'; E.v = [0, 0, 0]; snd('click'); toast('La cuerda tira de ti…', '#ffd966'); }
 function evaMove(dt, f, s) {
   const E = local.eva, a = AIRLOCKS[E.id], t = performance.now() / 1000;
-  if (E.ph === 'out' || E.ph === 'in') { E.t += dt / .9; const k = Math.min(1, E.t), e = k * k * (3 - 2 * k);
-    const A = E.ph === 'out' ? [a.in[0], EYE, a.in[1]] : E.from, B = E.ph === 'out' ? a.out : [a.in[0], EYE, a.in[1]];
-    P.x = A[0] + (B[0] - A[0]) * e; P.ey = A[1] + (B[1] - A[1]) * e; P.z = A[2] + (B[2] - A[2]) * e;
-    if (k >= 1) { if (E.ph === 'out') { E.ph = 'free'; toast('¡Estás fuera! Volver tira de la cuerda', '#ffd966'); } else { finishEVA(); return; } } }
+  const ss = (t0, t1, x) => { const k = Math.max(0, Math.min(1, (x - t0) / (t1 - t0))); return k * k * (3 - 2 * k); }, W = a.w, o = a.o, yawOut = Math.atan2(-o[0], -o[1]), yawIn = Math.atan2(o[0], o[1]);
+  if (E.ph === 'out') { E.t += dt; const T = E.t;
+    if (T < 1.2) { // dentro: ir hasta la compuerta, que se abre, y entrar en la esclusa
+      const k1 = ss(0, .6, T), k2 = ss(.6, 1.15, T), sx = W[0] - o[0] * .95, sz = W[1] - o[1] * .95;
+      P.x = E.from[0] + (sx - E.from[0]) * k1 + (W[0] - o[0] * .3 - sx) * k2; P.z = E.from[1] + (sz - E.from[1]) * k1 + (W[1] - o[1] * .3 - sz) * k2; P.ey = EYE;
+      P.yaw = E.yaw0 + wrapA(yawOut - E.yaw0) * k1; P.pitch = E.pit0 * (1 - k1);
+      irisSet(1 - ss(.8, 1.15, T), 'Despresurizando…', 1 - ss(.3, 1.15, T)); if (T > E.beep) { E.beep = T + .35; snd('beep'); } }
+    else { if (!E.outside) { E.outside = 1; spaceEnv(true); if (a.hd) { a.hd.out.o = a.hd.out.t = 1; a.hd.in.t = 0; } burst('steam', W[0] + o[0] * .6, 1.25, W[1] + o[1] * .6, 22); snd('vent'); P.yaw = yawOut; }
+      // fuera: la compuerta exterior ya está abierta y sales flotando
+      const k3 = ss(1.2, 2.3, T), sx = W[0] + o[0] * .35, sz = W[1] + o[1] * .35; P.x = sx + (a.out[0] - sx) * k3; P.z = sz + (a.out[2] - sz) * k3; P.ey = 1.25 + Math.sin(k3 * Math.PI) * .25; P.pitch = Math.sin(k3 * Math.PI) * .12;
+      irisSet(ss(1.2, 1.6, T), T < 1.6 ? 'Despresurizando…' : '', 0);
+      if (T >= 2.3) { E.ph = 'free'; irisSet(1); if (a.hd) a.hd.out.t = 0; toast('¡Estás fuera! Volver tira de la cuerda', '#ffd966'); } } }
+  else if (E.ph === 'in') { E.t += dt; const T = E.t;
+    if (T < .7) { // fuera: la cuerda te mete por la compuerta exterior
+      const k1 = ss(0, .6, T), tx = W[0] + o[0] * .3, tz = W[2] === undefined ? W[1] + o[1] * .3 : 0; P.x = E.from[0] + (tx - E.from[0]) * k1; P.z = E.from[2] + (tz - E.from[2]) * k1; P.ey = E.from[1] + (1.25 - E.from[1]) * k1;
+      P.yaw = E.yaw0 + wrapA(yawIn - E.yaw0) * k1; irisSet(1 - ss(.35, .7, T), 'Presurizando…', ss(.1, .7, T)); if (T > E.beep) { E.beep = T + .35; snd('beep'); } }
+    else { if (!E.inside) { E.inside = 1; spaceEnv(false); dropRope('me'); if (a.hd) { a.hd.in.o = a.hd.in.t = 1; a.hd.out.t = 0; } snd('door'); P.yaw = yawIn; P.pitch = 0; }
+      const k2 = ss(.7, 1.35, T), sx = W[0] - o[0] * .25, sz = W[1] - o[1] * .25; P.x = sx + (a.in[0] - sx) * k2; P.z = sz + (a.in[1] - sz) * k2; P.ey = EYE;
+      irisSet(ss(.7, 1.1, T), T < 1.1 ? 'Presurizando…' : '', 1);
+      if (T > 1.2 && a.hd) a.hd.in.t = 0; if (T >= 1.4) { finishEVA(); return; } } }
   else if (E.ph === 'reel') { const T = a.out, dx = T[0] - P.x, dy = T[1] - P.ey, dz = T[2] - P.z, d = Math.hypot(dx, dy, dz);
-    if (d < .35) { E.ph = 'in'; E.t = 0; E.from = [P.x, P.ey, P.z]; snd('vent'); }
+    if (d < .35) { E.ph = 'in'; E.t = 0; E.from = [P.x, P.ey, P.z]; E.yaw0 = P.yaw; E.beep = 0; if (a.hd) a.hd.out.t = 1; snd('door'); }
     else { const sp = Math.min(d, Math.min(10, 3 + d * .8) * dt), nx = P.x + dx / d * sp, ny = P.ey + dy / d * sp, nz = P.z + dz / d * sp;
       if (insideHull(nx, ny, nz) && Math.hypot(P.x - T[0], P.z - T[2]) > 2.2) P.ey = Math.min(WALL_H + 1.4, P.ey + sp); else { P.x = nx; P.ey = ny; P.z = nz; }
       const ty = Math.atan2(-dx, -dz); P.yaw += wrapA(ty - P.yaw) * Math.min(1, dt * 2); } }
@@ -1101,7 +1132,7 @@ function evaMove(dt, f, s) {
     const ax = a.anchor, dx = P.x - ax[0], dy = P.ey - ax[1], dz = P.z - ax[2], d = Math.hypot(dx, dy, dz);
     if (d > ROPE_L) { const k = ROPE_L / d; P.x = ax[0] + dx * k; P.ey = ax[1] + dy * k; P.z = ax[2] + dz * k; const vr = (v[0] * dx + v[1] * dy + v[2] * dz) / d; if (vr > 0) { v[0] -= vr * dx / d; v[1] -= vr * dy / d; v[2] -= vr * dz / d; } if (!E.tug) { E.tug = 1; snd('bad'); } } else E.tug = 0;
     local.moveSp = Math.hypot(...v); }
-  if (local.eva) { const bx = -Math.sin(P.yaw) * .25, bz = -Math.cos(P.yaw) * .25; setRope('me', a.anchor, [P.x - bx, P.ey - .6, P.z - bz], t); }
+  if (local.eva && (E.ph !== 'out' || E.outside) && !E.inside) { const bx = -Math.sin(P.yaw) * .25, bz = -Math.cos(P.yaw) * .25; setRope('me', a.anchor, [P.x - bx, P.ey - .6, P.z - bz], t); }
 }
 function evaInteract(me, myTasks) {
   const E = local.eva; if (!E || E.ph !== 'free' || !me || crisisKey() === 'comms') return; let bd = 2.6;
@@ -1581,7 +1612,7 @@ const nm = i => (S && S.pl[i]) ? S.pl[i].n : '¿?';
 const dispC = p => (p.sh >= 0 && S.pl[p.sh]) ? S.pl[p.sh].c : p.c;
 const dispN = p => (p.sh >= 0 && S.pl[p.sh]) ? S.pl[p.sh].n : p.n;
 const crisisKey = () => S && S.sab ? S.sab.k : null;
-function fixNeeded() { const s = S && S.sab; if (!s) return []; if (s.k === 'lights') return [0]; if (s.k === 'comms') return [3]; if (s.k === 'reactor') return [1, 2].filter(k => !s.f[k - 1]); return []; }
+function fixNeeded() { const s = S && S.sab; if (!s) return []; if (s.k === 'lights' || s.k === 'black') return [0]; if (s.k === 'grav') return [4]; if (s.k === 'comms') return [3]; if (s.k === 'reactor') return [1, 2].filter(k => !s.f[k - 1]); return []; }
 
 /* ================== RED ================== */
 // Online: dentro de Claude se usa su sala en directo; fuera (GitHub Pages, archivo) se conecta directamente entre dispositivos con PeerJS
@@ -1764,7 +1795,7 @@ function npcThink() {
   });
   S.pl.forEach(p => { if (!p.npc) return; const ai = H.ai[p.i]; if (!ai) return;
     if (p.im) {
-      if (Math.random() < .006 && !S.sab && S.sabCd <= 0 && H.introT <= 0) { const r = Math.random(); hostSabotage(p.i, r < .38 ? -1 : r < .66 ? -3 : -2); }
+      if (Math.random() < .006 && !S.sab && S.sabCd <= 0 && H.introT <= 0) { const r = Math.random(); hostSabotage(p.i, r < .22 ? -1 : r < .42 ? -3 : r < .6 ? -2 : r < .8 ? -4 : -5); }
       if (Math.random() < .004) hostSabotage(p.i, pick(DOOR_ROOMS));
       if (p.al && p.ro === 'cam' && p.ac <= 0 && p.sh < 0 && !ai.inVent && Math.random() < .02) { const o = S.pl.filter(q => q.al && q !== p); if (o.length) hostAbility(p.i, pick(o).i); }
       if (p.al && p.ro === 'tre' && p.ac <= 0 && p.ce <= 0 && !ai.inVent && ai.chase < 0 && Math.random() < .015) hostAbility(p.i, 0);
@@ -1810,11 +1841,11 @@ function hostEmergency(i) { const R = S.pl[i]; if (!R || !R.al || R.em <= 0 || S
 function hostSabotage(i, x) {
   const p = S.pl[i]; if (!p || !p.im || S.ph !== 'play' || H.introT > 0) return;
   if (x >= 0) { if (!DOOR_ROOMS.includes(x) || S.doors[x] || (S.dc[x] || 0) > 0) return; S.doors[x] = DOOR_T; S.dc[x] = S.pr ? 12 : DOOR_CD; return; }
-  if (S.sab || S.sabCd > 0) return; const k = { '-1': 'lights', '-2': 'reactor', '-3': 'comms' }[x]; if (!k) return;
-  S.sab = { k, t: k === 'reactor' ? REACTOR_T : 0, f: [0, 0], age: 0 }; S.sabCd = S.pr ? 6 : SAB_CD;
+  if (S.sab || S.sabCd > 0) return; const k = { '-1': 'lights', '-2': 'reactor', '-3': 'comms', '-4': 'grav', '-5': 'black' }[x]; if (!k) return;
+  S.sab = { k, t: k === 'reactor' ? REACTOR_T : k === 'grav' ? GRAV_T : 0, f: [0, 0], age: 0 }; S.sabCd = S.pr ? 6 : SAB_CD;
 }
 function hostFix(i, k) { const p = S.pl[i]; if (!p || !p.al || !S.sab) return; const s = S.sab;
-  if (k === 0 && s.k === 'lights') S.sab = null; else if ((k === 1 || k === 2) && s.k === 'reactor') { s.f[k - 1] = 1; if (s.f[0] && s.f[1]) S.sab = null; } else if (k === 3 && s.k === 'comms') S.sab = null; }
+  if (k === 0 && (s.k === 'lights' || s.k === 'black')) S.sab = null; else if (k === 4 && s.k === 'grav') S.sab = null; else if ((k === 1 || k === 2) && s.k === 'reactor') { s.f[k - 1] = 1; if (s.f[0] && s.f[1]) S.sab = null; } else if (k === 3 && s.k === 'comms') S.sab = null; }
 function startMeeting(by, bid) {
   const body = bid != null ? S.b.find(b => b.id === bid) : null;
   H.lastRoom = {}; S.pl.forEach(p => H.lastRoom[p.i] = roomName(p.x, p.z));
@@ -1886,6 +1917,7 @@ function hostTick(dt) {
     Object.keys(S.doors).forEach(k => { S.doors[k] -= dt; if (S.doors[k] <= 0) delete S.doors[k]; });
     Object.keys(S.dc).forEach(k => { S.dc[k] -= dt; if (S.dc[k] <= 0) delete S.dc[k]; });
     if (S.pr && S.sab) { S.sab.age = (S.sab.age || 0) + dt; if (S.sab.k === 'reactor') S.sab.t = Math.max(1, S.sab.t - dt); if (S.sab.age > 20 && !(S.pl[ME] && !S.pl[ME].im)) S.sab = null; }
+    else if (S.sab && S.sab.k === 'grav') { S.sab.t -= dt; if (S.sab.t <= 0) S.sab = null; }
     else if (S.sab && S.sab.k === 'reactor') { S.sab.t -= dt; if (S.sab.t <= 0) { S.ph = 'end'; S.win = 'imp'; S.wr = 'El reactor se ha fundido.'; S.sab = null; S.doors = {}; return; } }
     DOOR_ON = new Set(Object.keys(S.doors).map(Number));
     S.pl.forEach(p => { if (p.npc) { npcUpdate(p, dt); npcSeparate(p, dt); } });
@@ -1945,13 +1977,19 @@ function updateAvatars(dt, t) {
     // pegada al techo boca abajo: solo se ve mirando claramente hacia arriba
     if (a.cl > .5 && p.i !== ME && P.pitch < CEIL_LOOK) a.g.visible = false;
     a.g.rotation.order = 'YXZ'; a.g.position.set(a.rx, a.cl * (CEIL_Y - .5), a.rz); a.g.rotation.set(a.cl * Math.PI / 2, a.ry + Math.PI, 0);
+    const gzOn = crisisKey() === 'grav' && p.al && !p.ev && !(p.ce > 0) && v < 0; a.gf = (a.gf || 0) + ((gzOn ? 1 : 0) - (a.gf || 0)) * Math.min(1, dt * (gzOn ? 1.5 : 4));
+    if (a.gf > .01 && !p.ev) { a.g.position.y += a.gf * (.55 + Math.sin(t * .9 + p.i * 1.7) * .35); a.g.rotation.x = a.gf * Math.sin(t * .6 + p.i) * .5; a.g.rotation.z = a.gf * Math.cos(t * .5 + p.i * 2) * .4; }
+    const beamOn = crisisKey() === 'black' && p.al && !p.ev && p.i !== ME && S.ph === 'play';
+    if (beamOn && !a.beam) { const g2 = new THREE.ConeGeometry(1.5, 7, 20, 1, true); g2.rotateX(-Math.PI / 2); g2.translate(0, 0, 3.5 + .45); a.beam = new THREE.Mesh(g2, BEAM_M); a.beam.position.y = .98; a.beam.rotation.x = .12; a.g.add(a.beam); }
+    if (a.beam) a.beam.visible = beamOn;
     if (p.ev && p.i !== ME) { const ty = (p.ey || 1.2) - 1.0; a.evy = a.evy == null ? ty : a.evy + (ty - a.evy) * k; a.g.position.y = a.evy; a.g.rotation.x = .3 + Math.sin(t * 1.3 + p.i) * .12; a.g.rotation.z = Math.sin(t * .9 + p.i) * .15; const al = AIRLOCKS[p.ev - 1]; if (al) setRope('p' + p.i, al.anchor, [a.rx, a.evy + .72, a.rz], t); }
-    else { a.evy = null; a.g.rotation.z = 0; dropRope('p' + p.i); }
+    else { a.evy = null; if (!(a.gf > .01)) a.g.rotation.z = 0; dropRope('p' + p.i); }
     const sp = Math.hypot(a.rx - ox, a.rz - oz) / Math.max(dt, 1e-3); a.sp = (a.sp || 0) * .8 + (p.i === ME ? (local.moveSp || 0) : sp) * .2; animChar(a, a.sp, t);
   });
   Object.keys(ROPES).forEach(k => { if (k[0] === 'p') { const q = S.pl[+k.slice(1)]; if (!q || !q.ev || !AV[q.i] || !AV[q.i].g.visible) dropRope(k); } });
   const bids = new Set((S.b || []).map(b => b.id));
-  (S.b || []).forEach(b => { if (!BODIES[b.id]) { const p = S.pl[b.id]; const c = deadBody(p ? p.c : 0); c.g.position.set(b.x, 0, b.z); c.g.rotation.y = (b.id * 1.7) % 6.28; scene.add(c.g); BODIES[b.id] = c; } BODIES[b.id].stars.rotation.y += dt * 3; });
+  const gzB = crisisKey() === 'grav'; (S.b || []).forEach(b => { if (BODIES[b.id]) { const B = BODIES[b.id]; B.gf = (B.gf || 0) + ((gzB ? 1 : 0) - (B.gf || 0)) * Math.min(1, dt * 1.5); B.g.position.y = B.gf * (.6 + Math.sin(t * .8 + b.id) * .3); B.g.rotation.x = B.gf * Math.sin(t * .4 + b.id) * .6; }
+    if (!BODIES[b.id]) { const p = S.pl[b.id]; const c = deadBody(p ? p.c : 0); c.g.position.set(b.x, 0, b.z); c.g.rotation.y = (b.id * 1.7) % 6.28; scene.add(c.g); BODIES[b.id] = c; } BODIES[b.id].stars.rotation.y += dt * 3; });
   Object.keys(BODIES).forEach(k => { if (!bids.has(+k)) { scene.remove(BODIES[k].g); delete BODIES[k]; } });
 }
 function buildMenuBlobs() {
@@ -2033,12 +2071,15 @@ function gameFrame(dt, t) {
   if (moving) { if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1; if (keys.KeyD || keys.ArrowRight) s += 1; if (keys.KeyA || keys.ArrowLeft) s -= 1; f += joy.y; s += joy.x;
     const L = Math.hypot(f, s); if (L > 1) { f /= L; s /= L; } }
   { const k = 1 - Math.exp(-dt * (f || s ? 13 : 18)); local.mf = moving ? (local.mf || 0) + (f - (local.mf || 0)) * k : 0; local.ms = moving ? (local.ms || 0) + (s - (local.ms || 0)) * k : 0; if (Math.abs(local.mf) < .003) local.mf = 0; if (Math.abs(local.ms) < .003) local.ms = 0; f = local.mf; s = local.ms; }
+  const zeroG = crisis === 'grav' && S.ph === 'play' && me && me.al && !inD && !local.eva && !(me.ce > 0);
+  if (zeroG && !local.zg) { local.zg = 1; P.ey = EYE; local.gv = [0, .9, 0]; } else if (!zeroG && local.zg) { local.zg = 0; local.fallV = 0; }
   if (local.eva) evaMove(dt, moving ? f : 0, moving ? s : 0);
+  else if (zeroG) floatMove(dt, moving ? f : 0, moving ? s : 0);
   else if (moving && (f || s)) {
     const sp = SPEED * (inD ? .95 : ghost ? 1.15 : 1) * dt, sy = Math.sin(P.yaw), cy = Math.cos(P.yaw), dx = (-sy * f + cy * s) * sp, dz = (-cy * f - sy * s) * sp;
     if (inD) ductMove(P, dx, dz, local.duct); else movePos(P, dx, dz, PR, ghost); }
   const onCeil = !!(me && me.al && me.ce > 0 && S.ph === 'play');
-  if (!inD && !ghost && !onCeil && !local.eva && S.ph === 'play') bumpPlayer();
+  if (!inD && !ghost && !onCeil && !local.eva && !zeroG && S.ph === 'play') bumpPlayer();
   const mv = Math.hypot(f, s); local.moveSp = mv * SPEED; local.bob = (local.bob || 0) + dt * mv * 10;
   let ey;
   if (inD) { const low = DUCTS[local.duct].y + .72;
@@ -2047,16 +2088,22 @@ function gameFrame(dt, t) {
     else ey = low + Math.sin(local.bob) * .03 * Math.min(1, mv); }
   else ey = EYE + (ghost ? .35 + Math.sin(t * 2) * .05 : Math.sin(local.bob) * .035 * Math.min(1, mv));
   if (local.eva) ey = P.ey;
+  else if (zeroG) ey = P.ey;
+  else if (P.ey > EYE + .02 && !local.eva && !inD) { local.fallV = (local.fallV || 0) + 14 * dt; P.ey = Math.max(EYE, P.ey - local.fallV * dt); ey = P.ey; if (P.ey <= EYE + .001) { snd('bad'); local.land = .25; } }
+  if (local.land > 0) { local.land -= dt; ey -= Math.sin(local.land / .25 * Math.PI) * .12; }
   local.ceil = (local.ceil || 0) + ((onCeil ? 1 : 0) - (local.ceil || 0)) * Math.min(1, dt * 5); if (!inD) ey += (CEIL_Y - .3 - EYE) * local.ceil;
   if (onCeil !== !!local.wasCeil) { local.wasCeil = onCeil; local.pT = .7; P.pitch = onCeil ? -1.5 : 0; snd(onCeil ? 'vent' : 'click'); if (onCeil) toast('¡Estás en el techo! ' + CEIL_T + ' s', '#a8f07a'); }
   camera.position.set(P.x, ey, P.z); if (local.pT > 0) { local.pT -= dt; local.cp += (P.pitch - local.cp) * Math.min(1, dt * 7); } else local.cp = P.pitch;
-  camera.rotation.set(local.cp, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25);
+  camera.rotation.set(local.cp, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25 + (zeroG ? Math.sin(t * .7) * .07 : 0));
   // iluminación (sabotaje de luces)
-  const dark = crisis === 'lights' && me && me.al && !me.im;
-  local.light += ((dark ? .2 : 1) - local.light) * Math.min(1, dt * 2.2); const L = local.light;
+  const dark = crisis === 'lights' && me && me.al && !me.im, black = crisis === 'black' && S.ph === 'play' && me && me.al && !local.eva;
+  local.light += ((black ? (me.im ? .45 : .05) : dark ? .2 : 1) - local.light) * Math.min(1, dt * 2.2); const L = local.light;
+  const flashOn = black && !me.im && local.vent < 0; FLASH.intensity += ((flashOn ? 2.4 : 0) - FLASH.intensity) * Math.min(1, dt * 6);
+  if (FLASH.intensity > .01) { const fx = -Math.sin(P.yaw) * Math.cos(local.cp || 0), fy = Math.sin(local.cp || 0), fz = -Math.cos(P.yaw) * Math.cos(local.cp || 0); FLASH.position.set(P.x + Math.cos(P.yaw) * .18, (local.eva ? P.ey : EYE) - .15, P.z - Math.sin(P.yaw) * .18); FLASH.target.position.set(P.x + fx * 10, (local.eva ? P.ey : EYE) + fy * 10 - .4, P.z + fz * 10); }
   const evL = local.eva ? 1.45 : 1; hemi.intensity = .52 * L * evL; amb.intensity = .12 * L; sun.intensity = .38 * L * (local.eva ? 1.8 : 1); LIGHTS.forEach(l => l.intensity = l.userData.base * (.25 + .75 * L) * (local.eva ? .15 : 1));
   qs('#darkV').style.opacity = dark && !local.camView ? 1 : 0;
-  const q = (L - .2) / .8; scene.fog.near = 2 + 26 * q; scene.fog.far = 8 + 72 * q; scene.fog.color.copy(FOG_D).lerp(FOG_C, q);
+  const q = Math.max(0, (L - .2) / .8); scene.fog.near = 2 + 26 * q; scene.fog.far = 8 + 72 * q; scene.fog.color.copy(FOG_D).lerp(FOG_C, q);
+  if (black && !me.im) { scene.fog.near = 4; scene.fog.far = 24; scene.fog.color.setHex(0x020308); }
   if (inD && local.dropT <= 0 && local.exitT <= 0) { scene.fog.near = 1.5; scene.fog.far = 17; scene.fog.color.setHex(0x0c1824); }
   if (local.eva) { scene.fog.near = 90; scene.fog.far = 420; scene.fog.color.setHex(0x04050d); }
   if (ANIM.reactorLight) { ANIM.reactorLight.color.setHex(crisis === 'reactor' ? 0xff3b4f : 0x7fe6ff); }
@@ -2064,6 +2111,7 @@ function gameFrame(dt, t) {
   DOORS.forEach(d => { const target = DOOR_ON.has(d.room) ? 0 : 1; d.o += (target - d.o) * Math.min(1, dt * 7); d.mesh.position.y = d.h / 2 + d.o * WALL_H; d.mesh.visible = d.o < .985; });
   const dk = [...DOOR_ON].sort().join(','); if (dk !== local.lastDoors) { const added = [...DOOR_ON].filter(r => !local.lastDoors.split(',').includes(String(r))); if (added.length) { const near = DOORS.some(d => added.includes(d.room) && Math.hypot(d.pt[0] - P.x, d.pt[1] - P.z) < 14); if (near) snd('door'); } local.lastDoors = dk; }
   // alcantarillas
+  animHatches(dt);
   VENTS.forEach(v => { if (v.pop > 0) v.pop = Math.max(0, v.pop - dt * 2.2); v.lid.rotation.z = Math.sin(Math.min(1, v.pop) * Math.PI) * 1.1; });
   ANIM.camLeds.forEach(l => l.material.emissiveIntensity = S.cams > 0 ? (Math.sin(t * 6) > 0 ? 1.2 : .3) : .05);
   updateAvatars(dt, t);
@@ -2093,7 +2141,7 @@ function gameFrame(dt, t) {
   interact.ab = abilityState(me);
   footTick(me, t);
   if (crisis === 'reactor' && S.ph === 'play') { local.beepT -= dt; if (local.beepT <= 0) { local.beepT = 1; snd('beep'); } }
-  if (crisis !== local.lastSab) { if (crisis && S.ph === 'play') { snd('alarm'); toast(crisis === 'lights' ? '¡Se han apagado las luces!' : crisis === 'reactor' ? '¡Fusión del reactor!' : '¡Comunicaciones caídas!', '#ff8a98'); } local.lastSab = crisis; hudT = 0; }
+  if (crisis !== local.lastSab) { if (crisis && S.ph === 'play') { snd('alarm'); toast(crisis === 'lights' ? '¡Se han apagado las luces!' : crisis === 'grav' ? '¡Gravedad desactivada!' : crisis === 'black' ? '¡Apagón total! Enciende la linterna' : crisis === 'reactor' ? '¡Fusión del reactor!' : '¡Comunicaciones caídas!', '#ff8a98'); } local.lastSab = crisis; hudT = 0; }
   updateHUD(t);
   if (local.introT > 0) { local.introT -= dt; if (local.introT <= 0) qs('#intro').hidden = true; }
   if (local.taskTick) local.taskTick(dt);
@@ -2146,6 +2194,16 @@ function footTick(me, t) {
     m.material = basic(COLORS[f.c].h, { op: .9 }); const k = 1 - (t - f.t) / 12; m.scale.set(.6 + .5 * k, (.6 + .5 * k) * 1.6, 1); m.position.set(f.x, .035, f.z); m.rotation.z = -f.y; m.visible = true; n++; }
   for (let i = n; i < FOOT_POOL.length; i++) FOOT_POOL[i].visible = false;
 }
+function floatMove(dt, f, s) {
+  const v = local.gv, cp = Math.cos(P.pitch), fx = -Math.sin(P.yaw) * cp, fy = Math.sin(P.pitch), fz = -Math.cos(P.yaw) * cp, rx = Math.cos(P.yaw), rz = -Math.sin(P.yaw);
+  const up = (keys.Space ? 1 : 0) - (keys.ShiftLeft || keys.ShiftRight ? 1 : 0), ACC = 5.5;
+  v[0] += (fx * f + rx * s) * ACC * dt; v[1] += (fy * f + up * .8) * ACC * dt; v[2] += (fz * f + rz * s) * ACC * dt;
+  const damp = Math.exp(-.55 * dt); v[0] *= damp; v[1] *= damp; v[2] *= damp; const vm = Math.hypot(...v); if (vm > 4.2) { v[0] *= 4.2 / vm; v[1] *= 4.2 / vm; v[2] *= 4.2 / vm; }
+  const bx = P.x, bz = P.z, dx = v[0] * dt, dz = v[2] * dt; movePos(P, dx, dz, PR, false);
+  if (Math.abs(P.x - (bx + dx)) > 1e-4) { v[0] *= -.55; if (Math.abs(v[0]) > .8) snd('click'); } if (Math.abs(P.z - (bz + dz)) > 1e-4) { v[2] *= -.55; if (Math.abs(v[2]) > .8) snd('click'); }
+  P.ey += v[1] * dt; const lo = .55, hi = WALL_H - .32; if (P.ey < lo) { P.ey = lo; v[1] = Math.abs(v[1]) * .5; } else if (P.ey > hi) { P.ey = hi; v[1] = -Math.abs(v[1]) * .5; }
+  local.moveSp = Math.hypot(v[0], v[2]);
+}
 function bumpPlayer() {
   S.pl.forEach(p => { if (p.i === ME || !p.al || p.v >= 0 || p.ce > 0 || p.ev) return; const a = AV[p.i]; if (!a || !a.g.visible || a.ghost) return;
     const dx = P.x - a.rx, dz = P.z - a.rz, d = Math.hypot(dx, dz); if (d >= BUMP) return;
@@ -2176,7 +2234,7 @@ function exitVent(silent, id) {
   if (silent) { finishExit(true); return; }
   local.exitT = .32; popVent(j); snd('vent');
 }
-function finishExit(silent) { const j = local.vent; local.exitT = 0; local.dropT = 0; if (j >= 0) { if (!silent) popVent(j); P.x = VENTS[j].p[0]; P.z = VENTS[j].p[1]; } local.pv[ME] = -1; local.vent = -1; local.duct = -1; P.pitch = 0; qs('#ventUI').hidden = true; qs('#ventTint').style.opacity = 0; }
+function finishExit(silent) { const j = local.vent; local.exitT = 0; local.dropT = 0; if (j >= 0) { if (!silent) popVent(j); P.x = VENTS[j].p[0]; P.z = VENTS[j].p[1]; if (!freeSpot(P.x, P.z)) { for (let r = .3; r < 2.5; r += .3) { let ok = false; for (let a = 0; a < 12; a++) { const nx = VENTS[j].p[0] + Math.cos(a / 12 * Math.PI * 2) * r, nz = VENTS[j].p[1] + Math.sin(a / 12 * Math.PI * 2) * r; if (freeSpot(nx, nz)) { P.x = nx; P.z = nz; ok = true; break; } } if (ok) break; } } } local.pv[ME] = -1; local.vent = -1; local.duct = -1; P.pitch = 0; qs('#ventUI').hidden = true; qs('#ventTint').style.opacity = 0; }
 let ventKey = '';
 function updateVentUI(force) {
   const near = interact.use && interact.use.k === 'ventExit' ? interact.use.id : -1; const key = local.duct + ':' + near; if (!force && key === ventKey) return; ventKey = key;
@@ -2206,6 +2264,8 @@ function renderMonitors() {
 }
 function camHide(on) { if (!S || !S.pl) return; S.pl.forEach(p => { const a = AV[p.i]; if (!(p.ro === 'fan' || p.ce > 0) || !a) return; if (on) { a._cv = a.g.visible; a.g.visible = false; } else a.g.visible = a._cv; }); FOOT_POOL.forEach(m => { if (on) { m._cv = m.visible; m.visible = false; } else m.visible = m._cv; }); }
 const _v2 = new THREE.Vector2();
+const FLASH = new THREE.SpotLight(0xfff0cc, 0, 28, .45, .5, 1.2); scene.add(FLASH); scene.add(FLASH.target);
+const BEAM_M = new THREE.MeshBasicMaterial({ color: 0xfff1b0, transparent: true, opacity: .13, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
 function renderCamsView() {
   const sa = AV[ME]; if (sa) sa.g.visible = local.vent < 0; camHide(true);
   renderer.getSize(_v2); const w = _v2.x, h = _v2.y, hw = Math.floor(w / 2), hh = Math.floor(h / 2);
@@ -2223,7 +2283,7 @@ function toggleSabo(on) {
 }
 qs('#sbX').onclick = () => toggleSabo(false); qs('#aSab').onclick = () => toggleSabo();
 qs('#sabo').addEventListener('click', e => { if (e.target.id === 'sabo') toggleSabo(false); });
-const SB_DEF = [{ x: -1, n: 'Apagar luces', d: 'La tripulación casi no ve' }, { x: -2, n: 'Fundir reactor', d: `Si no lo arreglan en ${REACTOR_T} s, ganáis` }, { x: -3, n: 'Cortar comunicaciones', d: 'Sin tareas ni cámaras' }];
+const SB_DEF = [{ x: -1, n: 'Apagar luces', d: 'La tripulación casi no ve' }, { x: -2, n: 'Fundir reactor', d: `Si no lo arreglan en ${REACTOR_T} s, ganáis` }, { x: -3, n: 'Cortar comunicaciones', d: 'Sin tareas ni cámaras' }, { x: -4, n: 'Gravedad cero', d: 'Todos flotan por la nave' }, { x: -5, n: 'Apagón total', d: 'Solo se ve con linterna' }];
 let sbKey = '';
 function renderSabo(force) {
   drawMap(qs('#sbMap'), true, { sabo: true });
@@ -2320,6 +2380,8 @@ function updateHUD(t) {
   if (S.ph === 'play' && crisis) { cr.hidden = false; cr.classList.toggle('soft', crisis !== 'reactor');
     if (crisis === 'reactor') { qs('#crT').textContent = `¡Fusión del reactor! ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = `Estabilizadores en Reactor: A ${S.sab.f[0] ? '✓' : '✗'} · B ${S.sab.f[1] ? '✓' : '✗'}`; }
     else if (crisis === 'lights') { qs('#crT').textContent = 'Luces saboteadas'; qs('#crS').textContent = 'Arregla el panel de luces en Electricidad'; }
+    else if (crisis === 'black') { qs('#crT').textContent = 'Apagón total'; qs('#crS').textContent = 'Usa la linterna y arregla el panel de luces'; }
+    else if (crisis === 'grav') { qs('#crT').textContent = `Gravedad cero · ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = 'Reinicia el generador en el Observatorio'; }
     else { qs('#crT').textContent = 'Comunicaciones saboteadas'; qs('#crS').textContent = 'Restaura la señal en Comunicaciones'; } }
   else cr.hidden = true;
   const u = qs('#aUse'), r = qs('#aRep'), k = qs('#aKill'), sb = qs('#aSab');

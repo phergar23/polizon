@@ -56,6 +56,11 @@ Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detec
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
 
+## Sabotajes especiales
+
+- **Gravedad cero**: todos flotan por la nave con inercia y rebotan contra paredes, suelo y techo. Se arregla reiniciando el generador del Observatorio (o vuelve sola a los 40 s).
+- **Apagón total**: todo queda a oscuras y cada tripulante solo ve con su linterna; se ven los haces de luz de los demás. Se arregla en el panel de luces.
+
 ## Paseos espaciales
 
 En la **Sala de armas** y en **Taquillas** hay una **esclusa**. Al usarla sales al espacio atado a una cuerda de 24 m:
