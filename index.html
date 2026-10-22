@@ -1159,52 +1159,91 @@ function evaInteract(me, myTasks) {
 
 /* ================== NAVE DEL ALIEN (interior caminable) ================== */
 const MINI = { x: 0, z: -100, y: 300 };
-const MINI_R = [[-4, -9, 4, -3], [-1.2, -3.2, 1.2, .2], [-5, 0, 5, 7]].map(r => [r[0] + MINI.x, r[1] + MINI.z, r[2] + MINI.x, r[3] + MINI.z]);
+const MINI_R = [[-4, -9, 4, -3], [-1.2, -4.2, 1.2, 1.2], [-5, 0, 5, 7]].map(r => [r[0] + MINI.x, r[1] + MINI.z, r[2] + MINI.x, r[3] + MINI.z]);
 const mpt = (x, z) => [x + MINI.x, z + MINI.z];
 const MINI_ST = [{ k: 'pilot', c: mpt(0, -8.45), p: mpt(0, -7.2), n: 'MANDOS' }, { k: 'tele', c: mpt(-2.2, 4), p: mpt(-2.2, 4), n: 'TELETRANSPORTADOR' },
   { k: 'tractor', c: mpt(.5, 6.45), p: mpt(.5, 5.3), n: 'RAYO TRACTOR' }, { k: 'msab', c: mpt(4.45, 2.0), p: mpt(3.3, 2.0), n: 'SABOTAJES' }, { k: 'ram', c: mpt(4.45, 5.0), p: mpt(3.3, 5.0), n: 'ARIETE' }];
 const MINI_SPAWN = { bridge: [...mpt(0, -5.2), 0], tele: [...mpt(-2.2, 4), Math.PI / 2] };
 let HOLO = null, TUBES = [], TELE_RINGS = null;
-const miniWalk = (x, z, rad = PR) => MINI_R.some(r => x > r[0] + rad && x < r[2] - rad && z > r[1] + rad && z < r[3] - rad);
+const MINI_OBS = [];
+const miniWalk = (x, z, rad = PR) => MINI_R.some(r => x > r[0] + rad && x < r[2] - rad && z > r[1] + rad && z < r[3] - rad) && !MINI_OBS.some(o => Math.hypot(x - o[0], z - o[1]) < o[2] + rad * .6);
+const HEX_T = new THREE.CanvasTexture(cvs(256, 222, (g) => { g.fillStyle = '#1d1636'; g.fillRect(0, 0, 256, 222); const r = 32, h = r * Math.sqrt(3) / 2;
+  const hexA = (cx, cy) => { g.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; g.lineTo(cx + Math.cos(a) * (r - 2), cy + Math.sin(a) * (r - 2)); } g.closePath(); };
+  for (let i = -1; i < 6; i++) for (let j = -1; j < 5; j++) { const cx = i * r * 1.5, cy = j * h * 2 + (i % 2 ? h : 0); hexA(cx, cy); const gr = g.createRadialGradient(cx, cy, 2, cx, cy, r); gr.addColorStop(0, '#2c2252'); gr.addColorStop(1, '#221a40'); g.fillStyle = gr; g.fill(); g.strokeStyle = 'rgba(92,255,154,.55)'; g.lineWidth = 2.5; g.stroke(); } }));
+HEX_T.wrapS = HEX_T.wrapT = THREE.RepeatWrapping;
+const AWALL_T = new THREE.CanvasTexture(cvs(256, 256, (g) => { const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#2a1f4d'); gr.addColorStop(.5, '#3d2f6e'); gr.addColorStop(1, '#241a42'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  for (let x = 0; x < 256; x += 64) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(x, 0, 6, 256); g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(x + 6, 0, 3, 256); }
+  for (let k = 0; k < 14; k++) { const x = (k * 53) % 256 + 30, y = 40 + (k * 97) % 180; g.fillStyle = k % 2 ? 'rgba(92,255,154,.8)' : 'rgba(201,160,255,.8)'; g.beginPath(); g.arc(x, y, 2.5, 0, 7); g.fill(); } }));
+AWALL_T.wrapS = AWALL_T.wrapT = THREE.RepeatWrapping;
+let TELE_BEAM = null;
 function buildMothership() {
-  const Y = MINI.y, R = MINI_R, FM = toon(0x2c2648, { map: FLOOR_T }), CM = toon(0x1a1530), WM = toon(0x4a3f72, { map: WALL_T }), AM = toon(0x5cff9a, { e: 0x2fd36f, ei: .6 }), BM = toon(0x241d3e);
+  const Y = MINI.y, R = MINI_R, FM = toon(0xffffff, { map: HEX_T }), CM = toon(0x150f2a), WM = toon(0xffffff, { map: AWALL_T }), NEON = basic(0x5cff9a), NEON2 = basic(0xc9a0ff), RIB = toon(0x2a2148), RIB2 = toon(0x5cff9a, { e: 0x2fd36f, ei: .9 });
+  const GLOW = c => toon(c, { e: c, ei: .9 }), GLASS = new THREE.MeshBasicMaterial({ color: 0x9dffbf, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide });
   R.forEach(r => { const [x0, z0, x1, z1] = r, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
-    const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 1.5); const f = new THREE.Mesh(fg, FM); f.position.set(cx, Y, cz); world.add(f);
-    const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const c = new THREE.Mesh(cg, CM); c.position.set(cx, Y + WALL_H, cz); world.add(c);
-    for (let lx = x0 + 1.5; lx < x1 - 1; lx += 3) { const l = new THREE.Mesh(new THREE.CircleGeometry(.35, 16), basic(0x9dffbf)); l.rotation.x = Math.PI / 2; l.position.set(lx, Y + WALL_H - .015, cz); world.add(l); } });
-  wallSegs(R, R.map(() => null)).forEach(e => { const L = e.b - e.a, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1); const m = new THREE.Mesh(g, WM);
+    const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 3); const f = new THREE.Mesh(fg, FM); f.position.set(cx, Y, cz); world.add(f);
+    const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); const c = new THREE.Mesh(cg, CM); c.position.set(cx, Y + WALL_H, cz); world.add(c); });
+  wallSegs(R, R.map(() => null)).forEach(e => { const L = e.b - e.a, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 4, 1); const m = new THREE.Mesh(g, WM);
     m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2); if (e.ax === 'z') m.position.set(mid, Y + WALL_H / 2, e.v); else m.position.set(e.v, Y + WALL_H / 2, mid); world.add(m);
-    const q = .04, px = e.ax === 'z' ? mid : e.v - e.out * q, pz = e.ax === 'z' ? e.v - e.out * q : mid; box(e.ax === 'z' ? L : .07, .1, e.ax === 'z' ? .07 : L, AM, px, Y + 1.5, pz, null, false); box(e.ax === 'z' ? L : .07, .3, e.ax === 'z' ? .07 : L, BM, px, Y + .15, pz, null, false); });
-  // ventanal del puente
-  const win = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.7), basic(0xffffff, { map: STAR_T })); win.position.set(MINI.x, Y + 1.85, MINI.z - 9 + .05); world.add(win);
+    const q = .03, px = e.ax === 'z' ? mid : e.v - e.out * q, pz = e.ax === 'z' ? e.v - e.out * q : mid, sx = e.ax === 'z' ? L : .05, sz = e.ax === 'z' ? .05 : L;
+    box(sx, .06, sz, NEON, px, Y + .1, pz, null, false); box(sx, .04, sz, NEON2, px, Y + WALL_H - .25, pz, null, false);
+    // tubería con líquido verde a media altura
+    if (L > 3) { const pp = cyl(.09, .09, L - .4, toon(0x6b5a9a), px - (e.ax === 'x' ? e.out * .12 : 0), Y + 2.45, pz - (e.ax === 'z' ? e.out * .12 : 0), null, 10); pp.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2;
+      const lq = cyl(.05, .05, L - .4, GLOW(0x5cff9a), px - (e.ax === 'x' ? e.out * .2 : 0), Y + 2.45, pz - (e.ax === 'z' ? e.out * .2 : 0), null, 8); lq.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2; } });
+  // arcos (costillas) que cruzan las salas
+  [[R[0], 2.0], [R[2], 2.3]].forEach(([r, step]) => { const w = r[2] - r[0], rad = w / 2, cx = (r[0] + r[2]) / 2;
+    for (let z = r[1] + 1; z < r[3] - .5; z += step) { const a = new THREE.Mesh(new THREE.TorusGeometry(rad - .1, .13, 8, 30, Math.PI), RIB); a.scale.y = (WALL_H - .05) / rad; a.position.set(cx, Y, z); world.add(a);
+      const a2 = new THREE.Mesh(new THREE.TorusGeometry(rad - .22, .035, 6, 30, Math.PI), RIB2); a2.scale.y = (WALL_H - .2) / (rad - .1); a2.position.set(cx, Y, z); world.add(a2); } });
+  // portales redondos entre salas
+  [-3, 0].forEach(dz => { const [x, z] = mpt(0, dz); const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35, .16, 10, 36), RIB); ring.position.set(x, Y + 1.3, z); world.add(ring);
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.2, .04, 6, 36), RIB2); ring2.position.set(x, Y + 1.3, z + (dz ? .1 : -.1)); world.add(ring2); });
+  // ventanal del puente con marco
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 2.0), basic(0xffffff, { map: STAR_T })); win.position.set(MINI.x, Y + 1.8, MINI.z - 9 + .05); world.add(win);
+  const fr = new THREE.Mesh(new THREE.TorusGeometry(1, .1, 8, 40), RIB2); fr.scale.set(3.4, 1.1, 1); fr.position.set(MINI.x, Y + 1.8, MINI.z - 9 + .08); world.add(fr);
+  // lámparas del techo: discos que brillan
+  [[0, -6], [0, 3.5], [-3, 5.5], [3, 1.5]].forEach(([x, z]) => { const [wx, wz] = mpt(x, z); const l = new THREE.Mesh(new THREE.CircleGeometry(.5, 24), basic(0xe9d9ff)); l.rotation.x = Math.PI / 2; l.position.set(wx, Y + WALL_H - .02, wz); world.add(l);
+    const rr2 = new THREE.Mesh(new THREE.RingGeometry(.55, .7, 24), basic(0x5cff9a)); rr2.rotation.x = Math.PI / 2; rr2.position.set(wx, Y + WALL_H - .025, wz); world.add(rr2); });
   // puestos
-  const C = toon(0x3a3266), S2 = toon(0x0c3a22);
+  const C = toon(0x3a2d6a), CL = toon(0x5b4a99);
   MINI_ST.forEach(st => { const [x, z] = st.c; const sg = sprText(st.n, { size: 46, bg: '#1c7a45', w: 1.9 });
-    if (st.k === 'pilot') { box(2.6, 1.0, .9, C, x, Y + .5, z); const sc = new THREE.Mesh(new THREE.PlaneGeometry(2.2, .6), basic(0x0c3a22)); sc.position.set(x, Y + 1.15, z + .48); sc.rotation.x = -.6; world.add(sc);
-      [-.7, 0, .7].forEach((dx, i) => sph(.09, toon([0xff5a6e, 0xffd93d, 0x5cff9a][i], { e: [0xff5a6e, 0xffd93d, 0x5cff9a][i], ei: .9 }), x + dx, Y + 1.08, z + .3, null, 10));
-      cyl(.06, .06, .5, toon(0xc9d2dc), x, Y + 1.2, z + .25, null, 8); const seat = cyl(.45, .5, .5, toon(0x5a4f8a), st.p[0], Y + .25, st.p[1] + .7, null, 18); hull(seat, 1.05); sg.position.set(x, Y + 2.2, z); }
-    else if (st.k === 'tele') { const pad = cyl(1.0, 1.15, .14, toon(0x3a3266), x, Y + .07, z, null, 28); hull(pad, 1.03); TELE_RINGS = new THREE.Group(); TELE_RINGS.position.set(x, Y, z); world.add(TELE_RINGS); TELE_RINGS.userData.dyn = 1;
-      [0, 1, 2].forEach(k => { const r = new THREE.Mesh(new THREE.TorusGeometry(.85, .04, 8, 30), new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .7 })); r.rotation.x = Math.PI / 2; r.position.y = .3 + k * .7; TELE_RINGS.add(r); }); sg.position.set(x, Y + 2.75, z); }
-    else { box(1.3, 1.05, .6, C, x, Y + .52, z); const sc = new THREE.Mesh(new THREE.PlaneGeometry(1.0, .55), basic(st.k === 'ram' ? 0x3a0c12 : 0x0c3a22)); sc.position.set(x, Y + 1.2, z); sc.lookAt(st.p[0], Y + 1.4, st.p[1]); sc.translateZ(.31); world.add(sc);
-      if (st.k === 'ram') { const lv = cyl(.05, .05, .7, toon(0xc9d2dc), x, Y + 1.35, z, null, 8); lv.rotation.x = .5; sph(.12, toon(0xff3b4f, { e: 0xff3b4f, ei: .8 }), x, Y + 1.7, z + .2, null, 10); }
-      sg.position.set(x, Y + 2.1, z); }
+    if (st.k === 'pilot') { const base = cyl(1.3, 1.5, .9, C, x, Y + .45, z + .1, null, 30); base.scale.z = .55; hull(base, 1.03); const top = cyl(1.35, 1.35, .08, GLOW(0x2fd36f), x, Y + .92, z + .1, null, 30); top.scale.z = .55;
+      [-.8, -.3, .3, .8].forEach((dx, i) => sph(.08, GLOW([0xff5a6e, 0xffd93d, 0x5cff9a, 0x5ab8ff][i]), x + dx, Y + 1.0, z + .45, null, 10));
+      [-1, 0, 1].forEach(k => { const hs = new THREE.Mesh(new THREE.PlaneGeometry(.75, .45), new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .35, side: THREE.DoubleSide, depthWrite: false })); hs.position.set(x + k * .85, Y + 1.55, z + .1); hs.rotation.y = -k * .35; hs.rotation.x = -.15; world.add(hs); });
+      const sx = st.p[0], sz = st.p[1] + .95, egg = sph(.45, toon(0x8f7fd6), sx, Y + .8, sz, null, 24); egg.scale.set(1, 1.15, 1); hull(egg, 1.04); const cut = sph(.36, toon(0x3a2d6a), sx, Y + .82, sz - .17, null, 20); cut.scale.set(.95, 1.05, .7); cyl(.1, .25, .4, C, sx, Y + .2, sz, null, 12);
+      MINI_OBS.push([x, z, 1.1], [sx, sz, .42]); sg.position.set(x, Y + 2.5, z); }
+    else if (st.k === 'tele') { const pad = cyl(1.0, 1.2, .16, C, x, Y + .08, z, null, 32); hull(pad, 1.03); cyl(.85, .85, .03, GLOW(0x5cff9a), x, Y + .17, z, null, 32); cyl(1.0, 1.0, .06, RIB, x, Y + WALL_H - .03, z, null, 32);
+      TELE_BEAM = new THREE.Mesh(new THREE.CylinderGeometry(.8, .8, WALL_H - .2, 28, 1, true), new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .14, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); TELE_BEAM.position.set(x, Y + WALL_H / 2, z); TELE_BEAM.userData.dyn = 1; world.add(TELE_BEAM);
+      TELE_RINGS = new THREE.Group(); TELE_RINGS.position.set(x, Y, z); world.add(TELE_RINGS); TELE_RINGS.userData.dyn = 1;
+      [0, 1, 2].forEach(k => { const r = new THREE.Mesh(new THREE.TorusGeometry(.85, .04, 8, 30), new THREE.MeshBasicMaterial({ color: 0x9dffbf, transparent: true, opacity: .7 })); r.rotation.x = Math.PI / 2; r.position.y = .3 + k * .7; TELE_RINGS.add(r); }); sg.position.set(x, Y + 2.85, z); }
+    else { const col = st.k === 'ram' ? 0xff5a6e : st.k === 'msab' ? 0xc9a0ff : 0x5cff9a; const bx = box(1.2, 1.0, .55, C, x, Y + .5, z); bx.lookAt(st.p[0], Y + .5, st.p[1]); const tp = box(1.25, .07, .6, GLOW(col), x, Y + 1.02, z, null, false); tp.lookAt(st.p[0], Y + 1.02, st.p[1]);
+      const hs = new THREE.Mesh(new THREE.PlaneGeometry(.9, .55), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .4, side: THREE.DoubleSide, depthWrite: false })); hs.position.set(x, Y + 1.55, z); hs.lookAt(st.p[0], Y + 1.6, st.p[1]); world.add(hs);
+      if (st.k === 'ram') { const lv = cyl(.05, .05, .7, toon(0xc9d2dc), x, Y + 1.3, z, null, 8); lv.rotation.z = .5; sph(.13, GLOW(0xff3b4f), x - .17, Y + 1.62, z, null, 10); }
+      if (st.k === 'tractor') { const em = cyl(.25, .4, .4, toon(0x6b5a9a), x, Y + WALL_H - .2, z - .6, null, 16); const gl = cyl(.2, .2, .02, GLOW(0x5cff9a), x, Y + WALL_H - .41, z - .6, null, 16); }
+      MINI_OBS.push([x, z, .65]); sg.position.set(x, Y + 2.15, z); }
     world.add(sg); });
   // mesa del holograma con la nave principal en miniatura
-  const ht = mpt(-2.4, -5.6); cyl(.9, .7, .9, toon(0x3a3266), ht[0], Y + .45, ht[1], null, 24); cyl(.95, .95, .05, toon(0x5cff9a, { e: 0x2fd36f, ei: .5 }), ht[0], Y + .92, ht[1], null, 24);
-  HOLO = new THREE.Group(); HOLO.position.set(ht[0], Y + 1.25, ht[1]); HOLO.userData.dyn = 1; world.add(HOLO); const hs = 1 / 55, HM2 = new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .45, depthWrite: false });
+  const ht = mpt(-2.6, -5.4); const tb = cyl(.85, .6, .9, C, ht[0], Y + .45, ht[1], null, 28); hull(tb, 1.03); cyl(.9, .9, .05, GLOW(0x5cff9a), ht[0], Y + .92, ht[1], null, 28); MINI_OBS.push([ht[0], ht[1], .85]);
+  const cone = new THREE.Mesh(new THREE.CylinderGeometry(.9, .2, .6, 24, 1, true), new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); cone.position.set(ht[0], Y + 1.25, ht[1]); world.add(cone);
+  HOLO = new THREE.Group(); HOLO.position.set(ht[0], Y + 1.4, ht[1]); HOLO.userData.dyn = 1; world.add(HOLO); const hs = 1 / 55, HM2 = new THREE.MeshBasicMaterial({ color: 0x5cff9a, transparent: true, opacity: .5, depthWrite: false });
   HULL_R().forEach(r => { const m = new THREE.Mesh(new THREE.BoxGeometry((r[2] - r[0]) * hs, .05, (r[3] - r[1]) * hs), HM2); m.position.set(((r[0] + r[2]) / 2) * hs, 0, ((r[1] + r[3]) / 2 - 12) * hs); HOLO.add(m); });
-  AIRLOCKS.forEach(a => { const m = new THREE.Mesh(new THREE.SphereGeometry(.04, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffd966 })); m.position.set(a.out[0] * hs, 0, (a.out[2] - 12) * hs); HOLO.add(m); });
-  const mk = new THREE.Mesh(new THREE.SphereGeometry(.06, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff5a6e })); HOLO.add(mk); HOLO.userData.mk = mk; HOLO.userData.hs = hs;
-  // tubos de especímenes (se llenan con las víctimas del alien)
-  [1.2, 3.0, 4.8].forEach((dz, k) => { const [x, z] = mpt(-4.35, dz); cyl(.42, .42, .15, toon(0x3a3266), x, Y + .08, z, null, 18); cyl(.42, .42, .15, toon(0x3a3266), x, Y + 2.2, z, null, 18);
-    const glass = new THREE.Mesh(new THREE.CylinderGeometry(.38, .38, 2.0, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0x9dffbf, transparent: true, opacity: .22, depthWrite: false, side: THREE.DoubleSide })); glass.position.set(x, Y + 1.15, z); world.add(glass);
+  AIRLOCKS.forEach(a => { const m = new THREE.Mesh(new THREE.SphereGeometry(.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffd966 })); m.position.set(a.out[0] * hs, 0, (a.out[2] - 12) * hs); HOLO.add(m); });
+  const mk = new THREE.Mesh(new THREE.SphereGeometry(.07, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff5a6e })); HOLO.add(mk); HOLO.userData.mk = mk; HOLO.userData.hs = hs;
+  // tubos de especímenes con burbujas
+  [1.2, 3.0, 4.8].forEach((dz, k) => { const [x, z] = mpt(-4.3, dz); const b1 = cyl(.45, .5, .2, C, x, Y + .1, z, null, 20); hull(b1, 1.04); cyl(.45, .45, .2, C, x, Y + 2.25, z, null, 20); cyl(.4, .4, .03, GLOW(0x5cff9a), x, Y + .21, z, null, 20);
+    const glass = new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, 2.0, 22, 1, true), GLASS); glass.position.set(x, Y + 1.2, z); world.add(glass);
+    const liq = new THREE.Mesh(new THREE.CylinderGeometry(.37, .37, 1.9, 20), new THREE.MeshBasicMaterial({ color: 0x2fd36f, transparent: true, opacity: .16, depthWrite: false })); liq.position.set(x, Y + 1.18, z); world.add(liq);
+    EMIT.push({ k: 'glow', p: [x, Y + .4, z], c: 0x9dffbf }); MINI_OBS.push([x, z, .5]);
     const sp = makeChar(0); sp.g.scale.setScalar(.55); sp.g.position.set(x, Y + .55, z); sp.g.rotation.y = Math.PI / 2; sp.g.visible = false; sp.g.userData.dyn = 1; world.add(sp.g); TUBES.push(sp); });
-  const sg2 = sprText('ESPECÍMENES', { size: 46, bg: '#1c7a45', w: 1.9 }); sg2.position.set(...mpt(-4.2, 3).map((v, i) => v), 0); sg2.position.set(mpt(-4.2, 3)[0], Y + 2.65, mpt(-4.2, 3)[1]); world.add(sg2);
+  const sg2 = sprText('ESPECÍMENES', { size: 46, bg: '#1c7a45', w: 1.9 }); sg2.position.set(mpt(-4.2, 3)[0], Y + 2.75, mpt(-4.2, 3)[1]); world.add(sg2);
+  // setas luminosas en las esquinas
+  [[-3.4, -8.3], [3.4, -8.3], [-3.5, -3.6], [3.5, -3.6], [4.3, 6.3], [-1.2, 6.4], [4.3, .6]].forEach(([dx, dz], k) => { const [x, z] = mpt(dx, dz); const sc = .7 + (k % 3) * .25;
+    cyl(.06 * sc, .1 * sc, .6 * sc, toon(0xe9e4ff), x, Y + .3 * sc, z, null, 8); const cap = sph(.28 * sc, GLOW(k % 2 ? 0x5cff9a : 0xc9a0ff), x, Y + .62 * sc, z, null, 14); cap.scale.y = .6;
+    cyl(.04 * sc, .07 * sc, .4 * sc, toon(0xe9e4ff), x + .25 * sc, Y + .2 * sc, z + .1, null, 8); const c2 = sph(.17 * sc, GLOW(k % 2 ? 0xc9a0ff : 0x5cff9a), x + .25 * sc, Y + .42 * sc, z + .1, null, 12); c2.scale.y = .6; });
   // luces de la nave del alien
-  [mpt(0, -6), mpt(0, 3.5), mpt(7.4, 3.5)].forEach(([x, z], k) => { const L = new THREE.PointLight(k === 1 ? 0x9dffbf : 0xc9a0ff, .6, 14, 1.6); if (k === 2) return; L.position.set(x, Y + 2.6, z); L.userData.base = .6; world.add(L); LIGHTS.push(L); });
+  [[mpt(0, -6), 0xc9a0ff], [mpt(0, 3.5), 0x9dffbf], [mpt(0, -1.5), 0x5cff9a]].forEach(([[x, z], c]) => { const L = new THREE.PointLight(c, .75, 14, 1.6); L.position.set(x, Y + 2.6, z); L.userData.base = .75; world.add(L); LIGHTS.push(L); });
 }
 let tubeKey = '';
 function miniTick(dt, t, me) {
+  if (TELE_BEAM) TELE_BEAM.material.opacity = .1 + Math.sin(t * 3) * .05 + (me && me.xa && me.xc <= 0 ? .08 : 0);
   if (TELE_RINGS) TELE_RINGS.children.forEach((r, k) => { r.position.y = .3 + ((t * .6 + k / 3) % 1) * 2.1; r.material.opacity = .75 * (1 - ((t * .6 + k / 3) % 1)); });
   if (HOLO && me && me.xa) { HOLO.rotation.y += dt * .15; const hs = HOLO.userData.hs; HOLO.userData.mk.position.set(me.ax * hs, me.ay * hs, (me.az - 12) * hs); }
   const av = (S && S.av) || [], key = av.join(','); if (key !== tubeKey) { tubeKey = key; TUBES.forEach((tb, k) => { const c = av[av.length - 1 - k]; if (c == null) { tb.g.visible = false; return; } const nw = makeChar(c, { dead: true }); nw.g.scale.setScalar(.55); nw.g.position.copy(tb.g.position); nw.g.rotation.y = Math.PI / 2; nw.g.userData.dyn = 1; world.remove(tb.g); world.add(nw.g); TUBES[k] = nw; }); }
@@ -1682,12 +1721,12 @@ function tree(x, z) { cyl(.12, .18, 1.2, toon(0x8a5a34), x, 1.2, z, null, 10); [
 buildShip();
 let LSLOT = null, lsT = 0; const LSPEC = [];
 function lightSlots() { LIGHTS.forEach(l => { LSPEC.push(l); if (l.parent) l.parent.remove(l); }); LIGHTS.length = 0; LSLOT = [];
-  for (let i = 0; i < 4; i++) { const L = new THREE.PointLight(0xffffff, 0, 20, 1.6); L.userData.base = 0; scene.add(L); LSLOT.push(L); LIGHTS.push(L); } lsT = 0; updateSlots(); }
+  for (let i = 0; i < (TOUCH0 ? 4 : 6); i++) { const L = new THREE.PointLight(0xffffff, 0, 20, 1.6); L.userData.base = 0; scene.add(L); LSLOT.push(L); LIGHTS.push(L); } lsT = 0; updateSlots(); }
 function updateSlots() { if (!LSLOT) return; const now = performance.now(); if (now < lsT) return; lsT = now + 250; const cx = camera.position.x, cz = camera.position.z;
   const best = LSPEC.slice().sort((a, b) => Math.hypot(a.position.x - cx, a.position.z - cz) - Math.hypot(b.position.x - cx, b.position.z - cz));
   LSLOT.forEach((L, i) => { const sp = best[i]; const k = L.userData.base ? L.intensity / L.userData.base : 1; if (!sp) { L.userData.base = 0; L.intensity = 0; return; }
     L.position.copy(sp.position); L.color.copy(sp.color); L.distance = sp.distance; L.decay = sp.decay; L.userData.base = sp.userData.base; L.intensity = sp.userData.base * k; }); }
-if (TOUCH0) lightSlots();
+lightSlots(); // pocas luces a la vez (las más cercanas): evita que los materiales fallen en algunas tarjetas gráficas
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { SPRS.forEach(s => { s.draw(s.c.getContext('2d'), 512, 128); s.t.needsUpdate = true; }); }).catch(() => {});
 
 /* ================== PERSONAJES ================== */
@@ -2276,7 +2315,7 @@ function gameFrame(dt, t) {
   const me = S.pl[ME]; const ghost = !me || !me.al; const crisis = crisisKey();
   if (local.vent >= 0 && (!me || !me.al || !canVent(me) || S.ph !== 'play')) exitVent(true);
   if (local.eva && (!me || !me.al || S.ph !== 'play')) endEVA(true);
-  if (me && me.xa) alienModes(me); else if (local.ufo) { local.ufo = null; qs('#cockpit').hidden = true; spaceEnv(false); }
+  if (me && me.xa) alienModes(me); else if (local.ufo || local.mini) { local.ufo = null; local.mini = false; qs('#cockpit').hidden = true; spaceEnv(false); P.ey = EYE; }
   if (local.fixOpen != null && !fixNeeded().includes(local.fixOpen)) closeTask();
   if (local.dropT > 0) local.dropT = Math.max(0, local.dropT - dt);
   if (local.exitT > 0) { local.exitT -= dt; if (local.exitT <= 0) finishExit(); }
@@ -2325,6 +2364,7 @@ function gameFrame(dt, t) {
   if (black && !me.im) { scene.fog.near = 4; scene.fog.far = 24; scene.fog.color.setHex(0x020308); }
   if (inD && local.dropT <= 0 && local.exitT <= 0) { scene.fog.near = 1.5; scene.fog.far = 17; scene.fog.color.setHex(0x0c1824); }
   if (local.eva || local.ufo) { scene.fog.near = 90; scene.fog.far = 420; scene.fog.color.setHex(0x04050d); }
+  else if (local.mini) { scene.fog.near = 14; scene.fog.far = 48; scene.fog.color.setHex(0x1a1030); }
   if (ANIM.reactorLight) { ANIM.reactorLight.color.setHex(crisis === 'reactor' ? 0xff3b4f : 0x7fe6ff); }
   // puertas
   DOORS.forEach(d => { const target = DOOR_ON.has(d.room) ? 0 : 1; d.o += (target - d.o) * Math.min(1, dt * 7); d.mesh.position.y = d.h / 2 + d.o * WALL_H; d.mesh.visible = d.o < .985; });
@@ -2561,12 +2601,12 @@ function syncPhase(dt) {
 function startGameLocal() {
   mode = 'game'; hideScreens(); MENU_BLOBS.forEach(b => scene.remove(b.c.g)); MENU_BLOBS.length = 0; clearAvatars();
   ME = S.pl.findIndex(p => p.pe && p.pe === (NET.online ? NET.myPeer : 'yo')); if (NET.isHost && !NET.online) ME = 0;
-  local.done = new Set(); local.lastRd = 0; local.lastPh = ''; local.lastMid = S.mid; local.kfN = S.kf ? S.kf.n : 0; local.vent = -1; local.duct = -1; local.dropT = 0; local.exitT = 0; local.camView = false; local.pv = {}; local.lastSab = null; local.light = 1; local.clN = S.cl ? S.cl.n : 0; local.shkN = S.shk ? S.shk.n : 0; local.ufN = S.uf ? S.uf.n : 0; local.udN = S.ud ? S.ud.n : 0; local.axN = S.ax ? S.ax.n : 0; local.ufo = null; local.alWasIn = false; qs('#cockpit').hidden = true; local.detT = 0; local.fp = {}; FOOT.length = 0; NET.pres.a = null; NET.pres.vt = null;
-  qs('#vig').classList.add('on'); qs('#hud').hidden = false; qs('#joy').hidden = !isTouch; qs('#lockhint').hidden = isTouch;
+  local.done = new Set(); local.lastRd = 0; local.lastPh = ''; local.lastMid = S.mid; local.kfN = S.kf ? S.kf.n : 0; local.vent = -1; local.duct = -1; local.dropT = 0; local.exitT = 0; local.camView = false; local.pv = {}; local.lastSab = null; local.light = 1; local.clN = S.cl ? S.cl.n : 0; local.shkN = S.shk ? S.shk.n : 0; local.ufN = S.uf ? S.uf.n : 0; local.udN = S.ud ? S.ud.n : 0; local.axN = S.ax ? S.ax.n : 0; local.ufo = null; local.mini = false; local.alWasIn = false; local.alWasMini = false; qs('#cockpit').hidden = true; local.detT = 0; local.fp = {}; FOOT.length = 0; NET.pres.a = null; NET.pres.vt = null;
+  hudT = 0; qs('#vig').classList.add('on'); qs('#hud').hidden = false; qs('#joy').hidden = !isTouch; qs('#lockhint').hidden = isTouch;
   showIntro();
 }
 function teardownGame() {
-  mode = 'menu'; qs('#vig').classList.remove('on'); endEVA(true); local.ufo = null; qs('#cockpit').hidden = true; Object.keys(UFOS).forEach(k => { scene.remove(UFOS[k]); delete UFOS[k]; }); clearAvatars(); closeTask(); toggleMap(false); exitVent(true); closeCams(); local.saboOpen = false;
+  mode = 'menu'; qs('#vig').classList.remove('on'); endEVA(true); local.ufo = null; local.mini = false; qs('#cockpit').hidden = true; Object.keys(UFOS).forEach(k => { scene.remove(UFOS[k]); delete UFOS[k]; }); clearAvatars(); closeTask(); toggleMap(false); exitVent(true); closeCams(); local.saboOpen = false;
   hideSplash(); ['#hud', '#meeting', '#eject', '#intro', '#death', '#end', '#sabo', '#cams'].forEach(s => qs(s).hidden = true); qs('#ghostTint').style.opacity = 0; qs('#darkV').style.opacity = 0; qs('#alarm').classList.remove('on');
   try { if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {} canvas.style.cursor = '';
   DOOR_ON = new Set(); DOORS.forEach(d => { d.o = 1; d.mesh.visible = false; });
