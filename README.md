@@ -56,6 +56,17 @@ Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detec
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
 
+## El Alien (rol aparte)
+
+Se activa en el menú de roles (grupo "Rol aparte") y se puede probar en el modo práctica. No es tripulante ni polizón: **gana si quedan 2 o menos supervivientes** mientras su platillo siga entero.
+
+El alien camina por su propia nave, de dos salas:
+
+- **Puente**: los **mandos** para pilotar el platillo alrededor de la nave (R para levantarse) y una mesa con el holograma de la nave principal.
+- **Sala de mecánicas**: el **teletransportador** (con el platillo acoplado a una esclusa, entra 30 s en la nave y puede eliminar a una sola persona), el **rayo tractor** (abduce a quien esté fuera), la consola de **sabotajes** (pulso EMP, antigravedad, interferencias), el **ariete** (embiste la nave: a todos les tiembla la pantalla y se les cierra la tarea) y los tubos con sus víctimas.
+
+Para pararle, cualquiera puede usar el **cañón de defensa** de la Sala de armas: tres impactos y el platillo queda destruido.
+
 ## Sabotajes especiales
 
 - **Gravedad cero**: todos flotan por la nave con inercia y rebotan contra paredes, suelo y techo. Se arregla reiniciando el generador del Observatorio (o vuelve sola a los 40 s).
