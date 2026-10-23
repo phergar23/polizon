@@ -37,6 +37,15 @@ En el móvil el juego se pone en horizontal automáticamente.
 
 Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño original.
 
+## Mapas
+
+Al crear una partida o en el modo práctica puedes elegir el mapa:
+
+- **Nave**: el mapa clásico, con pasillos, conductos y paseos espaciales.
+- **Planeta Violeta**: una base en un planeta de suelo morado. El exterior es terreno abierto, sin caminos marcados: puedes ir por donde quieras entre los edificios (Nave Lucero, Comunicaciones, Laboratorio, Seguridad, Electricidad, Invernadero y Almacén). Hay rocas, cristales, fumarolas y acantilados alrededor, tareas al aire libre y, de vez en cuando, una **tormenta de polvo** que casi no deja ver fuera de los edificios. El alien aterriza en las plataformas del exterior.
+
+Al cambiar de mapa la página se recarga. Si tus amigos se unen a una sala con otro mapa, su juego cambia solo al mapa de quien la ha creado.
+
 ## Roles especiales
 
 Al crear la partida, el botón **Elegir** de "Roles especiales" abre un menú para activar los roles. Cada rol activado lo recibe un jugador al azar de su bando. La habilidad se usa con la tecla **C** (o el botón de habilidad en móvil).

@@ -104,6 +104,7 @@ kbd{font-family:var(--fd);background:#0b0f3a;border:2px solid var(--line);border
 .chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--fd);font-size:18px;padding:6px 14px;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.35);align-self:flex-start}
 .chip.crew{background:var(--sky);color:#071c3c}
 .chip.imp{background:var(--coral);color:#fff}
+.mapsel{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.mbtn{border:2px solid #2c3590;background:#1a2060;color:var(--ink);font:inherit;font-weight:800;font-size:14px;border-radius:12px;padding:8px 10px;cursor:pointer}.mbtn[aria-pressed="true"]{border-color:#c9a0ff;background:#4a2d7a}
 .chip.alien{background:#2fd36f;color:#04210f}
 #cockpit{position:fixed;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 52%,rgba(20,90,50,.35) 70%,rgba(6,30,18,.92) 88%);box-shadow:inset 0 -60px 80px rgba(47,211,111,.15)}
 #cockpit::after{content:"PLATILLO ALIEN";position:absolute;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-family:var(--fd);color:#5cff9a;font-size:15px;letter-spacing:2px;text-shadow:0 0 8px #2fd36f;opacity:.8}
@@ -447,6 +448,10 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
     </div>
     <div class="rgrp"><h4 id="prSubT" class="crewh">Rol especial</h4><div class="rlist four" id="prSubs" role="group" aria-label="Rol especial"></div></div>
     <div class="set">
+      <div class="t"><b>Mapa</b><small>Cambiarlo recarga la página</small></div>
+      <div class="mapsel"><button class="mbtn" data-m="nave" type="button">Nave</button><button class="mbtn" data-m="planeta" type="button">Planeta</button></div>
+    </div>
+    <div class="set">
       <div class="t"><b>NPCs en la nave</b><small>Se quedan quietos en distintas salas</small></div>
       <div class="step"><button id="pMinus" aria-label="Menos NPCs">−</button><output id="pOut">6</output><button id="pPlus" aria-label="Más NPCs">+</button></div>
     </div>
@@ -472,6 +477,10 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
     <div class="set">
       <div class="t"><b>Polizones</b><small id="impHint">Impostores escondidos</small></div>
       <div class="step"><button id="iMinus" aria-label="Menos polizones">−</button><output id="iOut">1</output><button id="iPlus" aria-label="Más polizones">+</button></div>
+    </div>
+    <div class="set">
+      <div class="t"><b>Mapa</b><small>Cambiarlo recarga la página</small></div>
+      <div class="mapsel"><button class="mbtn" data-m="nave" type="button">Nave Lucero</button><button class="mbtn" data-m="planeta" type="button">Planeta Violeta</button></div>
     </div>
     <div class="set">
       <div class="t"><b>Roles especiales</b><small id="roHint">Todos activados</small></div>
@@ -612,6 +621,8 @@ const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls)
 const clean = (s, n) => String(s || '').replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯]/g, '').trim().slice(0, n);
 const wrapA = a => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 
+/* ================== MAPA ELEGIDO ================== */
+const MAPID = (new URLSearchParams(location.search).get('mapa') || store.get('map', 'nave')) === 'planeta' ? 'planeta' : 'nave', IS_PLANET = MAPID === 'planeta';
 /* ================== DATOS DEL MUNDO ================== */
 const COLORS = [
   { n: 'Rojo', h: 0xff4757 }, { n: 'Azul', h: 0x3d7bff }, { n: 'Verde', h: 0x2ed573 }, { n: 'Rosa', h: 0xff7ac6 }, { n: 'Naranja', h: 0xff9f1a },
@@ -719,7 +730,7 @@ LAYOUT.forEach((L, i) => {
     ROOMS.push({ n: L.n || o.n, r: L.r, f: o.f, a: o.a, l: o.l, node: L.ring ? L.ring[0] : f(o.node[0], o.node[1]), ctr: o.ctr ? f(o.ctr[0], o.ctr[1]) : null, ch: L.ch || null, ring: L.ring || null });
   } else ROOMS.push({ n: L.n, r: L.r, f: L.f, a: L.a, l: L.l, node: L.ring ? L.ring[0] : L.node, ctr: L.ring ? [(L.r[0] + L.r[2]) / 2, (L.r[1] + L.r[3]) / 2] : null, ch: L.ch || null, hall: L.hall || 0, ring: L.ring || null });
 });
-const FLOORCOL = { 'Comedor': 0xffffff, 'Navegación': 0x93a3b6, 'Médico': 0xc6d3dc, 'Reactor': 0x8e88aa, 'Electricidad': 0x938a72, 'Comunicaciones': 0x8495a2, 'Administración': 0xa8767a, 'Observatorio': 0x93a896, 'Sala de armas': 0xcfbf9f, 'Seguridad': 0x86ab92, 'Taquillas': 0xaaa5c2, 'Cruce este': 0xb4c0c9, 'Zona de carga': 0x8c9196 };
+const FLOORCOL = { 'Nave Lucero': 0xdfe6ee, 'Laboratorio': 0xc7e8dc, 'Invernadero': 0xa8c98e, 'Almacén': 0xb59a86, 'Exterior': 0x7a5aa0, 'Comedor': 0xffffff, 'Navegación': 0x93a3b6, 'Médico': 0xc6d3dc, 'Reactor': 0x8e88aa, 'Electricidad': 0x938a72, 'Comunicaciones': 0x8495a2, 'Administración': 0xa8767a, 'Observatorio': 0x93a896, 'Sala de armas': 0xcfbf9f, 'Seguridad': 0x86ab92, 'Taquillas': 0xaaa5c2, 'Cruce este': 0xb4c0c9, 'Zona de carga': 0x8c9196 };
 function inShape(i, x, z, m = 0) { const R = ROOMS[i], r = R.r; if (x < r[0] + m || x > r[2] - m || z < r[1] + m || z > r[3] - m) return false; const ch = R.ch; if (!ch) return true; const k = m * 1.4142;
   return !((ch[0] && (x - r[0]) + (z - r[1]) < ch[0] + k) || (ch[1] && (r[2] - x) + (z - r[1]) < ch[1] + k) || (ch[2] && (r[2] - x) + (r[3] - z) < ch[2] + k) || (ch[3] && (x - r[0]) + (r[3] - z) < ch[3] + k)); }
 const xfPt = (x, z) => { const i = origRoomAt(x, z); return i >= 0 && XF[i] ? XF[i].f(x, z) : null; };
@@ -741,6 +752,51 @@ CAM_DESK.p = xfPt(CAM_DESK.p[0], CAM_DESK.p[1]);
     { p: [21.6, -16.6], net: 2 }, pickV(9, 2), pickV(8, 2), { p: [27.6, 30.6], net: 2 }); }
 for (let k = 0; k < 7; k++) OBS.push({ x: -43 + k, z: 30.5, r: .5 });
 OBS.push({ x: -37.2, z: 37.1, r: .45 }, { x: 30, z: -11, r: 1.45 }, { x: 21.4, z: -7.3, r: .8 }, { x: -4.5, z: -4.4, r: .7 }, { x: 4.5, z: -4.4, r: .7 }, { x: 0, z: 30, r: 1.75 });
+
+// ================== PLANETA VIOLETA: datos del mapa ==================
+const PL_B = [-54, -40, 54, 40], PL_GAP = .25;
+function planetData() {
+  BTN.x = 0; BTN.z = 0;
+  const B = [
+    { n: 'Nave Lucero', r: [-8, -6, 8, 6], f: 0xdfe6ee, a: 0xff9f43, l: 0xffd59a, ring: [[0, -3.4], [3.4, 0], [0, 3.4], [-3.4, 0]] },
+    { n: 'Comunicaciones', r: [-44, -32, -30, -20], f: 0x9fb2c2, a: 0x52c7ff, l: 0xbfe4ff },
+    { n: 'Laboratorio', r: [26, -32, 44, -18], f: 0xc7e8dc, a: 0x36e0ad, l: 0xc8ffe9 },
+    { n: 'Seguridad', r: [-8, -34, 8, -24], f: 0x9fc4aa, a: 0x5fbf7a, l: 0xd2ffd8 },
+    { n: 'Electricidad', r: [-46, 16, -32, 28], f: 0xb3a77e, a: 0xffcc33, l: 0xfff0b0 },
+    { n: 'Invernadero', r: [28, 14, 44, 28], f: 0xa8c98e, a: 0x55c43a, l: 0xe0ffc8 },
+    { n: 'Almacén', r: [-8, 24, 10, 36], f: 0xb59a86, a: 0xc8834a, l: 0xffe0c0 }];
+  ROOMS.length = 0;
+  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, a: b.a, l: b.l, node: b.ring ? b.ring[0] : c, ctr: c, ch: null, hall: 0, ring: b.ring || null }); });
+  // exterior: el terreno libre se divide en rectángulos transitables alrededor de los edificios
+  const holes = B.map(b => [b.r[0] - PL_GAP, b.r[1] - PL_GAP, b.r[2] + PL_GAP, b.r[3] + PL_GAP]);
+  const xs = [...new Set([PL_B[0], PL_B[2], ...holes.flatMap(h => [h[0], h[2]])])].sort((a, b) => a - b), zs = [...new Set([PL_B[1], PL_B[3], ...holes.flatMap(h => [h[1], h[3]])])].sort((a, b) => a - b);
+  const strips = []; for (let j = 0; j < zs.length - 1; j++) { const z0 = zs[j], z1 = zs[j + 1]; let cur = null;
+    for (let i = 0; i < xs.length - 1; i++) { const x0 = xs[i], x1 = xs[i + 1], cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, free = !holes.some(h => cx > h[0] && cx < h[2] && cz > h[1] && cz < h[3]);
+      if (free) { if (cur) cur[2] = x1; else cur = [x0, z0, x1, z1]; } else if (cur) { strips.push(cur); cur = null; } } if (cur) strips.push(cur); }
+  const merged = []; strips.forEach(st => { const m = merged.find(q => Math.abs(q[0] - st[0]) < 1e-6 && Math.abs(q[2] - st[2]) < 1e-6 && Math.abs(q[3] - st[1]) < 1e-6); if (m) m[3] = st[3]; else merged.push(st.slice()); });
+  merged.forEach(r => ROOMS.push({ n: 'Exterior', r, f: 0x7a5aa0, a: 0x9b7cd0, l: 0xc9b0ff, node: [(r[0] + r[2]) / 2, (r[1] + r[3]) / 2], ctr: null, ch: null, hall: 1, out: 1, ring: null }));
+  // puertas de los edificios: tramos cortos que atraviesan la pared hacia el exterior
+  CORR.length = 0;
+  [[0, [0, -6], [0, -8.6]], [0, [0, 6], [0, 8.6]], [0, [-8, 0], [-10.6, 0]], [0, [8, 0], [10.6, 0]], [1, [-30, -26], [-27.4, -26]], [2, [26, -25], [23.4, -25]], [3, [0, -24], [0, -21.4]],
+   [4, [-32, 22], [-29.4, 22]], [5, [28, 21], [25.4, 21]], [6, [1, 24], [1, 21.4]]].forEach(([a, A, Bp]) => CORR.push({ p: [A, Bp], a, b: -1, w: 3 }));
+  // rocas (obstáculos redondos)
+  OBS.length = 0; [[-20, -18, 2.2], [16, -12, 1.8], [-22, 9, 2.0], [-14, 30, 2.0], [20, 34, 1.8], [-50, 3, 2.6], [50, -4, 2.6], [-28, -4, 1.5], [41, 2, 1.8], [-6, 15, 1.3], [12, -34, 1.6], [-50, -30, 2.2], [50, 32, 2.4], [-50, 34, 2.2], [24, -2, 1.2]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 1 }));
+  OBS.push({ x: 0, z: 0, r: 1.75 });
+  // tareas
+  ST.length = 0; ST.push(
+    { c: [-43.55, -26], t: 'dial', n: 'Sintonizar receptor' }, { c: [-37, -31.55], t: 'download', n: 'Descargar datos' },
+    { c: [35, -31.55], t: 'samples', n: 'Analizar muestras' }, { c: [43.55, -22], t: 'scan', n: 'Escáner médico' },
+    { c: [-7.55, -29], t: 'swipe', n: 'Pasar tarjeta' }, { c: [-45.55, 20], t: 'cables', n: 'Arreglar cables' }, { c: [-39, 27.55], t: 'power', n: 'Desviar energía' },
+    { c: [43.55, 18], t: 'plants', n: 'Regar plantas' }, { c: [36, 27.55], t: 'sort', n: 'Ordenar semillas' }, { c: [9.55, 30], t: 'sort', n: 'Ordenar minerales' }, { c: [-7.55, 30], t: 'fuel', n: 'Cargar combustible' },
+    { c: [4, -5.55], t: 'gauge', n: 'Fijar rumbo' }, { c: [-4, -5.55], t: 'upload', n: 'Subir datos' }, { c: [5, 5.55], t: 'trash', n: 'Vaciar basura' },
+    { man: 1, c: [-37, -14.4], p: [-37, -13.2], yaw: 0, t: 'dial', n: 'Reparar antena' }, { man: 1, c: [36, -10.4], p: [36, -9.2], yaw: 0, t: 'wipe', n: 'Limpiar paneles solares' },
+    { man: 1, c: [-24, 3.4], p: [-24, 4.6], yaw: 0, t: 'gauge', n: 'Revisar sonda' }, { man: 1, c: [16, 21.4], p: [16, 22.6], yaw: 0, t: 'samples', n: 'Recoger cristales' }, { man: 1, c: [-10, 12.4], p: [-10, 13.6], yaw: 0, t: 'align', n: 'Medir seísmos' });
+  FIX.length = 0; FIX.push({ k: 0, c: [-32.45, 18.5], t: 'levers', n: 'Panel de luces' }, { k: 1, c: [26.45, -30], t: 'hand', n: 'Estabilizador A' }, { k: 2, c: [26.45, -20], t: 'hand', n: 'Estabilizador B' },
+    { k: 3, c: [-30.45, -30], t: 'dial', n: 'Restaurar señal' }, { k: 4, c: [-7.55, 34.5], t: 'power', n: 'Generador de gravedad' });
+  CAMS.length = 0; CAMS.push({ n: 'Exterior oeste', p: [-10.6, 4.4, -7.4], t: [-24, 0, -12] }, { n: 'Exterior este', p: [10.6, 4.4, 7.4], t: [24, 0, 12] }, { n: 'Laboratorio', p: [43.4, 2.85, -31.4], t: [34, .4, -24] }, { n: 'Almacén', p: [9.4, 2.85, 35.4], t: [1, .4, 29] });
+  CAM_DESK.p = [0, -31.9];
+  VENTS.length = 0; VENTS.push({ p: [-5, 3.5], net: 0 }, { p: [-33.5, -23], net: 0 }, { p: [-35, 25.5], net: 0 }, { p: [5.5, -3.5], net: 1 }, { p: [29.5, -21], net: 1 }, { p: [31, 25.5], net: 1 }, { p: [5.5, -26.5], net: 2 }, { p: [7.5, 26.5], net: 2 });
+}
 // pasillos: polilíneas; a/b = sala en cada extremo (-1 si enlaza con otro pasillo)
 const CORR = [
   { p: [[-10, -12], [-22, -12], [-32, -12], [-32, 4], [-32, 11.5], [-32, 34]], a: 0, b: -1 },
@@ -757,6 +813,7 @@ const CORR = [
   { p: [[30, -6], [30, 2], [30, 6], [30, 27]], a: 8, b: 10 },
   { p: [[27, 6], [30, 6]], a: 7, b: -1 },
   { p: [[30, 2], [36.5, 2]], a: -1, b: 1 }];
+if (IS_PLANET) planetData();
 const CRECTS = [], WALK = ROOMS.map(r => r.r), DOORS = [];
 CORR.forEach((c, ci) => { const w = c.w || 4, h = w / 2, n = c.p.length;
   for (let i = 0; i < n - 1; i++) { const A = c.p[i], B = c.p[i + 1], vert = Math.abs(A[0] - B[0]) < 1e-6, sR = i === 0 && c.a >= 0, eR = i === n - 2 && c.b >= 0;
@@ -785,28 +842,30 @@ function subtract(segs, cuts) { cuts = cuts.slice().sort((p, q) => p[0] - q[0]);
   segs.forEach(([a, b]) => { let cur = a; cuts.forEach(([l, r]) => { if (r <= cur || l >= b) return; if (l > cur + 1e-3) res.push([cur, Math.min(l, b)]); cur = Math.max(cur, r); }); if (b > cur + 1e-3) res.push([cur, b]); });
   return res; }
 function roomAt(x, z) { for (let i = 0; i < ROOMS.length; i++) { const r = ROOMS[i].r; if (x >= r[0] && x <= r[2] && z >= r[1] && z <= r[3]) return i; } return -1; }
-const roomName = (x, z) => { const r = roomAt(x, z); return r >= 0 && !ROOMS[r].hall ? ROOMS[r].n : 'un pasillo'; };
+const roomName = (x, z) => { const r = roomAt(x, z); return r >= 0 && !ROOMS[r].hall ? ROOMS[r].n : r >= 0 && ROOMS[r].out ? 'el exterior' : 'un pasillo'; };
 function setupPoint(s) {
+  if (s.man) { s.room = roomAt(s.p[0], s.p[1]); s.nr = [Math.sin(s.yaw), Math.cos(s.yaw)]; return; }
   s.room = roomAt(s.c[0], s.c[1]); const r = ROOMS[s.room].r;
   const d = [s.c[0] - r[0], r[2] - s.c[0], s.c[1] - r[1], r[3] - s.c[1]]; const k = d.indexOf(Math.min(...d));
   const nr = [[1, 0], [-1, 0], [0, 1], [0, -1]][k]; s.nr = nr; s.p = [s.c[0] + nr[0] * 1.15, s.c[1] + nr[1] * 1.15]; s.yaw = Math.atan2(nr[0], nr[1]);
 }
 ST.forEach((s, i) => { s.id = i; s.kind = 'st'; setupPoint(s); });
 // esclusas al espacio (w: punto de la pared, o: hacia fuera)
-const AIRLOCKS = [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
-AIRLOCKS.forEach((a, i) => { a.id = i; a.in = [a.w[0] - a.o[0] * 1.3, a.w[1] - a.o[1] * 1.3]; a.anchor = [a.w[0] + a.o[0] * .5, 1.25, a.w[1] + a.o[1] * .5]; a.out = [a.w[0] + a.o[0] * 1.9, 1.25, a.w[1] + a.o[1] * 1.9]; a.room = roomAt(a.in[0], a.in[1]); });
+const AIRLOCKS = IS_PLANET ? [{ n: 'zona de aterrizaje norte', w: [-20, -10], o: [0, 1] }, { n: 'zona de aterrizaje sur', w: [20, 12], o: [0, -1] }] : [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
+AIRLOCKS.forEach((a, i) => { a.id = i; if (IS_PLANET) { a.in = a.w.slice(); a.out = [a.w[0], 8, a.w[1]]; a.anchor = a.out; a.room = roomAt(a.in[0], a.in[1]); return; } a.in = [a.w[0] - a.o[0] * 1.3, a.w[1] - a.o[1] * 1.3]; a.anchor = [a.w[0] + a.o[0] * .5, 1.25, a.w[1] + a.o[1] * .5]; a.out = [a.w[0] + a.o[0] * 1.9, 1.25, a.w[1] + a.o[1] * 1.9]; a.room = roomAt(a.in[0], a.in[1]); });
 const ROPE_L = 24;
 // tareas exteriores (solo para jugadores humanos; se hacen flotando fuera de la nave)
-[{ n: 'Limpiar paneles solares', t: 'wipe', c: [24, -22.2], y: 1.5, al: 0 }, { n: 'Reparar antena', t: 'dial', c: [31, -12], y: 4.5, al: 0 },
- { n: 'Soldar el casco', t: 'weld', c: [-44.6, 36.4], y: 1.2, al: 1 }, { n: 'Cambiar baliza', t: 'simon', c: [-40, 34], y: 4.3, al: 1 }].forEach(e => {
+(IS_PLANET ? [] : [{ n: 'Limpiar paneles solares', t: 'wipe', c: [24, -22.2], y: 1.5, al: 0 }, { n: 'Reparar antena', t: 'dial', c: [31, -12], y: 4.5, al: 0 },
+ { n: 'Soldar el casco', t: 'weld', c: [-44.6, 36.4], y: 1.2, al: 1 }, { n: 'Cambiar baliza', t: 'simon', c: [-40, 34], y: 4.3, al: 1 }]).forEach(e => {
   const a = AIRLOCKS[e.al], id = ST.length;
   ST.push({ id, kind: 'st', ext: 1, n: e.n, t: e.t, al: e.al, c: e.c, p: e.c, py: e.y, room: a.room, yaw: 0, nr: [-a.o[0], -a.o[1]],
     proxy: { kind: 'st', id, p: a.in, room: a.room, nr: [a.o[0], a.o[1]] } }); });
 const ST_IN = ST.filter(s => !s.ext), ST_EXT = ST.filter(s => s.ext);
-const CANNON = { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
+const CANNON = IS_PLANET ? { c: [7.45, -29], p: [6.25, -29], yaw: -Math.PI / 2 } : { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
+const roomOf = (x, z) => { const r = roomAt(x, z); return r >= 0 ? ROOMS[r].n : ''; };
 const taskTarget = s => s.ext ? s.proxy : s;
 function pickTasks(human) { const ins = shuffle(ST_IN.map(s => s.id)); if (!human || !ST_EXT.length) return ins.slice(0, TASKS_PER); const t = ins.slice(0, TASKS_PER - 1); t.splice(Math.floor(Math.random() * TASKS_PER), 0, pick(ST_EXT).id); return t; }
-FIX.push({ k: 4, c: [23.5, -1.55], t: 'power', n: 'Generador de gravedad' });
+if (!IS_PLANET) FIX.push({ k: 4, c: [23.5, -1.55], t: 'power', n: 'Generador de gravedad' });
 FIX.forEach(s => { s.kind = 'fix'; setupPoint(s); });
 VENTS.forEach((v, i) => { v.id = i; v.kind = 'vent'; v.room = roomAt(v.p[0], v.p[1]); v.links = VENTS.map((w, j) => j).filter(j => j !== i && VENTS[j].net === v.net); });
 // conductos subterráneos: cada red de alcantarillas tiene su túnel a distinta profundidad
@@ -828,6 +887,9 @@ const nearCaf = (x, z) => nearRing(0, x, z);
 const NK = new Map(); const nodeAt = q => { const k = q[0].toFixed(2) + ',' + q[1].toFixed(2); if (!NK.has(k)) NK.set(k, addNode(q)); return NK.get(k); };
 CORR.forEach(c => { const ids = c.p.map(nodeAt); for (let i = 0; i < ids.length - 1; i++) link(ids[i], ids[i + 1]);
   [[c.a, ids[0]], [c.b, ids[ids.length - 1]]].forEach(([r, n]) => { if (r < 0) return; link(n, RING[r] ? nearRing(r, NODES[n][0], NODES[n][1]) : r); }); });
+if (IS_PLANET) { const ids = ROOMS.map((r, i) => r.out ? i : -1).filter(i => i >= 0); CORR.forEach(c => ids.push(nodeAt(c.p[c.p.length - 1])));
+  const clearO = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / .4)); for (let k = 1; k < n; k++) { const t = k / n, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t; if (!inWalk(x, z, .3)) return false; if (OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .45)) return false; } return true; };
+  for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) { const a = NODES[ids[i]], b = NODES[ids[j]]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 20 && clearO(a, b)) link(ids[i], ids[j]); } }
 function losClear(x0, z0, x1, z1) { const d = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.ceil(d / .3)); for (let i = 1; i < n; i++) { const t = i / n; if (!inWalk(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, .05)) return false; } return true; }
 function navPath(s, t) {
   const n = NODES.length, D = Array(n).fill(1e9), Pv = Array(n).fill(-1), done = Array(n).fill(false); D[s] = 0;
@@ -837,6 +899,7 @@ function navPath(s, t) {
 }
 function nearestNode(x, z) { const r = roomAt(x, z); if (r >= 0 && RING[r]) return nearRing(r, x, z); if (r >= 0) return r; let b = -1, bd = 1e9; NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd && losClear(x, z, nd[0], nd[1])) { bd = d; b = i; } }); if (b < 0) NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd) { bd = d; b = i; } }); return b; }
 const DOOR_ROOMS = [...new Set(DOORS.map(d => d.room))];
+const SEC_ROOM = ROOMS.findIndex(r => r.n === 'Seguridad');
 let DOOR_ON = new Set();
 function doorBlocked(x, z, rad) { if (!DOOR_ON.size) return false; for (const d of DOORS) { if (!DOOR_ON.has(d.room)) continue; const r = d.rect; if (x > r[0] - rad && x < r[2] + rad && z > r[1] - rad && z < r[3] + rad) return true; } return false; }
 const BUMP = .82; // distancia mínima entre dos personajes
@@ -859,7 +922,8 @@ const TOUCH0 = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoi
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: !TOUCH0 });
 let PRATIO = Math.min(window.devicePixelRatio || 1, TOUCH0 ? 1.5 : 1.75); renderer.setPixelRatio(PRATIO);
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x15191c); scene.fog = new THREE.Fog(0x2a3034, 30, 85);
-const FOG_C = new THREE.Color(0x2a3034), FOG_D = new THREE.Color(0x04050e);
+const FOG_C = new THREE.Color(IS_PLANET ? 0x4a3470 : 0x2a3034), FOG_D = new THREE.Color(0x04050e);
+if (IS_PLANET) { scene.background.setHex(0x1c1036); scene.fog.color.setHex(0x4a3470); }
 const camera = new THREE.PerspectiveCamera(72, 1, TOUCH0 ? .1 : .05, TOUCH0 ? 140 : 220); camera.rotation.order = 'YXZ';
 const IS_TOUCH = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches);
 const KB = k => IS_TOUCH ? '' : ` (${k})`;
@@ -1007,7 +1071,7 @@ const SOLAR_T = new THREE.CanvasTexture(cvs(128, 64, (g) => { g.fillStyle = '#c9
 const CRACK_T = new THREE.CanvasTexture(cvs(128, 96, (g) => { g.clearRect(0, 0, 128, 96); g.lineCap = 'round'; g.lineJoin = 'round'; const pts = [[8, 50], [30, 38], [44, 58], [64, 34], [82, 60], [100, 40], [120, 52]];
   [[14, 'rgba(255,140,40,.35)'], [7, '#ff7a1a'], [3.5, '#1a1020']].forEach(([w, c]) => { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }); }));
 const DUCT_MATS = []; let DUCT_MESHES = null; const ROPES = {}; const ROPE_M = toon(0xffcc33); let SKY = null;
-const HULL_R = () => [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)];
+const HULL_R = () => IS_PLANET ? ROOMS.filter(r => !r.out).map(r => r.r) : [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)];
 function hatch(a, outside) { // compuerta redonda en la pared de la esclusa
   const dv = outside ? 1 : -1; // hacia quien mira la compuerta
   const ox = a.o[0], oz = a.o[1], s2 = outside ? .13 : -.06, x = a.w[0] + ox * s2, z = a.w[1] + oz * s2, along = oz !== 0;
@@ -1027,6 +1091,7 @@ function hatch(a, outside) { // compuerta redonda en la pared de la esclusa
 }
 function buildExterior() {
   const R = HULL_R(), E = .12, Hh = WALL_H + 2 * E, HM = toon(0xb3bcc6, { map: HULL_T }), RM = toon(0x9aa3ad, { map: HULL_T }), BM = toon(0x6d7680, { map: HULL_T });
+  if (!IS_PLANET) {
   // paredes exteriores
   wallSegs(R, ROOMS.map(r => r.ch)).forEach(e => { const L = e.b - e.a + 2 * E, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, Hh); scaleUV(g, L / 4, Hh / 4); const m = new THREE.Mesh(g, HM);
     if (e.ax === 'z') { m.rotation.y = e.out > 0 ? 0 : Math.PI; m.position.set(mid, WALL_H / 2, e.v + e.out * E); } else { m.rotation.y = e.out > 0 ? Math.PI / 2 : -Math.PI / 2; m.position.set(e.v + e.out * E, WALL_H / 2, mid); } world.add(m); });
@@ -1051,9 +1116,10 @@ function buildExterior() {
     const gl = new THREE.Mesh(new THREE.CircleGeometry(.85, 24), basic(0x5fc8e8)); gl.rotation.y = -Math.PI / 2; gl.position.set(-50.72, 1.6, z); world.add(gl); EMIT.push({ k: 'glow', p: [-51, 1.6, z], c: 0x7fe6ff }); });
   // luces de navegación
   [[-48.3, 3.4, -4.2, 0xff3b4f], [47.7, 3.4, -4.2, 0x36e0ad], [14.5, 3.4, 45.3, 0xffffff]].forEach(([x, y, z, c]) => { const l = sph(.16, toon(c, { e: c, ei: 1 }), x, y, z, null, 10); ANIM.pulse.push(l); });
+  }
   buildMothership();
   // esclusas
-  AIRLOCKS.forEach(a => { hatch(a, false); hatch(a, true); });
+  if (!IS_PLANET) AIRLOCKS.forEach(a => { hatch(a, false); hatch(a, true); });
   { const g = new THREE.Group(); g.position.set(CANNON.c[0], 0, CANNON.c[1]); g.rotation.y = CANNON.yaw; world.add(g); const D2 = toon(0x2a2f5e), Mg = toon(0x5a6296);
     box(1.4, 1.0, .7, Mg, 0, .5, -.05, g); const sc2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, .7), basic(0x0c3a22)); sc2.position.set(0, 1.25, .12); sc2.rotation.x = -.35; g.add(sc2);
     const ring = new THREE.Mesh(new THREE.RingGeometry(.18, .26, 24), basic(0x5cff9a)); ring.position.set(0, 1.26, .14); ring.rotation.x = -.35; g.add(ring);
@@ -1086,7 +1152,7 @@ function irisSet(open, label, prog) { const el2 = qs('#iris'); if (open >= 1 && 
   el2.querySelector('i').style.width = el2.querySelector('i').style.height = r + 'vmax'; const lb = el2.querySelector('b'); lb.hidden = !label; if (label) { lb.firstChild.textContent = label; lb.querySelector('u').style.width = Math.round(prog * 100) + '%'; } }
 function spaceEnv(on) {
   if (!DUCT_MESHES) { DUCT_MESHES = []; world.traverse(o => { if (o.isMesh && DUCT_MATS.includes(o.material)) DUCT_MESHES.push(o); }); }
-  DUCT_MESHES.forEach(m => m.visible = !on); if (SKY) SKY.visible = on; scene.background.setHex(on ? 0x04050d : 0x15191c);
+  DUCT_MESHES.forEach(m => m.visible = !on); if (SKY) SKY.visible = on || IS_PLANET; scene.background.setHex(on ? 0x04050d : IS_PLANET ? 0x1c1036 : 0x15191c);
 }
 function setRope(key, A, B, t) {
   let r = ROPES[key]; if (!r) { r = ROPES[key] = new THREE.Mesh(new THREE.BufferGeometry(), ROPE_M); r.frustumCulled = false; scene.add(r); }
@@ -1352,6 +1418,23 @@ function aoStrip(x, z, L, th) { // th: dirección hacia el interior
   [[.009, AO_F, 1.0], [WALL_H - .02, AO_C, .7]].forEach(([y, m, wd], ci) => { const g = new THREE.PlaneGeometry(L, wd); g.rotateX(ci ? Math.PI / 2 : -Math.PI / 2); if (ci) g.rotateY(Math.PI);
     const o = new THREE.Mesh(g, m); o.rotation.y = th; const ox = Math.sin(th) * wd / 2, oz = Math.cos(th) * wd / 2; o.position.set(x + ox, y, z + oz); o.renderOrder = 1; world.add(o); });
 }
+const ROCK_T = new THREE.CanvasTexture(cvs(256, 256, (g) => { g.fillStyle = '#6b4f92'; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 900; i++) { const v = Math.random(); g.fillStyle = v < .5 ? `rgba(40,20,70,${.15 + Math.random() * .2})` : `rgba(190,160,235,${.08 + Math.random() * .15})`; g.beginPath(); g.arc(Math.random() * 256, Math.random() * 256, 1 + Math.random() * 6, 0, 7); g.fill(); }
+  g.strokeStyle = 'rgba(30,14,55,.55)'; g.lineWidth = 2; for (let k = 0; k < 9; k++) { let x = Math.random() * 256, y = Math.random() * 256; g.beginPath(); g.moveTo(x, y); for (let j = 0; j < 6; j++) { x += (Math.random() - .5) * 60; y += (Math.random() - .5) * 60; g.lineTo(x, y); } g.stroke(); } }));
+ROCK_T.wrapS = ROCK_T.wrapT = THREE.RepeatWrapping;
+const CLIFF_T = new THREE.CanvasTexture(cvs(256, 256, (g) => { const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#8d72b8'); gr.addColorStop(1, '#3f2a63'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  for (let y = 0; y < 256; y += 18 + Math.random() * 14) { g.fillStyle = `rgba(20,8,40,${.25 + Math.random() * .2})`; g.fillRect(0, y, 256, 3 + Math.random() * 4); }
+  for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(220,200,255,${Math.random() * .12})`; g.fillRect(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 10, 2); } }));
+CLIFF_T.wrapS = CLIFF_T.wrapT = THREE.RepeatWrapping;
+function planetWall(e) {
+  const L = e.b - e.a, mid = (e.a + e.b) / 2, q = e.ax === 'z' ? [mid, e.v + e.out * .15] : [e.v + e.out * .15, mid];
+  const bi = ROOMS.findIndex(r => !r.out && q[0] > r.r[0] - PL_GAP - .05 && q[0] < r.r[2] + PL_GAP + .05 && q[1] > r.r[1] - PL_GAP - .05 && q[1] < r.r[3] + PL_GAP + .05);
+  const rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), at = (h, m2) => { const g = new THREE.PlaneGeometry(L, h); scaleUV(g, L / (h > 5 ? 8 : 3), h > 5 ? 1 : 1); const m = new THREE.Mesh(g, m2); m.rotation.y = rot; if (e.ax === 'z') m.position.set(mid, h / 2, e.v); else m.position.set(e.v, h / 2, mid); world.add(m); return m; };
+  if (bi >= 0) { const B = ROOMS[bi]; at(WALL_H + .12, toon(0xd2d6de, { map: WALL_T }));
+    const px = e.ax === 'z' ? mid : e.v - e.out * .03, pz = e.ax === 'z' ? e.v - e.out * .03 : mid, sx = e.ax === 'z' ? L : .07, sz = e.ax === 'z' ? .07 : L;
+    box(sx, .22, sz, toon(B.a, { e: B.a, ei: .25 }), px, 2.55, pz, null, false); box(sx, .3, sz, toon(0x3c3550), px, .15, pz, null, false); box(sx + (e.ax === 'z' ? .2 : .14), .16, sz + (e.ax === 'x' ? .2 : .14), toon(0x8a8fa0), px, WALL_H + .08, pz, null, false); }
+  else { at(9, toon(0xffffff, { map: CLIFF_T })); }
+}
 function buildShip() {
   sharpTex();
   const allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], NR = ROOMS.length;
@@ -1359,7 +1442,9 @@ function buildShip() {
     const [x0, z0, x1, z1] = R, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, isRoom = idx < NR, room = isRoom ? ROOMS[idx] : null, dy = isRoom ? .004 : 0;
     const chm = isRoom && room.ch; // salas achaflanadas: suelo y techo recortados por la diagonal
     let fg; if (chm) fg = chamferGeo(room.r, room.ch, true, 2); else { fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 2); }
+    if (isRoom && room.out) { worldUV(fg, x0, z1, w, d, 6); const fo = new THREE.Mesh(fg, toon(0xffffff, { map: ROCK_T })); fo.position.set(cx, dy, cz); world.add(fo); return; }
     const fm = new THREE.Mesh(fg, toon(isRoom ? (FLOORCOL[room.n] ?? 0xb4c0c9) : 0xb4c0c9, { map: isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm);
+    if (IS_PLANET && !isRoom) return;
     let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); } const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm);
     const lampM = basic(0xfff3d6);
     if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
@@ -1374,6 +1459,7 @@ function buildShip() {
       const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m); aoStrip(mx, mz, L, th);
       const q = R.hall ? .03 : .036, hA = R.hall ? .16 : .168, hB = R.hall ? .26 : .272, ix = n[0] * q / 1.414, iz = n[1] * q / 1.414; box(L - .02, hA, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L - .02, hB, .07, baseM, mx + ix, hB / 2, mz + iz, null, false).rotation.y = th; }); });
   wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
+    if (isRoom && room.out) { planetWall(e); return; }
     const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(0x78838b, room.a, .06), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(mix(room.a, 0x8a9399, .35), { e: room.a, ei: .18 }) : corrAcc, baseM = isRoom && !hl ? toon(0x3c444a) : corrBase;
     const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
     const m = new THREE.Mesh(g, wallM); m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
@@ -1393,7 +1479,7 @@ function buildShip() {
     m.userData.dyn = 1; m.visible = false; d.mesh = m; d.h = h; });
   // ventanas
   const winM = basic(0xffffff, { map: STAR_T });
-  [[47.5, 2, 5, 1.8, 'e'], [34, -12, 6, 1.8, 'e'], [19, 6, 10, 2.1, 'w'], [-48, 2, 3.4, 1.5, 'w'], [14.5, 45, 4, 1.5, 's'], [-44, 34, 3, 1.2, 'w'], [-16, -1.5, 3, 1.4, 'e']].forEach(([x, z, w, h, f]) => {
+  (IS_PLANET ? [] : [[47.5, 2, 5, 1.8, 'e'], [34, -12, 6, 1.8, 'e'], [19, 6, 10, 2.1, 'w'], [-48, 2, 3.4, 1.5, 'w'], [14.5, 45, 4, 1.5, 's'], [-44, 34, 3, 1.2, 'w'], [-16, -1.5, 3, 1.4, 'e']]).forEach(([x, z, w, h, f]) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), winM); const y = f === 'w' && h < 1.4 ? 2.2 : 1.85;
     m.rotation.y = { n: 0, s: Math.PI, e: -Math.PI / 2, w: Math.PI / 2 }[f];
     const nx = { n: 0, s: 0, e: -1, w: 1 }[f], nz = { n: 1, s: -1, e: 0, w: 0 }[f];
@@ -1403,16 +1489,16 @@ function buildShip() {
     if (f === 'n' || f === 's') { box(w + .3, t, .16, frM, x + fx, y + h / 2, z + fz); box(w + .3, t, .16, frM, x + fx, y - h / 2, z + fz); box(t, h, .16, frM, x - w / 2, y, z + fz); box(t, h, .16, frM, x + w / 2, y, z + fz); if (w > 6) { box(t * .8, h, .14, frM, x - w / 6, y, z + fz); box(t * .8, h, .14, frM, x + w / 6, y, z + fz); } }
     else { box(.16, t, w + .3, frM, x + fx, y + h / 2, z); box(.16, t, w + .3, frM, x + fx, y - h / 2, z); box(.16, h, t, frM, x + fx, y, z - w / 2); box(.16, h, t, frM, x + fx, y, z + w / 2); }
   });
-  [[0, -12, 5, 5, 0xff9f43], [...XF[12].f(0, -42), 4, 6, 0x5b6cff]].forEach(([x, z, w, d, c]) => { const sky = new THREE.Mesh(new THREE.PlaneGeometry(w, d), winM); sky.rotation.x = Math.PI / 2; sky.position.set(x, WALL_H - .02, z); world.add(sky);
+  (IS_PLANET ? [] : [[0, -12, 5, 5, 0xff9f43], [...XF[12].f(0, -42), 4, 6, 0x5b6cff]]).forEach(([x, z, w, d, c]) => { const sky = new THREE.Mesh(new THREE.PlaneGeometry(w, d), winM); sky.rotation.x = Math.PI / 2; sky.position.set(x, WALL_H - .02, z); world.add(sky);
     const F = toon(c); box(w + .4, .2, .3, F, x, WALL_H - .1, z - d / 2 - .1); box(w + .4, .2, .3, F, x, WALL_H - .1, z + d / 2 + .1); box(.3, .2, d + .4, F, x - w / 2 - .1, WALL_H - .1, z); box(.3, .2, d + .4, F, x + w / 2 + .1, WALL_H - .1, z); });
-  ROOMS.forEach(r => { const L = new THREE.PointLight(r.l, .42, 20, 1.6); L.position.set((r.ctr || r.node)[0], 2.7, (r.ctr || r.node)[1]); L.userData.base = .42; world.add(L); LIGHTS.push(L);
+  ROOMS.forEach(r => { if (r.out) return; const L = new THREE.PointLight(r.l, .42, 20, 1.6); L.position.set((r.ctr || r.node)[0], 2.7, (r.ctr || r.node)[1]); L.userData.base = .42; world.add(L); LIGHTS.push(L);
     if (r.hall) return; const s = sprText(r.n, { size: 58, bg: hex(darker(r.a, .15)), w: 2.5 }); s.position.set((r.ctr || r.node)[0], 2.78, (r.ctr || r.node)[1]); world.add(s); });
-  const s0 = world.children.length; decorate(); decorate2();
+  const s0 = world.children.length; if (!IS_PLANET) { decorate(); decorate2(); }
   world.children.slice(s0).forEach(o => { const i = origRoomAt(o.position.x, o.position.z, 1); if (i < 0) return;
     if (!XF[i]) { world.remove(o); return; }
     o.updateMatrix(); o.applyMatrix4(XF[i].m); if (!inShape(XF[i].room, o.position.x, o.position.z, -.4) || (ROOMS[XF[i].room].ch && !inShape(XF[i].room, o.position.x, o.position.z, .25))) world.remove(o); });
   for (let k = LIGHTS.length - 1; k >= 0; k--) if (!LIGHTS[k].parent) LIGHTS.splice(k, 1);
-  decorateNew();
+  if (IS_PLANET) decoratePlanet(); else decorateNew();
   ST.forEach(s => { if (!s.ext) consoleAt(s, false); }); FIX.forEach(s => consoleAt(s, true)); buildExterior();
   CAMS.forEach(buildCam); VENTS.forEach(buildVent); buildDucts();
   [...ANIM.rings.map(r => r.m), ...ANIM.pulse, ...ANIM.leds, ...ANIM.camLeds].forEach(m => m.userData.dyn = 1);
@@ -1714,6 +1800,52 @@ function decorateNew() {
   // Cruce este: tanque y señales
   [[27.2, 37.7], [28.1, 38.5]].forEach(([x, z], k) => { const b = cyl(.4, .4, 1, toon(k ? 0xff5a6e : 0x5ab8ff), x, .5, z); hull(b, 1.06); });
 }
+function decoratePlanet() {
+  const D = toon(0x2a2f5e), M = toon(0x5a6296), W = toon(0xe8eaf8), Y = WALL_H + .12;
+  // techos de los edificios (se ven desde el platillo)
+  ROOMS.forEach(r => { if (r.out) return; const [x0, z0, x1, z1] = r.r, w = x1 - x0 + 2 * PL_GAP, d = z1 - z0 + 2 * PL_GAP; const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); const m = new THREE.Mesh(g, toon(0x9aa3ad, { map: HULL_T })); m.position.set((x0 + x1) / 2, Y, (z0 + z1) / 2); world.add(m);
+    box(1.4, .5, 1.0, toon(0x6f7882), x0 + w * .3, Y + .25, z0 + d * .3); box(.9, .7, .9, toon(0x6f7882), x1 - w * .25, Y + .35, z1 - d * .3); });
+  // mesa del botón de emergencia en la Nave Lucero
+  const tb = cyl(1.55, 1.35, .85, toon(0xff9f43), BTN.x, .43, BTN.z, null, 32); hull(tb, 1.03); cyl(1.6, 1.6, .08, toon(0xffcc33), BTN.x, .88, BTN.z, null, 32);
+  const btn = sph(.42, toon(0xff3b4f, { e: 0xff0022, ei: .4 }), BTN.x, .95, BTN.z, null, 20); btn.scale.y = .55; hull(btn, 1.06); const glassD = sph(.6, new THREE.MeshBasicMaterial({ color: 0xbfe4ff, transparent: true, opacity: .25, depthWrite: false }), BTN.x, .92, BTN.z, null, 20); glassD.scale.y = .8;
+  const se = sprText('EMERGENCIA', { size: 46, color: '#ff8a98', w: 1.6 }); se.position.set(BTN.x, 2.1, BTN.z); world.add(se);
+  [[-6.5, -3.5], [6.5, -3.5], [-6.5, 3.5], [6.5, 3.5]].forEach(([x, z]) => { box(1.0, .5, 1.0, toon(0x3d7bff), x, .25, z); box(1.0, .7, .2, toon(0x3d7bff), x, .7, z + (z < 0 ? -.4 : .4)); OBS.push({ x, z, r: .6 }); });
+  [[0, -5.95, 4, 1.4], [0, 5.95, 4, 1.4]].forEach(([x, z, w, h]) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), basic(0xffffff, { map: STAR_T })); m.position.set(x, 1.9, z); m.rotation.y = z > 0 ? Math.PI : 0; world.add(m); });
+  // Comunicaciones: armarios de servidores
+  for (let k = 0; k < 4; k++) { box(.9, 2.1, .7, toon(0x2a3a5e), -42 + k * 1.1, 1.05, -20.4); for (let j = 0; j < 4; j++) box(.6, .05, .02, toon(j % 2 ? 0x36e0ad : 0x52c7ff, { e: 0x52c7ff, ei: .8 }), -42 + k * 1.1, .6 + j * .35, -20.04, null, false); }
+  // Laboratorio: mesas con matraces
+  [[31, -25], [38, -25]].forEach(([x, z]) => { box(2.8, .9, 1.2, W, x, .45, z); [-.8, 0, .8].forEach((dx, i) => { cyl(.12, .2, .4, toon([0x36e0ad, 0xff7ac6, 0xffd93d][i], { e: [0x36e0ad, 0xff7ac6, 0xffd93d][i], ei: .5 }), x + dx, 1.1, z, null, 12); }); OBS.push({ x, z, r: 1.4 }); });
+  // Seguridad: mesa y pared de monitores
+  box(2.4, .8, .9, toon(0x4b5296), 0, .4, -32.95); box(2.5, .08, 1.0, toon(0x2a2f5e), 0, .82, -32.95); box(4.7, 2.5, .14, toon(0x2a2450), 0, 1.95, -33.86);
+  CAMS.forEach((c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.08), new THREE.MeshBasicMaterial({ map: RT[i].texture })); m.position.set(i % 2 ? 1.1 : -1.1, i < 2 ? 2.55 : 1.38, -33.78); m.userData.dyn = 1; world.add(m); MON.push(m); });
+  const sc2 = sprText('CÁMARAS', { size: 50, color: '#ff8a98', w: 1.4 }); sc2.position.set(0, 3.0, -33.6); world.add(sc2);
+  // Electricidad: generadores
+  [[-43, 25], [-40, 25]].forEach(([x, z]) => { box(1.6, 1.8, 1.4, toon(0x5a5a6a), x, .9, z); box(1.0, .3, .05, toon(0xffcc33, { e: 0xffcc33, ei: .8 }), x, 1.3, z - .72, null, false); OBS.push({ x, z, r: .95 }); }); EMIT.push({ k: 'spark', p: [-43, 1.9, 25] });
+  // Invernadero: plantas y árboles alienígenas
+  [[32, 18], [40, 24], [36, 21]].forEach(([x, z]) => { tree(x, z); OBS.push({ x, z, r: .55 }); }); [[29, 15], [43, 27], [29, 27], [43, 15]].forEach(([x, z]) => plant(x, z, 1.2));
+  // Almacén: cajas y montones de mineral
+  [[-4, 27], [-2.8, 27.2], [4, 33], [5.2, 32.8]].forEach(([x, z], i) => crate(x, .5, z, [0x8a6a42, 0x9a7a52, 0x5a7a9a, 0x6a8aaa][i])); OBS.push({ x: -3.4, z: 27.1, r: 1.1 }, { x: 4.6, z: 32.9, r: 1.1 });
+  [[3, 27.5], [-3, 33]].forEach(([x, z]) => { for (let k = 0; k < 6; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.18, .7, 5), toon(k % 2 ? 0xc9a0ff : 0x7fe6ff, { e: k % 2 ? 0x9b5cff : 0x3cc8ff, ei: .6 })); c.position.set(x + Math.cos(k) * .35, .35, z + Math.sin(k) * .35); c.rotation.z = Math.cos(k * 2) * .3; world.add(c); } });
+  // carteles con el nombre de cada edificio sobre sus puertas
+  CORR.forEach(c => { const B = ROOMS[c.a], o = c.p[1], sgn = sprText(B.n, { size: 52, bg: hex(darker(B.a, .15)), w: 2.3 }); sgn.position.set(o[0], 3.7, o[1]); world.add(sgn); });
+  // rocas grandes
+  OBS.filter(o => o.rock).forEach((o, k) => { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * 1.05, 0), toon(k % 2 ? 0x5a3f80 : 0x6b4f92)); r.position.set(o.x, o.r * .55, o.z); r.scale.y = .75; r.rotation.set(k, k * 2.3, 0); world.add(r); hull(r, 1.03);
+    if (k % 3 === 0) { const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * .45, 0), toon(0x7a5aa0)); r2.position.set(o.x + o.r * .9, o.r * .25, o.z + o.r * .3); world.add(r2); } });
+  // cristales que brillan y rocas al pie de los acantilados
+  for (let k = 0; k < 46; k++) { const side = k % 4, t = (k * 0.618) % 1; let x, z; if (side === 0) { x = PL_B[0] + 1.2; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 1) { x = PL_B[2] - 1.2; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 2) { z = PL_B[1] + 1.2; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); } else { z = PL_B[3] - 1.2; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); }
+    if (k % 2) { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2 + (k % 3) * .5, 0), toon(0x553a78)); r.position.set(x, .5, z); r.rotation.set(k, k, 0); world.add(r); }
+    else { const col = k % 4 === 0 ? 0xc9a0ff : 0x7fe6ff; for (let j = 0; j < 4; j++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.22, 1.1 + j * .2, 5), toon(col, { e: col, ei: .7 })); c.position.set(x + Math.cos(j * 1.7) * .4, .5, z + Math.sin(j * 1.7) * .4); c.rotation.z = Math.cos(j) * .35; c.rotation.x = Math.sin(j) * .35; world.add(c); } } }
+  // antena gigante de Comunicaciones (fuera)
+  cyl(.25, .45, 8, toon(0xc9d2dc), -37, 4, -17.2, null, 10); const dish = new THREE.Mesh(new THREE.SphereGeometry(1.6, 22, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), new THREE.MeshToonMaterial({ color: 0xeef2f6, gradientMap: GRAD, side: THREE.DoubleSide })); dish.position.set(-37, 8.2, -17.2); dish.rotation.x = -2.3; world.add(dish); OBS.push({ x: -37, z: -17.2, r: .5 });
+  ANIM.pulse.push(sph(.18, toon(0xff3b4f, { e: 0xff3b4f, ei: 1 }), -37, 8.3, -17.2, null, 10));
+  // paneles solares junto al Laboratorio
+  [[32, -12], [40, -12]].forEach(([x, z]) => { cyl(.08, .08, 1.2, toon(0x6f7882), x, .6, z, null, 8); const pn = box(3.2, .07, 1.8, toon(0xffffff, { map: SOLAR_T }), x, 1.25, z); pn.rotation.x = -.4; OBS.push({ x, z, r: 1.2 }); });
+  // zonas de aterrizaje del alien y fumarolas
+  AIRLOCKS.forEach(a => { const ring = new THREE.Mesh(new THREE.RingGeometry(1.6, 2.0, 40), basic(0x5cff9a, { op: .55, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.set(a.in[0], .03, a.in[1]); world.add(ring); });
+  [[-46, -8], [10, 16], [46, 10]].forEach(([x, z]) => { const c = cyl(.6, .9, .4, toon(0x4a3470), x, .2, z, null, 14); EMIT.push({ k: 'steam', p: [x, .45, z] }); OBS.push({ x, z, r: .8 }); });
+  // patas de aterrizaje de la Nave Lucero
+  [[-8.8, -6.8], [8.8, -6.8], [-8.8, 6.8], [8.8, 6.8]].forEach(([x, z]) => { const l = cyl(.18, .3, 1.6, toon(0x8a8fa0), x, .8, z, null, 10); l.rotation.z = x < 0 ? .3 : -.3; cyl(.55, .6, .15, toon(0x5a6370), x + (x < 0 ? -.25 : .25), .08, z, null, 14); OBS.push({ x, z, r: .55 }); });
+}
 function crate(x, y, z, c) { box(1.0, 1.0, 1.0, toon(c), x, y, z); box(1.02, .16, 1.02, toon(darker(c, .35)), x, y, z, null, false); }
 function plant(x, z, s) { cyl(.32 * s, .25 * s, .5 * s, toon(0xff7a5a), x, .25 * s, z, null, 14); [[0, .75, 0, .34], [.2, .62, .12, .24], [-.18, .66, -.1, .26]].forEach(([dx, y, dz, r]) => { const m = sph(r * s, toon(0x3dbb5a), x + dx * s, y * s, z + dz * s, null, 14); hull(m, 1.1); }); }
 function tree(x, z) { cyl(.12, .18, 1.2, toon(0x8a5a34), x, 1.2, z, null, 10); [[0, 2.0, 0, .62], [.4, 1.7, .2, .42], [-.4, 1.75, -.15, .45]].forEach(([dx, y, dz, r]) => { const m = sph(r, toon(0x55c43a), x + dx, y, z + dz, null, 16); hull(m, 1.06); });
@@ -1892,7 +2024,7 @@ function hostPoll(peers) {
   if (!S) return; const map = {};
   peers.forEach(p => { if (p.sameTab || p.kind !== 'viewer' || !p.presence || p.presence.h === 1 || p.presence.k !== NET.code) return; map[p.peer] = p; });
   H.order = H.order || []; Object.keys(map).forEach(pe => { if (!H.order.includes(pe)) H.order.push(pe); }); H.order = H.order.filter(pe => map[pe]);
-  if (S.ph === 'lobby') { S.lob = lobbyHumans(map); S.set = { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro }; return; }
+  if (S.ph === 'lobby') { S.lob = lobbyHumans(map); S.set = { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID }; return; }
   S.pl.forEach(p => {
     if (!p.pe || p.pe === NET.myPeer) return; const peer = map[p.pe];
     if (!peer) { const now = performance.now(); H.miss = H.miss || {}; if (!H.miss[p.pe]) H.miss[p.pe] = now; if (now - H.miss[p.pe] > 5000) { p.pe = ''; p.npc = 1; p.v = -1; p.w = 0; initAI(p, true); } return; }
@@ -1913,13 +2045,13 @@ function clientPoll(peers) {
   const host = peers.find(p => !p.sameTab && p.presence && p.presence.h === 1 && p.presence.k === NET.code && p.presence.g);
   peers.forEach(p => { if (p.presence && Array.isArray(p.presence.p)) NET.peerPos[p.peer] = p.presence.p; });
   const now = performance.now();
-  if (host) { NET.hostSeen = now; NET.hadHost = true; S = host.presence.g; }
+  if (host) { NET.hostSeen = now; NET.hadHost = true; S = host.presence.g; const hm = S && (S.map || (S.set && S.set.map)); if (hm && hm !== MAPID && !NET.reloading) { NET.reloading = 1; store.set('map', hm); location.href = location.pathname + '?mapa=' + hm + '&sala=' + NET.code + '&auto=1'; } }
   else if (NET.hadHost && now - NET.hostSeen > 6000) { leaveToMenu('El anfitrión ha cerrado la partida.'); }
   else if (!NET.hadHost && now - NET.joinT > 8000) { leaveToMenu(null); showScreen('join'); joinMsg('No hay ninguna partida abierta con ese código. Revisa las letras.'); }
 }
 
 /* ================== AUTORIDAD (anfitrión) ================== */
-function newLobbyState() { return { ph: 'lobby', set: { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro }, lob: lobbyHumans(null) }; }
+function newLobbyState() { return { ph: 'lobby', set: { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID }, lob: lobbyHumans(null) }; }
 function hostStart(practice) {
   const map = {}; if (NET.online) { try { NET.R.peers().forEach(p => { if (p.presence && p.presence.k === NET.code && !p.sameTab) map[p.peer] = p; }); } catch (e) {} }
   const N = practice ? settings.prN + 1 : settings.N;
@@ -1927,7 +2059,7 @@ function hostStart(practice) {
   if (settings.npc || practice) { const used = new Set(list.map(h => h.c)); while (list.length < N) { let c = 0; while (used.has(c)) c++; used.add(c); list.push({ pe: '', n: COLORS[c].n, c }); } }
   const n = list.length, impN = practice ? (settings.prRole === 'imp' ? 1 : 0) : Math.min(settings.imp, maxImp(n));
   const imps = practice ? new Set(settings.prRole === 'imp' ? [0] : []) : new Set(shuffle([...Array(n).keys()]).slice(0, impN));
-  S = { ph: 'play', rd: 1, mid: 0, win: null, wr: '', pl: [], b: [], m: null, ej: null, ch: [], impN, kf: null, sab: null, sabCd: practice ? 3 : 15, doors: {}, dc: {}, cams: 0, pr: practice ? 1 : 0 };
+  S = { map: MAPID, ph: 'play', rd: 1, mid: 0, win: null, wr: '', pl: [], b: [], m: null, ej: null, ch: [], impN, kf: null, sab: null, sabCd: practice ? 3 : 15, doors: {}, dc: {}, cams: 0, pr: practice ? 1 : 0 };
   list.forEach((h, i) => { const st = seat(i, n), im = imps.has(i) ? 1 : 0;
     S.pl.push({ i, n: h.n, c: h.c, pe: h.pe, npc: h.pe ? 0 : 1, al: 1, im, x: st.x, z: st.z, y: st.yaw, td: 0, tt: im ? 0 : TASKS_PER, tk: pickTasks(!!h.pe), cd: 14, em: 1, v: -1, w: 0 }); });
   assignRoles(practice);
@@ -2101,7 +2233,7 @@ function startMeeting(by, bid) {
   const body = bid != null ? S.b.find(b => b.id === bid) : null;
   H.lastRoom = {}; S.pl.forEach(p => H.lastRoom[p.i] = roomName(p.x, p.z));
   S.ph = 'meeting'; S.mid++; S.m = { by, bd: bid, t: MEET_T, v: {}, room: body ? roomName(body.x, body.z) : '' }; S.b = []; S.ch = [];
-  S.sab = null; S.doors = {}; S.pl.forEach(p => { if (p.xa && p.xin) alienExit(p); p.v = -1; p.w = 0; p.sh = -1; p.st = 0; p.ce = 0; p.ev = 0; const ai = H.ai[p.i]; if (ai) { ai.inVent = false; ai.fix = -1; ai.fixing = null; } });
+  S.sab = null; S.doors = {}; S.storm = 0; S.pl.forEach(p => { if (p.xa && p.xin) alienExit(p); p.v = -1; p.w = 0; p.sh = -1; p.st = 0; p.ce = 0; p.ev = 0; const ai = H.ai[p.i]; if (ai) { ai.inVent = false; ai.fix = -1; ai.fixing = null; } });
   H.accuse = {}; H.accBy = {}; H.op = {}; H.ev = [];
   S.pl.forEach(p => { if (p.npc && p.al && !p.xa) { H.ev.push({ t: MEET_T - rand(3, 20), i: p.i, k: 'chat' }); H.ev.push({ t: MEET_T - rand(20, 42), i: p.i, k: 'vote' }); } });
   H.ev.sort((a, b) => b.t - a.t);
@@ -2166,6 +2298,7 @@ function hostTick(dt) {
     S.pl.forEach(p => { if (p.im && p.al && p.cd > 0) p.cd = Math.max(0, p.cd - dt); if (p.ac > 0) p.ac = Math.max(0, p.ac - dt); if (p.sh >= 0) { p.st -= dt; if (p.st <= 0 || !p.al) { p.sh = -1; p.st = 0; } } if (p.ce > 0) p.ce = Math.max(0, p.ce - dt); });
     if (S.pr) { const me = S.pl[ME]; if (me && !me.im && me.ro === 'ing') { H.prSab = (H.prSab ?? 12) - dt; if (H.prSab <= 0) { H.prSab = 30; if (!S.sab) { const k = pick(['lights', 'reactor', 'comms']); S.sab = { k, t: k === 'reactor' ? REACTOR_T : 0, f: [0, 0], age: 0 }; } me.au = 1; } } }
     if (S.sabCd > 0) S.sabCd = Math.max(0, S.sabCd - dt);
+    if (IS_PLANET) { H.stormT = (H.stormT ?? rand(40, 60)) - dt; if (H.stormT <= 0) { S.storm = S.storm ? 0 : 1; H.stormT = S.storm ? 18 : rand(55, 85); } }
     S.pl.forEach(p => { if (!p.xa || !p.al) return; ['xc', 'xs', 'xr', 'xb'].forEach(k => { if (p[k] > 0) p[k] = Math.max(0, p[k] - dt); }); if (p.xin) { p.xt -= dt; if (p.xt <= 0) alienExit(p); } });
     { const A = alienP(); H.canT = (H.canT ?? 14) - dt; if (H.canT <= 0) { H.canT = 14; if (A && A.al && !A.xin && !S.pr && Math.hypot(A.ax - CANNON.c[0], A.az - CANNON.c[1]) < CANNON_RANGE && S.pl.some(q => q.npc && q.al && !q.xa) && Math.random() < .3) ufoHit(A); } }
     Object.keys(S.doors).forEach(k => { S.doors[k] -= dt; if (S.doors[k] <= 0) delete S.doors[k]; });
@@ -2365,6 +2498,8 @@ function gameFrame(dt, t) {
   if (inD && local.dropT <= 0 && local.exitT <= 0) { scene.fog.near = 1.5; scene.fog.far = 17; scene.fog.color.setHex(0x0c1824); }
   if (local.eva || local.ufo) { scene.fog.near = 90; scene.fog.far = 420; scene.fog.color.setHex(0x04050d); }
   else if (local.mini) { scene.fog.near = 14; scene.fog.far = 48; scene.fog.color.setHex(0x1a1030); }
+  if (IS_PLANET && S.storm && S.ph === 'play' && !local.eva && !local.ufo && !local.mini) { const ri = roomAt(P.x, P.z); if (ri < 0 || ROOMS[ri].out) { scene.fog.near = 1.5; scene.fog.far = 13; scene.fog.color.setHex(0x9a7aa8); if (Math.random() < .5) spawnP('steam', P.x + rand(-4, 4), rand(.3, 2.2), P.z + rand(-4, 4)); } }
+  if (IS_PLANET && !!S.storm !== !!local.storm) { local.storm = !!S.storm; if (S.storm && S.ph === 'play') { toast('¡Tormenta de polvo! Fuera casi no se ve', '#d9b8ff'); snd('alarm'); } }
   if (ANIM.reactorLight) { ANIM.reactorLight.color.setHex(crisis === 'reactor' ? 0xff3b4f : 0x7fe6ff); }
   // puertas
   DOORS.forEach(d => { const target = DOOR_ON.has(d.room) ? 0 : 1; d.o += (target - d.o) * Math.min(1, dt * 7); d.mesh.position.y = d.h / 2 + d.o * WALL_H; d.mesh.visible = d.o < .985; });
@@ -2393,7 +2528,7 @@ function gameFrame(dt, t) {
       if (me && me.al) need.forEach(k => { const d = Math.hypot(FIX[k].p[0] - P.x, FIX[k].p[1] - P.z); if (d < bd) { bd = d; interact.use = { k: 'fix', id: k }; } });
       if (!interact.use && Math.hypot(CAM_DESK.p[0] - P.x, CAM_DESK.p[1] - P.z) < 1.4) interact.use = { k: 'cams' };
       if (!interact.use && me && me.al && !me.xa && (alienP() || {}).al && Math.hypot(CANNON.p[0] - P.x, CANNON.p[1] - P.z) < 1.6) interact.use = { k: 'cannon' };
-      if (!interact.use && me && !me.xa && performance.now() > (local.evaCd || 0)) AIRLOCKS.forEach(a => { if (!interact.use && Math.hypot(a.in[0] - P.x, a.in[1] - P.z) < 1.5) interact.use = { k: 'eva', id: a.id }; });
+      if (!IS_PLANET && !interact.use && me && !me.xa && performance.now() > (local.evaCd || 0)) AIRLOCKS.forEach(a => { if (!interact.use && Math.hypot(a.in[0] - P.x, a.in[1] - P.z) < 1.5) interact.use = { k: 'eva', id: a.id }; });
       if (!interact.use && me && me.al && me.em > 0 && Math.hypot(BTN.x - P.x, BTN.z - P.z) < 2.3) interact.use = { k: 'btn' };
       if (!interact.use && me && me.al && canVent(me)) { let vb = 1.3; VENTS.forEach(v => { const d = Math.hypot(v.p[0] - P.x, v.p[1] - P.z); if (d < vb) { vb = d; interact.use = { k: 'vent', id: v.id }; } }); }
       if (me && me.al) { let rb = REPORT_R; (S.b || []).forEach(b => { const d = Math.hypot(b.x - P.x, b.z - P.z); if (d < rb) { rb = d; interact.rep = b.id; } }); }
@@ -2618,7 +2753,7 @@ function showIntro() {
   const me = S.pl[ME], ov = qs('#intro'); ov.replaceChildren(); local.introT = 3.8;
   const h = el('h1', 'pop'); const p = el('p'); const mates = el('div', 'mates pop');
   if (me && me.xa) { h.textContent = S.pr ? 'Práctica · Alien' : 'Alien'; h.style.color = '#5cff9a'; p.textContent = 'Recorre tu propia nave: en los mandos pilotas el platillo, en el teletransportador te infiltras 30 s para eliminar a una persona (con el platillo acoplado a una esclusa), y tienes rayo tractor, consola de sabotajes y ariete. Ganas si quedan 2 o menos supervivientes.'; const d = el('div'); d.innerHTML = roleIcon('ali', 80); d.style.cssText = 'background:#2fd36f;border-radius:24px;padding:10px;display:inline-grid'; mates.append(d); }
-  else if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas' + KB('E') + ' y sabotear' + KB('F') + '. Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre la nave y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
+  else if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas' + KB('E') + ' y sabotear' + KB('F') + '. Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre ' + (IS_PLANET ? 'la base' : 'la nave') + ' y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   else if (!me) { h.textContent = 'Espectador'; h.style.color = '#b9bff0'; p.textContent = 'La partida está llena. Puedes mirar como fantasma.'; }
   else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas' + KB('E') + ': por dentro hay que caminar por los conductos. ' + (IS_TOUCH ? 'Sabotea la nave con el botón Sabotear.' : 'Sabotea la nave con F.');
     S.pl.filter(q => q.im).forEach(q => { const d = el('div'); d.innerHTML = avatarSVG(q.c, false, 70); mates.append(d); }); }
@@ -2626,7 +2761,7 @@ function showIntro() {
     p.textContent = S.impN ? `Hay ${S.impN} ${S.impN > 1 ? 'polizones' : 'polizón'} a bordo. Completa tus tareas, vigila las cámaras y descubre quién es.` : 'No hay polizones: explora la nave y completa todas las tareas.';
     const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   ov.append(h, p);
-  if (me && !me.xa && S.pl.some(q => q.xa)) { const r2 = el('p', 'rolep pop'); r2.textContent = '👽 Hay un alien rondando la nave. Puedes dispararle con el cañón de la Sala de armas.'; r2.style.color = '#9dffbf'; ov.append(r2); }
+  if (me && !me.xa && S.pl.some(q => q.xa)) { const r2 = el('p', 'rolep pop'); r2.textContent = `👽 Hay un alien rondando. Puedes dispararle con el cañón de ${roomOf(...CANNON.c)}.`; r2.style.color = '#9dffbf'; ov.append(r2); }
   if (me && me.ro) { const r = el('p', 'rolep pop'); const ic = el('span'); ic.innerHTML = roleIcon(me.ro, 30); ic.style.cssText = `display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;vertical-align:middle;margin-right:8px;background:${ROLES[me.ro].col}`; const b = el('b', null, `Rol: ${ROLES[me.ro].n}. `); r.append(ic, b, document.createTextNode(ROLES[me.ro].d + (IS_TOUCH ? ' Úsala con el botón verde.' : ' Habilidad con C.'))); r.style.fontSize = '17px'; ov.append(r); }
   ov.append(mates); ov.hidden = false; snd('alarm');
 }
@@ -2660,11 +2795,11 @@ function updateHUD(t) {
   // banner de crisis
   const cr = qs('#crisis');
   if (S.ph === 'play' && crisis) { cr.hidden = false; cr.classList.toggle('soft', crisis !== 'reactor');
-    if (crisis === 'reactor') { qs('#crT').textContent = `¡Fusión del reactor! ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = `Estabilizadores en Reactor: A ${S.sab.f[0] ? '✓' : '✗'} · B ${S.sab.f[1] ? '✓' : '✗'}`; }
-    else if (crisis === 'lights') { qs('#crT').textContent = 'Luces saboteadas'; qs('#crS').textContent = 'Arregla el panel de luces en Electricidad'; }
+    if (crisis === 'reactor') { qs('#crT').textContent = `¡Fusión del reactor! ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = `Estabilizadores en ${roomOf(...FIX[1].c)}: A ${S.sab.f[0] ? '✓' : '✗'} · B ${S.sab.f[1] ? '✓' : '✗'}`; }
+    else if (crisis === 'lights') { qs('#crT').textContent = 'Luces saboteadas'; qs('#crS').textContent = `Arregla el panel de luces en ${roomOf(...FIX[0].c)}`; }
     else if (crisis === 'black') { qs('#crT').textContent = 'Apagón total'; qs('#crS').textContent = 'Usa la linterna y arregla el panel de luces'; }
-    else if (crisis === 'grav') { qs('#crT').textContent = `Gravedad cero · ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = 'Reinicia el generador en el Observatorio'; }
-    else { qs('#crT').textContent = 'Comunicaciones saboteadas'; qs('#crS').textContent = 'Restaura la señal en Comunicaciones'; } }
+    else if (crisis === 'grav') { qs('#crT').textContent = `Gravedad cero · ${Math.max(0, Math.ceil(S.sab.t))} s`; qs('#crS').textContent = `Reinicia el generador en ${roomOf(...FIX[4].c)}`; }
+    else { qs('#crT').textContent = 'Comunicaciones saboteadas'; qs('#crS').textContent = `Restaura la señal en ${roomOf(...FIX[3].c)}`; } }
   else cr.hidden = true;
   const u = qs('#aUse'), r = qs('#aRep'), k = qs('#aKill'), sb = qs('#aSab');
   u.classList.toggle('off', !interact.use || interact.use.ok === false); r.classList.toggle('off', interact.rep == null);
@@ -2689,7 +2824,7 @@ function updateHUD(t) {
   qs('#lockhint').hidden = isTouch || document.pointerLockElement === canvas || !canLook(); canvas.style.cursor = lockFail && canLook() ? 'none' : '';
   drawMap(mini, false);
 }
-const MB = { x0: -51, z0: -23, w: 101, h: 71 };
+const MB = IS_PLANET ? { x0: -55, z0: -41, w: 110, h: 82 } : { x0: -51, z0: -23, w: 101, h: 71 };
 function mapXf(cv, big) { const W = cv.width, Hh = cv.height; const sc = Math.min(W / MB.w, Hh / MB.h) * (big ? .96 : 1); return { sc, ox: (W - MB.w * sc) / 2, oz: (Hh - MB.h * sc) / 2 }; }
 function mapInv(cv, x, y) { const { sc, ox, oz } = mapXf(cv, true); return { x: (x - ox) / sc + MB.x0, z: (y - oz) / sc + MB.z0 }; }
 function drawMap(cv, big, opt = {}) {
@@ -2698,8 +2833,8 @@ function drawMap(cv, big, opt = {}) {
   g.clearRect(0, 0, W, Hh);
   g.fillStyle = hex(darker(0xb4c0c9, .45)); CRECTS.forEach(c => g.fillRect(X(c.r[0]), Z(c.r[1]), (c.r[2] - c.r[0]) * sc, (c.r[3] - c.r[1]) * sc));
   const doors = (S && S.doors) || {}, dcs = (S && S.dc) || {};
-  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(FLOORCOL[r.n] ?? 0xb4c0c9, .45)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
-    if (big) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * 1.7)}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
+  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(FLOORCOL[r.n] ?? 0xb4c0c9, .45)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else if (r.out) { g.beginPath(); g.rect(X(r.r[0]) - 1, Z(r.r[1]) - 1, (r.r[2] - r.r[0]) * sc + 2, (r.r[3] - r.r[1]) * sc + 2); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
+    if (big && !r.out) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * 1.7)}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
     if (opt.sabo) { const cx = X((r.r[0] + r.r[2]) / 2), cz = Z((r.r[1] + r.r[3]) / 2) + sc * .8; const closed = doors[i], cd = dcs[i]; g.save(); g.translate(cx, cz); g.scale(1.6, 1.6); g.translate(-cx, -cz);
       g.fillStyle = closed ? '#ff5a6e' : cd ? 'rgba(255,255,255,.25)' : '#c9a0ff'; rr(g, cx - sc * 1.6, cz - sc * 1.1, sc * 3.2, sc * 2.4, sc * .6); g.fill();
       g.strokeStyle = '#1d1640'; g.lineWidth = sc * .3; g.beginPath(); g.arc(cx, cz - sc * .5, sc * .7, Math.PI, 0); g.stroke();
@@ -3280,6 +3415,9 @@ qs('#bPractice').onclick = () => { ensureName(); snd('click'); goLandscape(); sh
 if (IS_TOUCH) { qs('#ventOut').textContent = 'Salir aquí'; qs('#camX').textContent = 'Salir'; const rn = qs('#roles .note'); if (rn) rn.textContent = rn.textContent.replace('con la tecla C', 'con el botón verde de habilidad'); }
 { const tl = qs('#taskList'); if (IS_TOUCH && store.get('tasksMini', false)) tl.classList.add('mini');
   tl.addEventListener('click', () => { if (!IS_TOUCH) return; tl.classList.toggle('mini'); store.set('tasksMini', tl.classList.contains('mini')); }); }
+document.querySelectorAll('.mbtn').forEach(b => { b.setAttribute('aria-pressed', b.dataset.m === MAPID ? 'true' : 'false'); b.onclick = () => { const m = b.dataset.m; if (m === MAPID) return; snd('click'); store.set('map', m); const scr = cur === 'practice' ? 'practica' : 'crear'; location.href = location.pathname + '?pantalla=' + scr + (QS.has('pztest') ? '&pztest' : ''); }; });
+if (QS.get('mapa')) store.set('map', MAPID);
+setTimeout(() => { const ps = QS.get('pantalla'); if (ps === 'crear') qs('#bCreate').click(); else if (ps === 'practica') qs('#bPractice').click(); }, 50);
 qs('#bFull').onclick = async () => { snd('click'); if (canRealFullscreen()) { await goLandscape(); updateFullBtn(); } else showFsHelp(); };
 qs('#fsOk').onclick = () => { snd('click'); qs('#fsHelp').hidden = true; };
 qs('#fsHelp').addEventListener('click', e => { if (e.target.id === 'fsHelp') qs('#fsHelp').hidden = true; });
@@ -3346,13 +3484,13 @@ function renderLobby() {
   qs('#lCount').textContent = `Tripulación · ${total} de ${set.N}${set.npc ? '' : ' (sin NPCs)'} · ${ei} ${ei === 1 ? 'polizón' : 'polizones'}`;
   humans.forEach(h => { const d = el('div', 'pchip'); const a = el('span'); a.innerHTML = avatarSVG(h.c, false, 32); d.append(a, el('span', null, h.n + (h.pe === NET.myPeer || (!NET.online && h.pe === 'yo') ? ' (tú)' : ''))); list.append(d); });
   for (let i = 0; i < npcN; i++) { const d = el('div', 'pchip npc'); const a = el('span'); a.innerHTML = avatarSVG(9 - (i % 10), false, 32); d.append(a, el('span', null, 'NPC')); list.append(d); }
-  qs('#lRoles').textContent = 'Roles: ' + roleSummary(set.ro).toLowerCase().replace(/^sin/, 'sin');
+  qs('#lRoles').textContent = 'Mapa: ' + ((set.map || MAPID) === 'planeta' ? 'Planeta Violeta' : 'Nave Lucero') + ' · Roles: ' + roleSummary(set.ro).toLowerCase().replace(/^sin/, 'sin');
   start.hidden = !NET.isHost;
 }
 qs('#lShare').onclick = async () => { const u = location.origin + location.pathname + '?sala=' + NET.code; const b = qs('#lShare');
   try { await navigator.clipboard.writeText(u); b.textContent = '¡Enlace copiado!'; } catch (e) { b.textContent = u; } setTimeout(() => b.textContent = 'Copiar enlace de la sala', 2500); };
 // abrir directamente la pantalla de unirse si el enlace trae ?sala=CÓDIGO
-(() => { const c = (QS.get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); if (c.length === 5) { showScreen('join'); qs('#codeIn').value = c; } })();
+(() => { const c = (QS.get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); if (c.length === 5) { showScreen('join'); qs('#codeIn').value = c; if (QS.get('auto')) setTimeout(() => qs('#jGo').click(), 500); } })();
 qs('#lStart').onclick = () => { if (!NET.isHost || !S) return; snd('click'); hostStart(); };
 qs('#lLeave').onclick = () => leaveToMenu(null);
 if (!profile.name) nameIn.focus();
@@ -3379,7 +3517,7 @@ function frame(now) {
   } catch (err) { console.error(err); }
   if (mode === 'game' && S && S.pl) {
     const sa = AV[ME];
-    try { if (!local.camView && roomAt(P.x, P.z) === 9 && frameN % 3 === 0) renderMonitors(); } catch (e) { console.error(e); renderer.setRenderTarget(null); }
+    try { if (!local.camView && roomAt(P.x, P.z) === SEC_ROOM && frameN % 3 === 0) renderMonitors(); } catch (e) { console.error(e); renderer.setRenderTarget(null); }
     if (local.camView) renderCamsView(); else { if (sa) sa.g.visible = false; renderer.render(scene, camera); }
   } else renderer.render(scene, camera);
   requestAnimationFrame(frame);
