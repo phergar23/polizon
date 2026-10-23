@@ -754,34 +754,46 @@ for (let k = 0; k < 7; k++) OBS.push({ x: -43 + k, z: 30.5, r: .5 });
 OBS.push({ x: -37.2, z: 37.1, r: .45 }, { x: 30, z: -11, r: 1.45 }, { x: 21.4, z: -7.3, r: .8 }, { x: -4.5, z: -4.4, r: .7 }, { x: 4.5, z: -4.4, r: .7 }, { x: 0, z: 30, r: 1.75 });
 
 // ================== PLANETA VIOLETA: datos del mapa ==================
-const PL_B = [-78, -58, 78, 58], PL_GAP = .25, PL_HOLES = [], PL_TUBES = [], PL_PROPS = [];
+const PL_B = [-69, -54, 70, 52], PL_GAP = .25, PL_HOLES = [], PL_TUBES = [], PL_PROPS = [];
 function planetData() {
-  BTN.x = 0; BTN.z = 0;
-  // edificios: varios forman complejos (salas pegadas con puertas interiores) y otros se unen por pasillos-tubo
+  BTN.x = 0; BTN.z = 30;
+  // bloques de salas pegadas (puertas interiores), torres y hangar apartados, sala de mando en la plaza
   const B = [
-    { n: 'Cúpula', r: [-10, -8, 10, 8], f: 0xe6e9f2, a: 0xff9f43, l: 0xffd59a, ring: [[0, -3.6], [3.6, 0], [0, 3.6], [-3.6, 0]], dome: 1 },
-    { n: 'Dormitorios', r: [-12, 8.5, 1, 19], f: 0xc9b8e8, a: 0xb18cff, l: 0xe6dcff },
-    { n: 'Enfermería', r: [1.5, 8.5, 14, 19], f: 0xd8eef0, a: 0x36e0ad, l: 0xd8fff4 },
-    { n: 'Laboratorio', r: [28, -42, 46, -28], f: 0xc7e8dc, a: 0x2fd0c0, l: 0xc8ffe9 },
-    { n: 'Muestras', r: [46.5, -42, 58, -32], f: 0xd0d8e8, a: 0x7fa8ff, l: 0xdfe8ff },
-    { n: 'Mando', r: [-6, -50, 12, -38], f: 0xb8c4dc, a: 0x5ab8ff, l: 0xd0e8ff },
-    { n: 'Comunicaciones', r: [-58, -46, -42, -34], f: 0x9fb2c2, a: 0x52c7ff, l: 0xbfe4ff },
-    { n: 'Seguridad', r: [-32, -48, -18, -36], f: 0x9fc4aa, a: 0x5fbf7a, l: 0xd2ffd8 },
-    { n: 'Electricidad', r: [-64, -8, -50, 6], f: 0xb3a77e, a: 0xffcc33, l: 0xfff0b0 },
-    { n: 'Taller', r: [-64, 6.5, -50, 18], f: 0xa8a0a0, a: 0xff7a3d, l: 0xffe0c8 },
-    { n: 'Almacén', r: [-46, 32, -28, 46], f: 0xb59a86, a: 0xc8834a, l: 0xffe0c0 },
-    { n: 'Hangar', r: [-8, 32, 16, 48], f: 0xa9b0ba, a: 0xff5a6e, l: 0xffd6dc, node: [4, 37] },
-    { n: 'Invernadero', r: [42, 2, 60, 18], f: 0x9ccf86, a: 0x55c43a, l: 0xe0ffc8, glass: 1 },
-    { n: 'Observatorio', r: [46, 30, 62, 44], f: 0x9a9ccf, a: 0xc9a0ff, l: 0xe8d8ff, node: [51, 34], dome: 2 }];
+    { n: 'Cúpula', r: [-10, 22, 10, 38], f: 0xe6e9f2, a: 0xff9f43, l: 0xffd59a, ring: [[0, 26.4], [3.6, 30], [0, 33.6], [-3.6, 30]], dome: 1 },
+    { n: 'Cocina', r: [-23, 26, -10.5, 37], f: 0xf0d9c0, a: 0xff7a5a, l: 0xffe2d0 },
+    { n: 'Dormitorios', r: [10.5, 22, 24, 32], f: 0xc9b8e8, a: 0xb18cff, l: 0xe6dcff },
+    { n: 'Enfermería', r: [10.5, 32.5, 22, 44], f: 0xd8eef0, a: 0x36e0ad, l: 0xd8fff4, ch: [0, 0, 3, 0] },
+    { n: 'Despensa', r: [-6, 38.5, 4, 46], f: 0xc8b48e, a: 0xd9a441, l: 0xfff0c8 },
+    { n: 'Electricidad', r: [-62, -30, -48, -16], f: 0xb3a77e, a: 0xffcc33, l: 0xfff0b0, ch: [3, 0, 0, 0] },
+    { n: 'Taller', r: [-47.5, -30, -32, -20], f: 0xa8a0a0, a: 0xff7a3d, l: 0xffe0c8 },
+    { n: 'Almacén', r: [-62, -15.5, -48, 0], f: 0xb59a86, a: 0xc8834a, l: 0xffe0c0 },
+    { n: 'Comunicaciones', r: [-47.5, -19.5, -32, -6], f: 0x9fb2c2, a: 0x52c7ff, l: 0xbfe4ff, ch: [0, 0, 2.5, 0] },
+    { n: 'Seguridad', r: [-62, .5, -50, 14], f: 0x9fc4aa, a: 0x5fbf7a, l: 0xd2ffd8 },
+    { n: 'Trastero', r: [-49.5, .5, -40, 7], f: 0xa9a2b8, a: 0x9b8cff, l: 0xe0dcff },
+    { n: 'Laboratorio', r: [34, -18, 52, -4], f: 0xc7e8dc, a: 0x2fd0c0, l: 0xc8ffe9 },
+    { n: 'Muestras', r: [52.5, -18, 62, -8], f: 0xd0d8e8, a: 0x7fa8ff, l: 0xdfe8ff, ch: [0, 2.5, 0, 0] },
+    { n: 'Invernadero', r: [34, -3.5, 50, 12], f: 0x9ccf86, a: 0x55c43a, l: 0xe0ffc8, glass: 1 },
+    { n: 'Bombas', r: [50.5, -3.5, 62, 8], f: 0x9fb8c8, a: 0x3d9bff, l: 0xd0e8ff },
+    { n: 'Observatorio', r: [30, 24, 46, 40], f: 0x9a9ccf, a: 0xc9a0ff, l: 0xe8d8ff, ch: [4, 4, 4, 4], node: [38, 29], dome: 2 },
+    { n: 'Torre de radio', r: [-14, -46, -6, -38], f: 0xb8c4dc, a: 0x52c7ff, l: 0xd0e8ff },
+    { n: 'Torre de vigía', r: [56, -46, 64, -38], f: 0xb8c4dc, a: 0xffcc33, l: 0xfff0c8 },
+    { n: 'Hangar', r: [6, -48, 26, -34], f: 0xa9b0ba, a: 0xff5a6e, l: 0xffd6dc, node: [14, -38] },
+    { n: 'Mando', r: [-14, -16, 2, -4], f: 0xb8c4dc, a: 0x5ab8ff, l: 0xd0e8ff, ch: [2.5, 2.5, 2.5, 2.5] }];
   ROOMS.length = 0;
-  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, a: b.a, l: b.l, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: null, hall: 0, ring: b.ring || null, dome: b.dome || 0, glass: b.glass || 0 }); });
-  // pasillos: puertas interiores, tubos entre edificios y salidas al exterior
+  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, a: b.a, l: b.l, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: b.ch || null, hall: 0, ring: b.ring || null, dome: b.dome || 0, glass: b.glass || 0 }); });
   CORR.length = 0;
-  [[[-5, 8], [-5, 8.5], 0, 1], [[6, 8], [6, 8.5], 0, 2], [[1, 14], [1.5, 14], 1, 2], [[46, -37], [46.5, -37], 3, 4], [[-57, 6], [-57, 6.5], 8, 9]].forEach(([A, Bp, a, b]) => CORR.push({ p: [A, Bp], a, b, w: 2.8 }));
-  [[[[12, -40], [28, -40]], 5, 3], [[[-42, -41], [-32, -41]], 6, 7], [[[-57, 18], [-57, 39], [-46, 39]], 9, 10], [[[-4, 19], [-4, 32]], 1, 11], [[[54, 18], [54, 30]], 12, 13]].forEach(([p, a, b]) => CORR.push({ p, a, b, w: 3.5, tube: 1 }));
-  [[0, [0, -8], [0, -10.8]], [0, [-10, 0], [-12.8, 0]], [0, [10, 0], [12.8, 0]], [2, [14, 14], [16.8, 14]], [1, [-12, 14], [-14.8, 14]], [3, [37, -28], [37, -25.2]], [4, [52, -32], [52, -29.2]],
-   [5, [3, -38], [3, -35.2]], [6, [-50, -34], [-50, -31.2]], [7, [-25, -36], [-25, -33.2]], [8, [-50, -1], [-47.2, -1]], [9, [-50, 12], [-47.2, 12]], [10, [-28, 39], [-25.2, 39]], [10, [-37, 32], [-37, 29.2]],
-   [11, [4, 32], [4, 29.2]], [12, [42, 10], [39.2, 10]], [13, [46, 37], [43.2, 37]]].forEach(([a, A, Bp]) => CORR.push({ p: [A, Bp], a, b: -1, w: 3, exit: 1 }));
+  // puertas interiores
+  [[[-10, 31], [-10.5, 31], 0, 1], [[10, 27], [10.5, 27], 0, 2], [[10, 35], [10.5, 35], 0, 3], [[16, 32], [16, 32.5], 2, 3], [[-1, 38], [-1, 38.5], 0, 4],
+   [[-48, -25], [-47.5, -25], 5, 6], [[-55, -16], [-55, -15.5], 5, 7], [[-40, -20], [-40, -19.5], 6, 8], [[-48, -11], [-47.5, -11], 7, 8], [[-56, 0], [-56, .5], 7, 9], [[-50, 4], [-49.5, 4], 9, 10],
+   [[52, -13], [52.5, -13], 11, 12], [[42, -4], [42, -3.5], 11, 13], [[50, 2], [50.5, 2], 13, 14]].forEach(([A, Bp, a, b]) => CORR.push({ p: [A, Bp], a, b, w: 2.8 }));
+  // pasillos-tubo con recodos
+  [[[[-40, -30], [-40, -42], [-14, -42]], 6, 16], [[[43, -18], [43, -42], [56, -42]], 11, 17], [[[22, 34], [30, 34]], 3, 15], [[[-17, 26], [-17, 8], [-8, 8], [-8, -4]], 1, 19]].forEach(([p, a, b]) => CORR.push({ p, a, b, w: 3.5, tube: 1 }));
+  // salidas al exterior
+  [[0, [0, 22], [0, 19.2]], [1, [-23, 31], [-25.8, 31]], [2, [17, 22], [17, 19.2]], [3, [16, 44], [16, 46.8]], [4, [-6, 42], [-8.8, 42]],
+   [8, [-32, -13], [-29.2, -13]], [10, [-40, 4], [-37.2, 4]], [9, [-56, 14], [-56, 16.8]],
+   [11, [34, -11], [31.2, -11]], [13, [34, 6], [31.2, 6]], [14, [56, 8], [56, 10.8]], [12, [62, -13], [64.8, -13]], [15, [38, 24], [38, 21.2]],
+   [16, [-10, -38], [-10, -35.2]], [17, [60, -38], [60, -35.2]], [18, [16, -34], [16, -31.2]], [18, [6, -41], [3.2, -41]],
+   [19, [-6, -16], [-6, -18.8]], [19, [2, -10], [4.8, -10]], [19, [-14, -10], [-16.8, -10]]].forEach(([a, A, Bp]) => CORR.push({ p: [A, Bp], a, b: -1, w: 3, exit: 1 }));
   // huecos que ocupan los edificios y los tubos (el terreno libre es todo lo demás)
   PL_HOLES.length = 0; PL_TUBES.length = 0;
   B.forEach(b => PL_HOLES.push([b.r[0] - PL_GAP, b.r[1] - PL_GAP, b.r[2] + PL_GAP, b.r[3] + PL_GAP]));
@@ -790,18 +802,21 @@ function planetData() {
       if (Math.abs(A[0] - Bq[0]) < 1e-6) { const up = A[1] < Bq[1], za = A[1] + (up ? -ea : ea), zb = Bq[1] + (up ? eb : -eb); r = [A[0] - h, Math.min(za, zb), A[0] + h, Math.max(za, zb)]; }
       else { const rt = A[0] < Bq[0], xa = A[0] + (rt ? -ea : ea), xb = Bq[0] + (rt ? eb : -eb); r = [Math.min(xa, xb), A[1] - h, Math.max(xa, xb), A[1] + h]; }
       PL_TUBES.push(r); PL_HOLES.push([r[0] - PL_GAP, r[1] - PL_GAP, r[2] + PL_GAP, r[3] + PL_GAP]); } });
-  // rocas, mesetas, fumarolas y aparatos del exterior (obstáculos redondos)
+  // rocas, mesetas, lava, fumarolas y aparatos del exterior (obstáculos redondos)
   OBS.length = 0;
-  [[-22, -22, 2.2], [16, -30, 1.6], [-36, 6, 2.0], [-16, 40, 2.0], [24, 40, 1.8], [-72, -6, 2.6], [70, -12, 2.6], [-40, -13, 1.5], [66, 24, 1.8], [-25, 13, 1.3], [22, -50, 1.6], [-70, -46, 2.4],
-   [70, 50, 2.4], [-70, 50, 2.2], [31, 17, 1.4], [-8, -21, 1.2], [45, -14, 1.6], [-67, 40, 1.8], [62, -48, 2.0], [-40, 52, 1.8], [-62, -22, 1.6], [6, 53, 1.5], [36, -52, 1.4], [-48, 20, 1.2], [20, 24, 1.3]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 1 }));
-  [[-30, -54, 3.4], [50, -54.5, 3.0], [-74, 20, 3.4], [74, 6, 3.4], [-14, 54.5, 3.0], [73, -36, 3.0], [-74, -34, 3.0], [44, 55, 2.8]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 2 }));
-  OBS.push({ x: 36, z: 50, r: 3.4, pond: 1 }, { x: 0, z: 0, r: 1.75 });
-  [[-12, -27], [40, -17], [-66, -30], [66, -2], [-24, 52]].forEach(([x, z]) => OBS.push({ x, z, r: .8, fum: 1 }));
+  [[-26, -12, 1.8], [12, -24, 1.6], [-50, 26, 2.0], [-30, 46, 1.8], [26, 48, 1.6], [48, 48, 2.2], [64, 30, 2.0], [-8, -28, 1.4], [-36, -50, 2.0],
+   [66, -50, 1.8], [-58, 44, 1.8], [40, 17, 1.4], [-30, -2, 1.5], [56, -30, 1.6]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 1 }));
+  [[-55, -46, 3.0], [-22, 47, 2.8], [66, 44, 3.0], [30, -49, 2.8], [-65, 24, 2.6]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 2 }));
+  OBS.push({ x: 18, z: -6, r: 4.5, lava: 1 }, { x: 10, z: 4, r: 2.2, lava: 1 }, { x: BTN.x, z: BTN.z, r: 1.75 });
+  [[-20, -24], [60, 22], [-64, 40], [30, 46], [64, -28]].forEach(([x, z]) => OBS.push({ x, z, r: .8, fum: 1 }));
+  // farolas a los lados de cada salida
+  CORR.forEach(c => { if (!c.exit) return; const A = c.p[0], E = c.p[1], dx = Math.sign(E[0] - A[0]), dz = Math.sign(E[1] - A[1]), fx = A[0] + dx * (PL_GAP + .1), fz = A[1] + dz * (PL_GAP + .1), h = c.w / 2;
+    [-1, 1].forEach(sg => { const lx = sg * (h + 1.7), lz = 2.4; OBS.push({ x: fx + lx * dz + lz * dx, z: fz - lx * dx + lz * dz, r: .25, post: 1 }); }); });
   PL_PROPS.length = 0;
   const prop = (k, x, z, r) => { PL_PROPS.push({ k, x, z }); if (r) OBS.push({ x, z, r }); };
-  prop('antenna', -45, -25, .6); [12, 18, 24].forEach(x => prop('solar', x, -22.4, 1.3)); prop('probe', -30, -.4, 1.2); prop('seismo', -20, 22.9, .6); prop('drill', -68, 26.6, 1.4); prop('cristal', 28, .3, .8);
-  [[24.5, -2], [31.5, -2.5], [29, -5], [25, 4.8], [32, 4], [22, 1.5]].forEach(([x, z]) => prop('crystals', x, z, .7));
-  // nodos del terreno: un punto libre cerca del centro de cada trozo
+  prop('antenna', -24, -50, .6); [24, 30, 36].forEach(x => prop('solar', x, -28, 1.3)); prop('probe', -28, 13.6, 1.2); prop('seismo', 26, 12.9, .6); prop('drill', -60, 28.6, 1.4); prop('cristal', -28, -35.7, .8);
+  [[-31.5, -37.5], [-24.5, -37.8], [-33, -33], [-23, -33.5], [-29, -38.4]].forEach(([x, z]) => prop('crystals', x, z, .7));
+  // nodos del terreno: un punto libre cerca de cada trozo
   const tiles = []; const holes = PL_HOLES;
   const xs = [...new Set([PL_B[0], PL_B[2], ...holes.flatMap(h => [h[0], h[2]])])].sort((a, b) => a - b), zs = [...new Set([PL_B[1], PL_B[3], ...holes.flatMap(h => [h[1], h[3]])])].sort((a, b) => a - b);
   const strips = []; for (let j = 0; j < zs.length - 1; j++) { const z0 = zs[j], z1 = zs[j + 1]; let cur = null; if (z1 - z0 < 1e-6) continue;
@@ -814,26 +829,29 @@ function planetData() {
     ROOMS.push({ n: 'Exterior', r, f: 0x7a5aa0, a: 0x9b7cd0, l: 0xc9b0ff, node: best || [cx, cz], ctr: null, ch: null, hall: 1, out: 1, ring: null }); });
   // tareas
   ST.length = 0; ST.push(
-    { c: [-6, -7.55], t: 'upload', n: 'Subir datos' }, { c: [6, -7.55], t: 'numbers', n: 'Introducir código' },
-    { c: [-11.55, 11.6], t: 'trash', n: 'Vaciar basura' }, { c: [-8, 18.55], t: 'sort', n: 'Ordenar taquillas' },
-    { c: [13.55, 10.5], t: 'scan', n: 'Escáner médico' }, { c: [8, 18.55], t: 'samples', n: 'Analizar sangre' },
-    { c: [32, -41.55], t: 'samples', n: 'Analizar muestras' }, { c: [41, -41.55], t: 'align', n: 'Calibrar microscopio' }, { c: [57.55, -37], t: 'sort', n: 'Ordenar minerales' },
-    { c: [-5.55, -44], t: 'download', n: 'Descargar datos' }, { c: [3, -49.55], t: 'gauge', n: 'Fijar rumbo' },
-    { c: [-57.55, -40], t: 'dial', n: 'Sintonizar receptor' }, { c: [-50, -45.55], t: 'download', n: 'Enviar informe' }, { c: [-18.45, -42], t: 'swipe', n: 'Pasar tarjeta' },
-    { c: [-63.55, -4], t: 'cables', n: 'Arreglar cables' }, { c: [-57, -7.55], t: 'power', n: 'Desviar energía' }, { c: [-63.55, 12], t: 'weld', n: 'Soldar placa' }, { c: [-61, 17.55], t: 'fuel', n: 'Cargar combustible' },
-    { c: [-45.55, 43], t: 'sort', n: 'Ordenar cajas' }, { c: [15.55, 40], t: 'fuel', n: 'Repostar el rover' }, { c: [-7.55, 42], t: 'align', n: 'Alinear motor' },
-    { c: [59.55, 6], t: 'plants', n: 'Regar plantas' }, { c: [48, 17.55], t: 'sort', n: 'Ordenar semillas' }, { c: [61.55, 37], t: 'align', n: 'Alinear telescopio' }, { c: [54, 43.55], t: 'asteroids', n: 'Vigilar meteoritos' },
-    { man: 1, c: [-45, -22.6], p: [-45, -21.4], yaw: 0, t: 'dial', n: 'Reparar antena' }, { man: 1, c: [18, -19.6], p: [18, -18.4], yaw: 0, t: 'wipe', n: 'Limpiar paneles solares' },
-    { man: 1, c: [-30, 2.0], p: [-30, 3.2], yaw: 0, t: 'gauge', n: 'Revisar sonda' }, { man: 1, c: [28, 1.6], p: [28, 2.8], yaw: 0, t: 'samples', n: 'Recoger cristales' },
-    { man: 1, c: [-20, 24], p: [-20, 25.2], yaw: 0, t: 'align', n: 'Medir seísmos' }, { man: 1, c: [-68, 28.4], p: [-68, 29.6], yaw: 0, t: 'gauge', n: 'Revisar perforadora' });
-  FIX.length = 0; FIX.push({ k: 0, c: [-50.45, 3], t: 'levers', n: 'Panel de luces' }, { k: 1, c: [28.45, -35], t: 'hand', n: 'Estabilizador A' }, { k: 2, c: [45.55, -31], t: 'hand', n: 'Estabilizador B' },
-    { k: 3, c: [-42.45, -36.5], t: 'dial', n: 'Restaurar señal' }, { k: 4, c: [-34, 45.55], t: 'power', n: 'Generador de gravedad' });
-  CAMS.length = 0; CAMS.push({ n: 'Exterior norte', p: [6, 3.4, -37.45], t: [0, 0, -24] }, { n: 'Exterior sur', p: [10, 3.4, 31.45], t: [4, 0, 20] }, { n: 'Laboratorio', p: [45.4, 2.85, -41.4], t: [37, .4, -34] }, { n: 'Almacén', p: [-28.6, 2.85, 45.4], t: [-37, .4, 38] });
-  CAM_DESK.p = [-25, -45.9];
-  VENTS.length = 0; VENTS.push({ p: [-7, 6.6], net: 0 }, { p: [-54, -4], net: 0 }, { p: [-47, -37.5], net: 0 },
-    { p: [11, 16], net: 1 }, { p: [45.5, 13], net: 1 }, { p: [31, -38.5], net: 1 }, { p: [48.5, 42], net: 1 },
-    { p: [9, -45.5], net: 2 }, { p: [-21, -39], net: 2 },
-    { p: [-4, 45], net: 3 }, { p: [-31, 42.5], net: 3 }, { p: [-20, 9.5], net: 3 });
+    { c: [-6, 22.45], t: 'upload', n: 'Subir datos' }, { c: [6, 22.45], t: 'numbers', n: 'Introducir código' },
+    { c: [-10.95, 35], t: 'trash', n: 'Vaciar basura' }, { c: [-16, 36.55], t: 'sort', n: 'Ordenar despensa' },
+    { c: [23.55, 27], t: 'sort', n: 'Ordenar taquillas' }, { c: [10.95, 39], t: 'scan', n: 'Escáner médico' }, { c: [12.6, 43.55], t: 'samples', n: 'Analizar sangre' }, { c: [3.55, 42], t: 'sort', n: 'Ordenar cajas' },
+    { c: [-61.55, -22], t: 'cables', n: 'Arreglar cables' }, { c: [-52, -29.55], t: 'power', n: 'Desviar energía' }, { c: [-32.45, -25], t: 'weld', n: 'Soldar placa' }, { c: [-36, -29.55], t: 'fuel', n: 'Cargar combustible' },
+    { c: [-61.55, -8], t: 'sort', n: 'Apilar cajas' }, { c: [-40, -6.45], t: 'dial', n: 'Sintonizar receptor' }, { c: [-47.05, -16], t: 'download', n: 'Descargar datos' },
+    { c: [-50.45, 10], t: 'swipe', n: 'Pasar tarjeta' }, { c: [-44, 6.55], t: 'trash', n: 'Tirar chatarra' },
+    { c: [38, -17.55], t: 'samples', n: 'Analizar muestras' }, { c: [48, -17.55], t: 'align', n: 'Calibrar microscopio' }, { c: [57, -8.45], t: 'sort', n: 'Ordenar minerales' },
+    { c: [49.55, 8], t: 'plants', n: 'Regar plantas' }, { c: [40, 11.55], t: 'sort', n: 'Ordenar semillas' }, { c: [61.55, 2], t: 'gauge', n: 'Revisar bombas' },
+    { c: [45.55, 32], t: 'align', n: 'Alinear telescopio' }, { c: [38, 39.55], t: 'asteroids', n: 'Vigilar meteoritos' },
+    { c: [-6.45, -42], t: 'dial', n: 'Calibrar emisora' }, { c: [63.55, -42], t: 'download', n: 'Enviar informe' },
+    { c: [25.55, -41], t: 'fuel', n: 'Repostar el rover' }, { c: [16, -47.55], t: 'align', n: 'Alinear motor' },
+    { c: [-10.5, -15.55], t: 'gauge', n: 'Fijar rumbo' }, { c: [-1.5, -15.55], t: 'download', n: 'Descargar mapa' },
+    { man: 1, c: [-24, -47.6], p: [-24, -46.4], yaw: 0, t: 'dial', n: 'Reparar antena' }, { man: 1, c: [30, -25.6], p: [30, -24.4], yaw: 0, t: 'wipe', n: 'Limpiar paneles solares' },
+    { man: 1, c: [-28, 16], p: [-28, 17.2], yaw: 0, t: 'gauge', n: 'Revisar sonda' }, { man: 1, c: [-28, -34.4], p: [-28, -33.2], yaw: 0, t: 'samples', n: 'Recoger cristales' },
+    { man: 1, c: [26, 14], p: [26, 15.2], yaw: 0, t: 'align', n: 'Medir seísmos' }, { man: 1, c: [-60, 30.4], p: [-60, 31.6], yaw: 0, t: 'gauge', n: 'Revisar perforadora' });
+  FIX.length = 0; FIX.push({ k: 0, c: [-48.45, -19], t: 'levers', n: 'Panel de luces' }, { k: 1, c: [34.45, -6], t: 'hand', n: 'Estabilizador A' }, { k: 2, c: [51.55, -7], t: 'hand', n: 'Estabilizador B' },
+    { k: 3, c: [-36, -19.05], t: 'dial', n: 'Restaurar señal' }, { k: 4, c: [-52, -15.05], t: 'power', n: 'Generador de gravedad' });
+  CAMS.length = 0; CAMS.push({ n: 'Plaza', p: [-2, 3.4, -16.45], t: [-6, 0, -26] }, { n: 'Exterior sur', p: [4, 3.4, 21.55], t: [2, 0, 12] }, { n: 'Laboratorio', p: [51.4, 2.85, -17.4], t: [43, .4, -10] }, { n: 'Almacén', p: [-61.4, 2.85, -15], t: [-55, .4, -8] });
+  CAM_DESK.p = [-59.9, 7];
+  VENTS.length = 0; VENTS.push({ p: [8, 36], net: 0 }, { p: [50, -16], net: 0 }, { p: [60, 6], net: 0 }, { p: [58, -40], net: 0 },
+    { p: [-21, 28], net: 1 }, { p: [-53, -21.5], net: 1 }, { p: [-44, -22.5], net: 1 },
+    { p: [-2, -12], net: 2 }, { p: [8, -46], net: 2 }, { p: [-12, -40], net: 2 },
+    { p: [-60, 12], net: 3 }, { p: [-30, 24], net: 3 }, { p: [2, 44], net: 3 }, { p: [42, 36], net: 3 });
 }
 // pasillos: polilíneas; a/b = sala en cada extremo (-1 si enlaza con otro pasillo)
 const CORR = [
@@ -889,7 +907,7 @@ function setupPoint(s) {
 }
 ST.forEach((s, i) => { s.id = i; s.kind = 'st'; setupPoint(s); });
 // esclusas al espacio (w: punto de la pared, o: hacia fuera)
-const AIRLOCKS = IS_PLANET ? [{ n: 'zona de aterrizaje oeste', w: [-38, -20], o: [0, 1] }, { n: 'zona de aterrizaje este', w: [30, 32], o: [0, -1] }] : [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
+const AIRLOCKS = IS_PLANET ? [{ n: 'zona de aterrizaje central', w: [5, 10], o: [0, 1] }, { n: 'zona de aterrizaje suroeste', w: [-38, 34], o: [0, -1] }] : [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
 AIRLOCKS.forEach((a, i) => { a.id = i; if (IS_PLANET) { a.in = a.w.slice(); a.out = [a.w[0], 8, a.w[1]]; a.anchor = a.out; a.room = roomAt(a.in[0], a.in[1]); return; } a.in = [a.w[0] - a.o[0] * 1.3, a.w[1] - a.o[1] * 1.3]; a.anchor = [a.w[0] + a.o[0] * .5, 1.25, a.w[1] + a.o[1] * .5]; a.out = [a.w[0] + a.o[0] * 1.9, 1.25, a.w[1] + a.o[1] * 1.9]; a.room = roomAt(a.in[0], a.in[1]); });
 const ROPE_L = 24;
 // tareas exteriores (solo para jugadores humanos; se hacen flotando fuera de la nave)
@@ -899,7 +917,7 @@ const ROPE_L = 24;
   ST.push({ id, kind: 'st', ext: 1, n: e.n, t: e.t, al: e.al, c: e.c, p: e.c, py: e.y, room: a.room, yaw: 0, nr: [-a.o[0], -a.o[1]],
     proxy: { kind: 'st', id, p: a.in, room: a.room, nr: [a.o[0], a.o[1]] } }); });
 const ST_IN = ST.filter(s => !s.ext), ST_EXT = ST.filter(s => s.ext);
-const CANNON = IS_PLANET ? { c: [-31.55, -45], p: [-30.35, -45], yaw: Math.PI / 2 } : { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
+const CANNON = IS_PLANET ? { c: [-52, 13.45], p: [-52, 12.25], yaw: Math.PI } : { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
 const roomOf = (x, z) => { const r = roomAt(x, z); return r >= 0 ? ROOMS[r].n : ''; };
 const taskTarget = s => s.ext ? s.proxy : s;
 function pickTasks(human) { const ins = shuffle(ST_IN.map(s => s.id)); if (!human || !ST_EXT.length) return ins.slice(0, TASKS_PER); const t = ins.slice(0, TASKS_PER - 1); t.splice(Math.floor(Math.random() * TASKS_PER), 0, pick(ST_EXT).id); return t; }
@@ -925,12 +943,12 @@ const nearCaf = (x, z) => nearRing(0, x, z);
 const NK = new Map(); const nodeAt = q => { const k = q[0].toFixed(2) + ',' + q[1].toFixed(2); if (!NK.has(k)) NK.set(k, addNode(q)); return NK.get(k); };
 CORR.forEach(c => { const ids = c.p.map(nodeAt); for (let i = 0; i < ids.length - 1; i++) link(ids[i], ids[i + 1]);
   [[c.a, ids[0]], [c.b, ids[ids.length - 1]]].forEach(([r, n]) => { if (r < 0) return; link(n, RING[r] ? nearRing(r, NODES[n][0], NODES[n][1]) : r); }); });
-if (IS_PLANET) { const clearO = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / .4)); for (let k = 1; k < n; k++) { const t = k / n, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t; if (!inWalk(x, z, .4)) return false; if (OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .5)) return false; } return true; };
-  const grid = []; for (let x = PL_B[0] + 4; x <= PL_B[2] - 4; x += 6) for (let z = PL_B[1] + 4; z <= PL_B[3] - 4; z += 6) if (inWalk(x, z, 1.1) && !OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + 1.2)) grid.push(addNode([x, z]));
+if (IS_PLANET) { const clearO = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / .4)); for (let k = 1; k < n; k++) { const t = k / n, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t; if (!inWalk(x, z, .4)) return false; if (OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .45)) return false; } return true; };
+  const grid = []; for (let x = PL_B[0] + 3; x <= PL_B[2] - 3; x += 4.5) for (let z = PL_B[1] + 3; z <= PL_B[3] - 3; z += 4.5) if (inWalk(x, z, 1.0) && !PL_HOLES.some(h => x > h[0] && x < h[2] && z > h[1] && z < h[3]) && !OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + 1.0)) grid.push(addNode([x, z]));
   const ids = [...ROOMS.map((r, i) => r.out ? i : -1).filter(i => i >= 0), ...CORR.filter(c => c.exit).map(c => nodeAt(c.p[c.p.length - 1]))];
-  for (let i = 0; i < grid.length; i++) for (let j = i + 1; j < grid.length; j++) { const a = NODES[grid[i]], b = NODES[grid[j]]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 8.6 && clearO(a, b)) link(grid[i], grid[j]); }
+  for (let i = 0; i < grid.length; i++) for (let j = i + 1; j < grid.length; j++) { const a = NODES[grid[i]], b = NODES[grid[j]]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 6.5 && clearO(a, b)) link(grid[i], grid[j]); }
   ids.forEach(k => { const a = NODES[k]; const near = grid.map(g => [Math.hypot(NODES[g][0] - a[0], NODES[g][1] - a[1]), g]).filter(q => q[0] < 13).sort((p, q) => p[0] - q[0]); let n = 0; for (const [, g] of near) { if (clearO(a, NODES[g])) { link(k, g); if (++n >= 3) break; } } }); }
-function losClear(x0, z0, x1, z1) { const d = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.ceil(d / .3)); for (let i = 1; i < n; i++) { const t = i / n; if (!inWalk(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, .05)) return false; } return true; }
+function losClear(x0, z0, x1, z1) { const d = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.ceil(d / (IS_PLANET ? .1 : .3))); for (let i = 1; i < n; i++) { const t = i / n; if (!inWalk(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, .05)) return false; } return true; }
 function navPath(s, t) {
   const n = NODES.length, D = Array(n).fill(1e9), Pv = Array(n).fill(-1), done = Array(n).fill(false); D[s] = 0;
   for (;;) { let u = -1, b = 1e9; for (let i = 0; i < n; i++) if (!done[i] && D[i] < b) { b = D[i]; u = i; } if (u < 0 || u === t) break; done[u] = true;
@@ -1610,82 +1628,98 @@ function decoratePlanet() {
     [-1, 1].forEach(s => box(.36, Y, .32, frM, s * (h + .16), Y / 2, 0, g)); box(c.w + .72, Y - 2.6, .32, frM, 0, (Y + 2.6) / 2, 0, g); box(c.w - .2, .08, .2, basic(lighter(B.l, .3)), 0, 2.56, .1, g, false);
     box(.5, .12, .35, D, 0, 2.95, .32, g, false); sph(.11, glow(0xfff0c8), 0, 2.85, .32, g, 10);
     box(c.w + .6, .05, 1.4, toon(0x4a4f6a), 0, .025, .85, g, false); box(c.w + .6, .06, .1, toon(0xffcc33), 0, .04, 1.52, g, false);
-    [-1, 1].forEach(s => { const [px, pz] = wp(s * (h + 1.7), 2.4); cyl(.07, .1, 2.4, M, px, 1.2, pz, null, 8); box(.34, .12, .34, D, px, 2.45, pz, null, false); sph(.14, glow(0xffe6b0), px, 2.32, pz, null, 10); obs(px, pz, .25); });
+    
     const sg = sprText(B.n, { size: 52, bg: hex(darker(B.a, .15)), w: 2.3 }); sg.position.set(fx + dx * .3, 3.75, fz + dz * .3); world.add(sg); });
+  OBS.filter(o => o.post).forEach(o => { cyl(.07, .1, 2.4, M, o.x, 1.2, o.z, null, 8); box(.34, .12, .34, D, o.x, 2.45, o.z, null, false); sph(.14, glow(0xffe6b0), o.x, 2.32, o.z, null, 10); });
   // ===== interiores =====
+  const BX = BTN.x, BZ = BTN.z;
   // Cúpula: mesa del botón, bancos, plantas, holograma y claraboya
-  const tb = cyl(1.55, 1.35, .85, toon(0xff9f43), BTN.x, .43, BTN.z, null, 32); hull(tb, 1.03); cyl(1.6, 1.6, .08, toon(0xffcc33), BTN.x, .88, BTN.z, null, 32);
-  const btn = sph(.42, toon(0xff3b4f, { e: 0xff0022, ei: .4 }), BTN.x, .95, BTN.z, null, 20); btn.scale.y = .55; hull(btn, 1.06); const glassD = sph(.6, new THREE.MeshBasicMaterial({ color: 0xbfe4ff, transparent: true, opacity: .25, depthWrite: false }), BTN.x, .92, BTN.z, null, 20); glassD.scale.y = .8;
-  const se = sprText('EMERGENCIA', { size: 46, color: '#ff8a98', w: 1.6 }); se.position.set(BTN.x, 1.75, BTN.z); world.add(se);
-  const hp = sph(.34, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), 0, 2.45, 0, null, 18); const hr = new THREE.Mesh(new THREE.TorusGeometry(.56, .04, 6, 30), glow(0xffcc88)); hr.rotation.x = 1.2; hp.add(hr); ANIM.rings.push({ m: hp, s: .5, ax: 'y', bob: 2.45 });
-  { const sk = new THREE.Mesh(new THREE.CircleGeometry(2.6, 36), basic(0xffffff, { map: SKYD_T })); sk.rotation.x = Math.PI / 2; sk.position.set(0, WALL_H - .03, 0); world.add(sk); const fr = new THREE.Mesh(new THREE.TorusGeometry(2.65, .12, 8, 40), toon(0xff9f43)); fr.rotation.x = Math.PI / 2; fr.position.set(0, WALL_H - .05, 0); world.add(fr); }
-  [[-6.2, -4.2], [6.2, -4.2], [-6.2, 4.2], [6.2, 4.2]].forEach(([x, z]) => { const g = grp(x, z, Math.atan2(x, z)); box(2.2, .18, .7, toon(0x3d7bff), 0, .5, 0, g); box(2.2, .6, .14, toon(0x2f5fd0), 0, .9, .32, g); box(.14, .45, .6, D, -.95, .22, 0, g, false); box(.14, .45, .6, D, .95, .22, 0, g, false); obs(x, z, .9); });
-  [[-9, -7], [9, -7], [-9, 7], [9, 7]].forEach(([x, z]) => { plant(x, z, 1.2); obs(x, z, .45); });
-  // Dormitorios: literas, taquillas y alfombra
+  const tb = cyl(1.55, 1.35, .85, toon(0xff9f43), BX, .43, BZ, null, 32); hull(tb, 1.03); cyl(1.6, 1.6, .08, toon(0xffcc33), BX, .88, BZ, null, 32);
+  const btn = sph(.42, toon(0xff3b4f, { e: 0xff0022, ei: .4 }), BX, .95, BZ, null, 20); btn.scale.y = .55; hull(btn, 1.06); const glassD = sph(.6, new THREE.MeshBasicMaterial({ color: 0xbfe4ff, transparent: true, opacity: .25, depthWrite: false }), BX, .92, BZ, null, 20); glassD.scale.y = .8;
+  const se = sprText('EMERGENCIA', { size: 46, color: '#ff8a98', w: 1.6 }); se.position.set(BX, 1.75, BZ); world.add(se);
+  const hp = sph(.34, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), BX, 2.45, BZ, null, 18); const hr = new THREE.Mesh(new THREE.TorusGeometry(.56, .04, 6, 30), glow(0xffcc88)); hr.rotation.x = 1.2; hp.add(hr); ANIM.rings.push({ m: hp, s: .5, ax: 'y', bob: 2.45 });
+  { const sk = new THREE.Mesh(new THREE.CircleGeometry(2.6, 36), basic(0xffffff, { map: SKYD_T })); sk.rotation.x = Math.PI / 2; sk.position.set(BX, WALL_H - .03, BZ); world.add(sk); const fr = new THREE.Mesh(new THREE.TorusGeometry(2.65, .12, 8, 40), toon(0xff9f43)); fr.rotation.x = Math.PI / 2; fr.position.set(BX, WALL_H - .05, BZ); world.add(fr); }
+  [[-6.2, -4.2], [6.2, -4.2], [-6.2, 4.2], [6.2, 4.2]].forEach(([dx, dz]) => { const x = BX + dx, z = BZ + dz, g = grp(x, z, Math.atan2(dx, dz)); box(2.2, .18, .7, toon(0x3d7bff), 0, .5, 0, g); box(2.2, .6, .14, toon(0x2f5fd0), 0, .9, .32, g); box(.14, .45, .6, D, -.95, .22, 0, g, false); box(.14, .45, .6, D, .95, .22, 0, g, false); obs(x, z, .9); });
+  [[-9, 23], [9, 23], [-9, 37]].forEach(([x, z]) => { plant(x, z, 1.2); obs(x, z, .45); });
+  // Cocina: encimera con fogones, nevera y mesa con taburetes
+  { box(.9, .9, 2.6, toon(0xe8e2d8), -22.5, .45, 34.3); box(1.0, .06, 2.7, toon(0xff7a5a), -22.5, .93, 34.3, null, false); [33.6, 34.9].forEach(z => cyl(.22, .22, .04, D, -22.5, .97, z, null, 14)); box(.5, .5, .5, toon(0x8a8fa0), -22.6, 1.45, 34.3, null, false); obs(-22.5, 33.6, .6); obs(-22.5, 35.0, .6);
+    box(.9, 2.1, .9, toon(0xf2f4fa), -22.4, 1.05, 36.4); box(.04, .5, .05, D, -21.93, 1.3, 36.0, null, false); obs(-22.4, 36.4, .6);
+    cyl(.9, .9, .08, toon(0xffe0c0), -14, .8, 29, null, 22); cyl(.12, .2, .78, D, -14, .4, 29, null, 10); for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + .4; cyl(.25, .25, .08, toon(0xff7a5a), -14 + Math.cos(a) * 1.3, .5, 29 + Math.sin(a) * 1.3, null, 12); cyl(.04, .04, .48, D, -14 + Math.cos(a) * 1.3, .25, 29 + Math.sin(a) * 1.3, null, 6); }
+    [[-14.3, 29.2, 0xff9f43], [-13.6, 28.8, 0x55c43a]].forEach(([x, z, c]) => sph(.12, toon(c), x, .93, z, null, 10)); obs(-14, 29, 1.2); }
+  // Dormitorios: literas y alfombra
   const bunk = (x, z, ry, col) => { const g = grp(x, z, ry), F = toon(0x8a90b8);
     [[-.95, -.4], [.95, -.4], [-.95, .4], [.95, .4]].forEach(([a, b]) => box(.08, 2.0, .08, F, a, 1.0, b, g, false));
     [.45, 1.45].forEach(y => { box(2.0, .12, .9, F, 0, y, 0, g); box(1.85, .16, .8, toon(0xf2f0fa), 0, y + .14, 0, g, false); box(1.1, .1, .82, toon(col), .3, y + .25, 0, g, false); box(.4, .12, .5, toon(0xffffff), -.7, y + .27, 0, g, false); });
     box(.06, 1.2, .5, F, .99, 1.1, .1, g, false); };
-  [[-10.2, 0xb18cff], [-7.9, 0x5ab8ff], [-.6, 0xff7ac6]].forEach(([x, c]) => { bunk(x, 9.0, 0, c); obs(x - .55, 9.0, .55); obs(x + .55, 9.0, .55); });
-  [.6, -.1].forEach((x, i) => { box(.66, 2.0, .5, toon(i ? 0x8a6bd0 : 0x6a4fb0), x, 1.0, 18.7); box(.06, .3, .04, toon(0xffcc33), x - .2, 1.1, 18.43, null, false); }); obs(.25, 18.6, .6);
-  { const rug = new THREE.Mesh(new THREE.CircleGeometry(2.2, 30), toon(0x7a5ac0)); rug.rotation.x = -Math.PI / 2; rug.position.set(-6, .012, 13.8); world.add(rug); const r2 = new THREE.Mesh(new THREE.RingGeometry(1.5, 1.7, 30), toon(0xffcc88)); r2.rotation.x = -Math.PI / 2; r2.position.set(-6, .016, 13.8); world.add(r2); }
-  // Enfermería: camillas con gotero, armario con cruz
-  const medbed = (x, z) => { const g = grp(x, z); box(.95, .5, 2.1, toon(0xdfe6ee), 0, .45, 0, g); box(.85, .14, 1.95, toon(0xffffff), 0, .77, 0, g, false); box(.9, .1, .9, toon(0x7fe6c8), 0, .86, .45, g, false); box(.6, .12, .35, toon(0xffffff), 0, .88, -.72, g, false);
-    cyl(.03, .03, 1.8, Lg, .66, .9, -.85, g, 6); box(.18, .28, .08, toon(0xbfe4ff, { op: .7 }), .66, 1.7, -.85, g, false); box(.5, .4, .1, D, -.62, 1.45, -.95, g); const sc = new THREE.Mesh(new THREE.PlaneGeometry(.4, .3), basic(0x36e0ad)); sc.position.set(-.62, 1.45, -.89); g.add(sc); cyl(.03, .03, 1.0, Lg, -.62, .75, -.95, g, 6);
-    obs(x, z - .45, .6); obs(x, z + .45, .6); };
-  medbed(3.0, 9.6); medbed(10.5, 9.6);
-  box(.5, 1.8, 1.2, W, 1.8, .9, 17.6); box(.04, .5, .14, glow(0xff3b4f), 2.06, 1.3, 17.6, null, false); box(.04, .14, .5, glow(0xff3b4f), 2.06, 1.3, 17.6, null, false);
-  // Laboratorio: mesas con matraces, tanque con criatura y estantería
-  [[33, -31.5], [41.5, -31.5]].forEach(([x, z], k) => { box(2.6, .9, 1.1, W, x, .45, z); box(2.7, .06, 1.2, toon(0x2fd0c0), x, .93, z, null, false); [-.8, -.2, .5].forEach((dx, i) => { const c = [0x36e0ad, 0xff7ac6, 0xffd93d][i]; cyl(.1, .18, .36, toon(c, { e: c, ei: .5 }), x + dx, 1.14, z, null, 12); });
-    if (k) { box(.3, .1, .3, D, x + 1.0, 1.0, z, null, false); cyl(.05, .05, .5, D, x + 1.0, 1.3, z - .08, null, 6); cyl(.08, .06, .25, Lg, x + 1.0, 1.55, z, null, 8); } obs(x - .65, z, .7); obs(x + .65, z, .7); });
-  { const x = 30.4, z = -29.6; cyl(.8, .9, .4, D, x, .2, z, null, 20); cyl(.7, .7, 2.0, toon(0x9fffe8, { op: .3 }), x, 1.4, z, null, 24); cyl(.62, .62, 1.7, toon(0x2fd0c0, { e: 0x2fd0c0, ei: .5, op: .55 }), x, 1.3, z, null, 20); cyl(.78, .78, .25, D, x, 2.5, z, null, 20);
-    const cr = sph(.24, toon(0xff7ac6), x, 1.4, z, null, 14); sph(.07, toon(0xffffff), .1, .06, .2, cr, 8); sph(.07, toon(0xffffff), -.1, .06, .2, cr, 8); ANIM.rings.push({ m: cr, s: .6, ax: 'y', bob: 1.4 }); EMIT.push({ k: 'glow', p: [x, 2.2, z], c: 0x7fffd4 }); obs(x, z, .9); }
-  { box(2.2, 2.2, .45, toon(0x8a90b8), 36.5, 1.1, -41.7); [.5, 1.2, 1.9].forEach(y => { box(2.1, .05, .4, D, 36.5, y - .05, -41.65, null, false); for (let k = 0; k < 5; k++) { const c = [0xff7ac6, 0x36e0ad, 0xffd93d, 0x7fe6ff, 0xc9a0ff][(k + y * 3 | 0) % 5]; cyl(.09, .09, .3, toon(c, { e: c, ei: .4 }), 35.7 + k * .4, y + .15, -41.55, null, 8); } }); }
-  // Muestras: vitrinas con cristales y una roca rara
-  [48.5, 51.5, 54.5].forEach((x, k) => { box(1.2, .9, .8, M, x, .45, -41.3); box(1.1, .7, .7, toon(0xbfe4ff, { op: .3 }), x, 1.25, -41.3, null, false); const c = [0xc9a0ff, 0x7fe6ff, 0xff9fd8][k]; const cc = new THREE.Mesh(new THREE.ConeGeometry(.16, .5, 5), toon(c, { e: c, ei: .8 })); cc.position.set(x, 1.15, -41.3); world.add(cc); obs(x, -41.3, .55); });
-  cyl(.6, .7, .8, M, 49, .4, -34.2, null, 16); { const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(.5, 0), toon(0x7a4fb0, { e: 0x4a2a80, ei: .4 })); rk.position.set(49, 1.25, -34.2); world.add(rk); hull(rk, 1.06); ANIM.rings.push({ m: rk, s: .4, ax: 'y', bob: 1.25 }); } obs(49, -34.2, .75);
-  // Mando: consolas con pantallas, sillón y mapa holográfico
-  [-2.5, 8.5].forEach(x => { box(3.2, .9, .9, toon(0x4b5296), x, .45, -49.1); const s = new THREE.Mesh(new THREE.PlaneGeometry(2.8, .5), basic(0xffffff, { map: SCR[1].t })); s.rotation.x = -1.0; s.position.set(x, .95, -48.9); world.add(s);
-    const big = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), basic(0xffffff, { map: VIEW_T })); big.position.set(x, 2.25, -49.96); world.add(big); box(3.4, .12, .1, D, x, 3.1, -49.94, null, false); box(3.4, .12, .1, D, x, 1.4, -49.94, null, false); });
-  { const g = grp(5.8, -46.4, -.5); cyl(.1, .2, .5, D, 0, .25, 0, g, 10); box(.8, .16, .8, toon(0x5ab8ff), 0, .55, 0, g); box(.8, .9, .16, toon(0x3d7bff), 0, 1.0, .38, g); obs(5.8, -46.4, .55); }
-  cyl(.8, .9, .9, M, -1.5, .45, -41.5, null, 20); { const hm = new THREE.Mesh(new THREE.CircleGeometry(.7, 24), basic(0x5ab8ff, { op: .6 })); hm.rotation.x = -Math.PI / 2; hm.position.set(-1.5, .92, -41.5); world.add(hm); const hs = sph(.3, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), -1.5, 1.5, -41.5, null, 14); ANIM.rings.push({ m: hs, s: .8, ax: 'y', bob: 1.5 }); } obs(-1.5, -41.5, .9);
-  // Comunicaciones: servidores y mesa de radio
-  [-56.4, -55.3, -54.2, -47, -45.9, -44.8].forEach(x => { box(.95, 2.1, .7, toon(0x2a3a5e), x, 1.05, -45.5); for (let j = 0; j < 4; j++) box(.6, .05, .02, glow(j % 2 ? 0x36e0ad : 0x52c7ff), x, .6 + j * .35, -45.14, null, false); }); obs(-55.3, -45.4, .8); obs(-45.9, -45.4, .8);
-  box(2.6, .85, .8, M, -55, .43, -34.55); box(.7, .4, .5, D, -55.7, 1.05, -34.6); box(.7, .5, .5, toon(0x52c7ff), -54.4, 1.1, -34.6); cyl(.02, .02, .4, D, -55, 1.1, -34.4, null, 6); sph(.06, D, -55, 1.32, -34.4, null, 8); obs(-55, -34.8, .9);
-  // Seguridad: mesa y pared de cámaras, trajes y taquillas
-  box(2.4, .8, .9, toon(0x4b5296), -25, .4, -46.95); box(2.5, .08, 1.0, D, -25, .82, -46.95); box(4.7, 2.5, .14, toon(0x2a2450), -25, 1.95, -47.86);
-  CAMS.forEach((c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.08), new THREE.MeshBasicMaterial({ map: RT[i].texture })); m.position.set(-25 + (i % 2 ? 1.1 : -1.1), i < 2 ? 2.55 : 1.38, -47.78); m.userData.dyn = 1; world.add(m); MON.push(m); });
-  { const sc2 = sprText('CÁMARAS', { size: 50, color: '#ff8a98', w: 1.4 }); sc2.position.set(-25, 3.0, -47.6); world.add(sc2); }
-  [[-20.6, 0xff9f43], [-19.4, 0x5ab8ff]].forEach(([x, c]) => { box(.6, .1, .5, D, x, .05, -36.6); cyl(.32, .3, .9, toon(c), x, .7, -36.6, null, 14); sph(.34, toon(0xe8eaf8), x, 1.45, -36.6, null, 14); const v = sph(.2, toon(0x2a2450), x, 1.48, -36.9, null, 12); v.scale.z = .5; }); obs(-20, -36.6, .8);
-  box(.5, 2.0, 1.4, toon(0x5fbf7a), -18.3, 1.0, -46.4); box(.04, 1.8, .03, D, -18.54, 1.0, -46.4, null, false); obs(-18.6, -46.4, .7);
+  [[12.2, 22.95, 0xb18cff], [21.8, 22.95, 0x5ab8ff], [12.4, 31.05, 0xff7ac6], [20.8, 31.05, 0x36e0ad]].forEach(([x, z, c]) => { bunk(x, z, 0, c); obs(x - .55, z, .55); obs(x + .55, z, .55); });
+  { const rug = new THREE.Mesh(new THREE.CircleGeometry(2.0, 30), toon(0x7a5ac0)); rug.rotation.x = -Math.PI / 2; rug.position.set(17.25, .012, 27); world.add(rug); const r2 = new THREE.Mesh(new THREE.RingGeometry(1.4, 1.6, 30), toon(0xffcc88)); r2.rotation.x = -Math.PI / 2; r2.position.set(17.25, .016, 27); world.add(r2); }
+  // Enfermería: camillas con gotero y armario con cruz
+  const medbed = (x, z, ry) => { const g = grp(x, z, ry); box(.95, .5, 2.1, toon(0xdfe6ee), 0, .45, 0, g); box(.85, .14, 1.95, toon(0xffffff), 0, .77, 0, g, false); box(.9, .1, .9, toon(0x7fe6c8), 0, .86, .45, g, false); box(.6, .12, .35, toon(0xffffff), 0, .88, -.72, g, false);
+    cyl(.03, .03, 1.8, Lg, .66, .9, -.85, g, 6); box(.18, .28, .08, toon(0xbfe4ff, { op: .7 }), .66, 1.7, -.85, g, false); box(.5, .4, .1, D, -.62, 1.45, -.95, g); const sc = new THREE.Mesh(new THREE.PlaneGeometry(.4, .3), basic(0x36e0ad)); sc.position.set(-.62, 1.45, -.89); g.add(sc); cyl(.03, .03, 1.0, Lg, -.62, .75, -.95, g, 6); };
+  [[18.6, 38.2], [18.6, 40.6]].forEach(([x, z]) => { medbed(x, z, -Math.PI / 2); obs(x - .5, z, .6); obs(x + .5, z, .6); });
+  box(1.2, 1.8, .5, W, 12.4, .9, 32.85); box(.5, .14, .04, glow(0xff3b4f), 12.4, 1.3, 33.12, null, false); box(.14, .5, .04, glow(0xff3b4f), 12.4, 1.3, 33.12, null, false); obs(12.4, 33.0, .7);
+  // Despensa: estanterías con provisiones y cajas
+  { box(3, 2, .6, toon(0x8a6a42), -3, 1.0, 45.6); [.6, 1.25, 1.9].forEach((y, j) => { box(2.9, .05, .55, D, -3, y - .05, 45.55, null, false); for (let k = 0; k < 6; k++) { const c = [0xff7a5a, 0x55c43a, 0xffcc33, 0x5ab8ff][(k + j) % 4]; box(.35, .3, .3, toon(c), -4.2 + k * .48, y + .12, 45.5, null, false); } }); obs(-3.6, 45.5, .6); obs(-2.4, 45.5, .6); }
+  crate(-5.2, .5, 39.4, 0x9a7a52); crate(-4.0, .5, 39.4, 0x5a7a9a); crate(-4.6, 1.5, 39.4, 0xc8834a); obs(-4.6, 39.4, 1.0);
   // Electricidad: generadores y transformador con chispas
-  [[-61.8, -.5], [-61.8, 3.2]].forEach(([x, z]) => { box(1.6, 1.8, 1.4, toon(0x5a5a6a), x, .9, z); box(1.62, .2, 1.42, toon(0xffcc33), x, 1.5, z, null, false); box(.05, .5, .9, glow(0xffcc33), x + .82, 1.0, z, null, false); obs(x, z, .95); });
-  { const x = -52.5, z = -6.3; cyl(.55, .65, .5, D, x, .25, z, null, 16); cyl(.42, .42, 2.0, toon(0x8a6a42), x, 1.5, z, null, 16); [.9, 1.5, 2.1].forEach((y, i) => { const r = new THREE.Mesh(new THREE.TorusGeometry(.5, .07, 8, 26), glow(0xffcc33)); r.rotation.x = Math.PI / 2; r.position.set(x, y, z); world.add(r); ANIM.rings.push({ m: r, s: .6 + i * .3, ax: 'z' }); });
+  [[-60.4, -17.6], [-58.2, -17.6]].forEach(([x, z]) => { box(1.6, 1.8, 1.4, toon(0x5a5a6a), x, .9, z); box(1.62, .2, 1.42, toon(0xffcc33), x, 1.5, z, null, false); box(.9, .5, .05, glow(0xffcc33), x, 1.0, z - .72, null, false); obs(x, z, .95); });
+  { const x = -56.5, z = -27.4; cyl(.55, .65, .5, D, x, .25, z, null, 16); cyl(.42, .42, 2.0, toon(0x8a6a42), x, 1.5, z, null, 16); [.9, 1.5, 2.1].forEach((y, i) => { const r = new THREE.Mesh(new THREE.TorusGeometry(.5, .07, 8, 26), glow(0xffcc33)); r.rotation.x = Math.PI / 2; r.position.set(x, y, z); world.add(r); ANIM.rings.push({ m: r, s: .6 + i * .3, ax: 'z' }); });
     sph(.25, glow(0xfff0b0), x, 2.7, z, null, 12); EMIT.push({ k: 'spark', p: [x, 2.6, z] }); obs(x, z, .8); }
   // Taller: banco de trabajo, brazo robótico y ruedas
-  box(3, .9, 1.0, toon(0x8a6a42), -61.5, .45, 7.1); box(3.1, .08, 1.1, toon(0x5a4a3a), -61.5, .93, 7.1, null, false); box(.4, .25, .3, toon(0xff5a6e), -62.4, 1.1, 7.1); box(.6, .1, .2, Lg, -61, 1.0, 7.2, null, false); cyl(.08, .08, .5, D, -60.5, 1.2, 7.0, null, 8); obs(-62.2, 7.2, .6); obs(-60.8, 7.2, .6);
-  { const x = -52.5, z = 8.4; cyl(.45, .55, .4, toon(0xff7a3d), x, .2, z, null, 14); const a1 = box(.25, 1.4, .25, toon(0xff9f43), x, 1.0, z); a1.rotation.z = .35; const a2 = box(.2, 1.0, .2, toon(0xff9f43), x - .55, 1.75, z); a2.rotation.z = 1.3; sph(.15, D, x - .9, 1.55, z, null, 10); obs(x, z, .7); }
-  [0, 1, 2].forEach(k => { const t = new THREE.Mesh(new THREE.TorusGeometry(.4, .17, 8, 18), toon(0x2a2450)); t.rotation.x = Math.PI / 2; t.position.set(-52.5, .17 + k * .34, 16.6); world.add(t); }); obs(-52.5, 16.6, .65); crate(-54.0, .5, 16.9, 0x8a6a42); obs(-54.0, 16.9, .7);
+  box(3, .9, 1.0, toon(0x8a6a42), -45, .45, -20.6); box(3.1, .08, 1.1, toon(0x5a4a3a), -45, .93, -20.6, null, false); box(.4, .25, .3, toon(0xff5a6e), -45.9, 1.1, -20.6); box(.6, .1, .2, Lg, -44.5, 1.0, -20.7, null, false); cyl(.08, .08, .5, D, -44, 1.2, -20.5, null, 8); obs(-45.7, -20.7, .6); obs(-44.3, -20.7, .6);
+  { const x = -34.5, z = -21.4; cyl(.45, .55, .4, toon(0xff7a3d), x, .2, z, null, 14); const a1 = box(.25, 1.4, .25, toon(0xff9f43), x, 1.0, z); a1.rotation.z = .35; const a2 = box(.2, 1.0, .2, toon(0xff9f43), x - .55, 1.75, z); a2.rotation.z = 1.3; sph(.15, D, x - .9, 1.55, z, null, 10); obs(x, z, .7); }
+  [0, 1, 2].forEach(k => { const t = new THREE.Mesh(new THREE.TorusGeometry(.4, .17, 8, 18), toon(0x2a2450)); t.rotation.x = Math.PI / 2; t.position.set(-46.4, .17 + k * .34, -28.6); world.add(t); }); obs(-46.4, -28.6, .65);
   // Almacén: cajas, barriles, toro elevador y mineral
-  [[-44.2, 33.8, 0x8a6a42], [-43.0, 33.8, 0x9a7a52], [-44.2, 35.0, 0x5a7a9a], [-30, 33.8, 0x6a8aaa], [-30, 35.0, 0x8a6a42]].forEach(([x, z, c]) => crate(x, .5, z, c)); crate(-43.6, 1.5, 34.4, 0xc8834a); obs(-43.6, 34.4, 1.1); obs(-30, 34.4, .9);
-  [[-41, 45], [-41.8, 44.6], [-40.4, 44.4]].forEach(([x, z], i) => { cyl(.35, .35, 1.0, toon(i % 2 ? 0x3d7bff : 0xff5a6e), x, .5, z, null, 14); cyl(.36, .36, .08, D, x, .75, z, null, 14); }); obs(-41, 44.7, .9);
-  { const g = grp(-41.5, 37, .4); box(1.2, .8, 1.8, toon(0xffcc33), 0, .7, 0, g); box(1.0, .9, .1, D, 0, 1.55, -.5, g); [-.5, .5].forEach(x => { box(.08, 2.0, .08, D, x, 1.0, -.95, g, false); box(.12, .05, 1.0, D, x, .1, -1.45, g, false); });
-    [[-.6, .5], [.6, .5], [-.6, -.5], [.6, -.5]].forEach(([x, z]) => { const w2 = cyl(.25, .25, .2, D, x, .25, z, g, 12); w2.rotation.z = Math.PI / 2; }); obs(-41.5, 37, 1.0); }
-  [[-29.6, 45]].forEach(([x, z]) => { for (let k = 0; k < 7; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.18, .7, 5), toon(k % 2 ? 0xc9a0ff : 0x7fe6ff, { e: k % 2 ? 0x9b5cff : 0x3cc8ff, ei: .6 })); c.position.set(x + Math.cos(k) * .4, .35, z + Math.sin(k) * .35); c.rotation.z = Math.cos(k * 2) * .3; world.add(c); } obs(x, z, .8); });
-  // Hangar: rover, depósitos de combustible y portón
-  { const g = grp(5, 43); box(5.0, 1.1, 2.4, toon(0xf2f2f8), 0, 1.15, 0, g); box(5.02, .18, 2.42, toon(0xff5a6e), 0, 1.0, 0, g, false); const dm = sph(.95, toon(0x9fd8ff, { op: .6 }), 1.4, 1.7, 0, g, 18); dm.scale.y = .7;
-    [-1.7, 0, 1.7].forEach(x => [-1.3, 1.3].forEach(z => { const w2 = cyl(.5, .5, .35, D, x, .5, z, g, 16); w2.rotation.x = Math.PI / 2; cyl(.22, .22, .37, toon(0x8a8fa0), x, .5, z, g, 10).rotation.x = Math.PI / 2; }));
-    cyl(.03, .03, 1.2, Lg, -2, 2.3, -.8, g, 6); sph(.08, glow(0xff3b4f), -2, 2.9, -.8, g, 8); box(.25, .2, .1, glow(0xfff0c8), 2.52, 1.25, .7, g, false); box(.25, .2, .1, glow(0xfff0c8), 2.52, 1.25, -.7, g, false); obs(3.6, 43, 1.6); obs(6.4, 43, 1.6); }
-  [[14.6, 34.2], [14.6, 35.5]].forEach(([x, z]) => { cyl(.55, .55, 2.0, toon(0xff5a6e), x, 1.0, z, null, 16); cyl(.56, .56, .12, toon(0xffcc33), x, 1.4, z, null, 16); sph(.55, toon(0xff5a6e), x, 2.0, z, null, 14); }); obs(14.6, 34.85, 1.0);
-  { box(10, 2.9, .12, toon(0x8a8fa0), 4, 1.45, 47.9); for (let k = 0; k < 6; k++) box(10, .05, .14, D, 4, .4 + k * .45, 47.85, null, false); const hz = new THREE.Mesh(new THREE.PlaneGeometry(10, .5), toon(0xffffff, { map: HAZ_T })); hz.rotation.x = -Math.PI / 2; hz.position.set(4, .014, 47.3); world.add(hz); scaleUV(hz.geometry, 6, 1); }
-  box(.5, 2.0, 1.6, toon(0x5a6296), -7.7, 1.0, 35.5); [.7, 1.2, 1.7].forEach(y => box(.08, .08, 1.3, toon(0xffcc33), -7.42, y, 35.5, null, false));
+  [[-60.6, -13.6, 0x8a6a42], [-59.4, -13.6, 0x9a7a52], [-60.6, -12.4, 0x5a7a9a]].forEach(([x, z, c]) => crate(x, .5, z, c)); crate(-60.0, 1.5, -13.0, 0xc8834a); obs(-60, -13, 1.1);
+  [[-50, -1.5], [-50.8, -1.1], [-49.4, -.9]].forEach(([x, z], i) => { cyl(.35, .35, 1.0, toon(i % 2 ? 0x3d7bff : 0xff5a6e), x, .5, z, null, 14); cyl(.36, .36, .08, D, x, .75, z, null, 14); }); obs(-50, -1.2, .9);
+  { const g = grp(-53, -5, .4); box(1.2, .8, 1.8, toon(0xffcc33), 0, .7, 0, g); box(1.0, .9, .1, D, 0, 1.55, -.5, g); [-.5, .5].forEach(x => { box(.08, 2.0, .08, D, x, 1.0, -.95, g, false); box(.12, .05, 1.0, D, x, .1, -1.45, g, false); });
+    [[-.6, .5], [.6, .5], [-.6, -.5], [.6, -.5]].forEach(([x, z]) => { const w2 = cyl(.25, .25, .2, D, x, .25, z, g, 12); w2.rotation.z = Math.PI / 2; }); obs(-53, -5, 1.0); }
+  { const x = -61, z = -1.2; for (let k = 0; k < 7; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.18, .7, 5), toon(k % 2 ? 0xc9a0ff : 0x7fe6ff, { e: k % 2 ? 0x9b5cff : 0x3cc8ff, ei: .6 })); c.position.set(x + Math.cos(k) * .4, .35, z + Math.sin(k) * .35); c.rotation.z = Math.cos(k * 2) * .3; world.add(c); } obs(x, z, .8); }
+  // Comunicaciones: servidores y mesa de radio
+  [-46.5, -45.4, -44.3].forEach(x => { box(.95, 2.1, .7, toon(0x2a3a5e), x, 1.05, -19.1); for (let j = 0; j < 4; j++) box(.6, .05, .02, glow(j % 2 ? 0x36e0ad : 0x52c7ff), x, .6 + j * .35, -18.74, null, false); }); obs(-45.4, -19.0, .9);
+  { const g = grp(-32.55, -17.2, -Math.PI / 2); box(2.4, .85, .8, M, 0, .43, 0, g); box(.7, .4, .5, D, -.6, 1.05, -.05, g); box(.7, .5, .5, toon(0x52c7ff), .5, 1.1, -.05, g); cyl(.02, .02, .4, D, 0, 1.1, .2, g, 6); sph(.06, D, 0, 1.32, .2, g, 8); obs(-32.9, -17.2, .9); }
+  // Seguridad: mesa y pared de cámaras, trajes
+  { const g = grp(-60.95, 7, Math.PI / 2); box(2.4, .8, .9, toon(0x4b5296), 0, .4, 0, g); box(2.5, .08, 1.0, D, 0, .82, 0, g); box(4.7, 2.5, .14, toon(0x2a2450), 0, 1.95, -.91, g);
+    CAMS.forEach((c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.08), new THREE.MeshBasicMaterial({ map: RT[i].texture })); m.position.set(i % 2 ? 1.1 : -1.1, i < 2 ? 2.55 : 1.38, -.83); m.userData.dyn = 1; g.add(m); MON.push(m); });
+    const sc2 = sprText('CÁMARAS', { size: 50, color: '#ff8a98', w: 1.4 }); sc2.position.set(0, 3.0, -.6); g.add(sc2); }
+  [[-52.6, 0xff9f43], [-51.4, 0x5ab8ff]].forEach(([x, c]) => { box(.6, .1, .5, D, x, .05, 1.1); cyl(.32, .3, .9, toon(c), x, .7, 1.1, null, 14); sph(.34, toon(0xe8eaf8), x, 1.45, 1.1, null, 14); const v = sph(.2, toon(0x2a2450), x, 1.48, 1.4, null, 12); v.scale.z = .5; }); obs(-52, 1.1, .8);
+  // Trastero: chatarra, un robot roto y estantes
+  crate(-41.0, .5, 1.3, 0x7a6a5a); crate(-42.1, .5, 1.3, 0x5a6a7a); obs(-41.5, 1.3, .9);
+  { const x = -48.2, z = 1.4; sph(.45, toon(0xc9d2dc), x, .45, z, null, 14); sph(.28, toon(0xc9d2dc), x + .2, 1.0, z + .1, null, 12); sph(.07, toon(0x1d1640), x + .3, 1.05, z + .35, null, 8); box(.1, .5, .1, Lg, x - .45, .5, z, null, false).rotation.z = 1.2; obs(x, z, .6); }
+  box(2.2, 1.6, .45, toon(0x8a90b8), -46, .8, 6.7); [.5, 1.1].forEach(y => { for (let k = 0; k < 4; k++) box(.35, .3, .3, toon([0xffcc33, 0x8a8fa0, 0xff7a5a, 0x5ab8ff][k]), -46.8 + k * .5, y + .2, 6.65, null, false); });
+  // Laboratorio: mesas con matraces, tanque con criatura y estantería
+  [[38, -8.5], [46, -8.5]].forEach(([x, z], k) => { box(2.6, .9, 1.1, W, x, .45, z); box(2.7, .06, 1.2, toon(0x2fd0c0), x, .93, z, null, false); [-.8, -.2, .5].forEach((dx, i) => { const c = [0x36e0ad, 0xff7ac6, 0xffd93d][i]; cyl(.1, .18, .36, toon(c, { e: c, ei: .5 }), x + dx, 1.14, z, null, 12); });
+    if (k) { box(.3, .1, .3, D, x + 1.0, 1.0, z, null, false); cyl(.05, .05, .5, D, x + 1.0, 1.3, z - .08, null, 6); cyl(.08, .06, .25, Lg, x + 1.0, 1.55, z, null, 8); } obs(x - .65, z, .7); obs(x + .65, z, .7); });
+  { const x = 35.4, z = -16.6; cyl(.8, .9, .4, D, x, .2, z, null, 20); cyl(.7, .7, 2.0, toon(0x9fffe8, { op: .3 }), x, 1.4, z, null, 24); cyl(.62, .62, 1.7, toon(0x2fd0c0, { e: 0x2fd0c0, ei: .5, op: .55 }), x, 1.3, z, null, 20); cyl(.78, .78, .25, D, x, 2.5, z, null, 20);
+    const cr = sph(.24, toon(0xff7ac6), x, 1.4, z, null, 14); sph(.07, toon(0xffffff), .1, .06, .2, cr, 8); sph(.07, toon(0xffffff), -.1, .06, .2, cr, 8); ANIM.rings.push({ m: cr, s: .6, ax: 'y', bob: 1.4 }); EMIT.push({ k: 'glow', p: [x, 2.2, z], c: 0x7fffd4 }); obs(x, z, .9); }
+  { const g = grp(51.55, -10.2, -Math.PI / 2); box(1.4, 2.2, .45, toon(0x8a90b8), 0, 1.1, 0, g); [.5, 1.2, 1.9].forEach(y => { box(1.3, .05, .4, D, 0, y - .05, .05, g, false); for (let k = 0; k < 3; k++) { const c = [0xff7ac6, 0x36e0ad, 0xffd93d, 0x7fe6ff][(k + y * 3 | 0) % 4]; cyl(.09, .09, .3, toon(c, { e: c, ei: .4 }), -.4 + k * .4, y + .15, .15, g, 8); } }); }
+  // Muestras: vitrinas con cristales y una roca rara
+  [54, 56.5].forEach((x, k) => { box(1.2, .9, .8, M, x, .45, -17.3); box(1.1, .7, .7, toon(0xbfe4ff, { op: .3 }), x, 1.25, -17.3, null, false); const c = [0xc9a0ff, 0x7fe6ff][k]; const cc = new THREE.Mesh(new THREE.ConeGeometry(.16, .5, 5), toon(c, { e: c, ei: .8 })); cc.position.set(x, 1.15, -17.3); world.add(cc); obs(x, -17.3, .55); });
+  cyl(.6, .7, .8, M, 60, .4, -10.4, null, 16); { const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(.5, 0), toon(0x7a4fb0, { e: 0x4a2a80, ei: .4 })); rk.position.set(60, 1.25, -10.4); world.add(rk); hull(rk, 1.06); ANIM.rings.push({ m: rk, s: .4, ax: 'y', bob: 1.25 }); } obs(60, -10.4, .75);
   // Invernadero: jardineras, árboles y una flor gigante
-  [45, 49, 53, 57].forEach(x => { box(3, .6, .9, toon(0x8a5a34), x, .3, 2.8); box(2.8, .05, .7, toon(0x3a2a1a), x, .61, 2.8, null, false); [-1, 0, 1].forEach(k => { const c = [0x55c43a, 0xff7ac6, 0x7fe6ff][(k + 1 + x) % 3]; const p = sph(.24, toon(c), x + k * .9, .85, 2.8, null, 10); hull(p, 1.1); cyl(.03, .03, .3, toon(0x3a8a3a), x + k * .9, .7, 2.8, null, 5); }); obs(x - .8, 2.8, .5); obs(x + .8, 2.8, .5); });
-  [[45, 15.5], [57.5, 15]].forEach(([x, z]) => { tree(x, z); [0, 2.1, 4.2].forEach(a => sph(.1, glow(0xffd93d), x + Math.cos(a) * .5, 1.9, z + Math.sin(a) * .5, null, 8)); obs(x, z, .55); });
-  { const x = 51, z = 5.6; cyl(.06, .09, 1.5, toon(0x3a8a3a), x, .75, z, null, 8); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, pt = new THREE.Mesh(new THREE.SphereGeometry(.3, 10, 8), toon(0xff7ac6, { e: 0xff3b9a, ei: .3 })); pt.scale.set(1, .35, .6); pt.position.set(x + Math.cos(a) * .35, 1.55, z + Math.sin(a) * .35); pt.rotation.y = -a; world.add(pt); } sph(.18, glow(0xffd93d), x, 1.6, z, null, 10); obs(x, z, .6); }
+  [36.5, 45].forEach(x => { box(3, .6, .9, toon(0x8a5a34), x, .3, 11.1); box(2.8, .05, .7, toon(0x3a2a1a), x, .61, 11.1, null, false); [-1, 0, 1].forEach(k => { const c = [0x55c43a, 0xff7ac6, 0x7fe6ff][(k + 1 + Math.round(x)) % 3]; const p = sph(.24, toon(c), x + k * .9, .85, 11.1, null, 10); hull(p, 1.1); cyl(.03, .03, .3, toon(0x3a8a3a), x + k * .9, .7, 11.1, null, 5); }); obs(x - .8, 11.1, .5); obs(x + .8, 11.1, .5); });
+  [[35.6, -1.8], [48.4, -1.8]].forEach(([x, z]) => { tree(x, z); [0, 2.1, 4.2].forEach(a => sph(.1, glow(0xffd93d), x + Math.cos(a) * .5, 1.9, z + Math.sin(a) * .5, null, 8)); obs(x, z, .55); });
+  { const x = 44, z = 8.4; cyl(.06, .09, 1.5, toon(0x3a8a3a), x, .75, z, null, 8); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, pt = new THREE.Mesh(new THREE.SphereGeometry(.3, 10, 8), toon(0xff7ac6, { e: 0xff3b9a, ei: .3 })); pt.scale.set(1, .35, .6); pt.position.set(x + Math.cos(a) * .35, 1.55, z + Math.sin(a) * .35); pt.rotation.y = -a; world.add(pt); } sph(.18, glow(0xffd93d), x, 1.6, z, null, 10); obs(x, z, .6); }
+  // Bombas: depósitos con tuberías
+  [[53.2, -2.2], [57.6, -2.2]].forEach(([x, z]) => { cyl(.85, .85, 2.2, toon(0x5a8ac8), x, 1.1, z, null, 18); cyl(.87, .87, .14, toon(0xffcc33), x, 1.6, z, null, 18); sph(.85, toon(0x5a8ac8), x, 2.2, z, null, 14); const pp = cyl(.12, .12, 4.4, toon(0x8a8fa0), 55.4, 2.5, z, null, 8); pp.rotation.z = Math.PI / 2; obs(x, z, .95); });
+  EMIT.push({ k: 'steam', p: [55.4, 2.7, -2.2] });
   // Observatorio: telescopio y mesa de cartas estelares
-  { const g = grp(56, 39.5); cyl(1.1, 1.3, .8, M, 0, .4, 0, g, 22); box(.5, 1.2, .5, D, 0, 1.4, 0, g); const tl = cyl(.42, .55, 4.0, W, 0, 2.6, 0, g, 18); tl.rotation.set(-.75, 0, .3); hull(tl, 1.03); obs(56, 39.5, 1.5); }
-  { cyl(.75, .75, .1, M, 48.6, .85, 32.4, null, 20); cyl(.1, .2, .8, D, 48.6, .4, 32.4, null, 8); const sm = new THREE.Mesh(new THREE.CircleGeometry(.68, 24), basic(0xffffff, { map: SKYD_T })); sm.rotation.x = -Math.PI / 2; sm.position.set(48.6, .91, 32.4); world.add(sm); obs(48.6, 32.4, .8); }
+  { const g = grp(34.5, 36.5); cyl(1.1, 1.3, .8, M, 0, .4, 0, g, 22); box(.5, 1.2, .5, D, 0, 1.4, 0, g); const tl = cyl(.42, .55, 4.0, W, 0, 2.6, 0, g, 18); tl.rotation.set(-.75, 0, .3); hull(tl, 1.03); obs(34.5, 36.5, 1.5); }
+  { cyl(.75, .75, .1, M, 42.5, .85, 27.5, null, 20); cyl(.1, .2, .8, D, 42.5, .4, 27.5, null, 8); const sm = new THREE.Mesh(new THREE.CircleGeometry(.68, 24), basic(0xffffff, { map: SKYD_T })); sm.rotation.x = -Math.PI / 2; sm.position.set(42.5, .91, 27.5); world.add(sm); obs(42.5, 27.5, .8); }
+  // Torre de radio: equipos de emisión
+  [-12, -10.9].forEach(x => { box(.95, 2.1, .7, toon(0x2a3a5e), x, 1.05, -45.5); for (let j = 0; j < 4; j++) box(.6, .05, .02, glow(j % 2 ? 0xffcc33 : 0x52c7ff), x, .6 + j * .35, -45.14, null, false); }); obs(-11.45, -45.4, .8);
+  // Torre de vigía: catalejo en trípode
+  { const x = 58, z = -44.6; [0, 2.1, 4.2].forEach(a => { const l = cyl(.03, .03, 1.3, Lg, x + Math.cos(a) * .3, .6, z + Math.sin(a) * .3, null, 6); l.rotation.set(Math.sin(a) * .3, 0, -Math.cos(a) * .3); }); const sp = cyl(.12, .16, 1.2, toon(0xffcc33), x, 1.35, z, null, 12); sp.rotation.x = -1.1; obs(x, z, .5); }
+  // Hangar: rover, depósitos de combustible y estante de herramientas
+  { const g = grp(19, -43.5); box(5.0, 1.1, 2.4, toon(0xf2f2f8), 0, 1.15, 0, g); box(5.02, .18, 2.42, toon(0xff5a6e), 0, 1.0, 0, g, false); const dm = sph(.95, toon(0x9fd8ff, { op: .6 }), 1.4, 1.7, 0, g, 18); dm.scale.y = .7;
+    [-1.7, 0, 1.7].forEach(x => [-1.3, 1.3].forEach(z => { const w2 = cyl(.5, .5, .35, D, x, .5, z, g, 16); w2.rotation.x = Math.PI / 2; cyl(.22, .22, .37, toon(0x8a8fa0), x, .5, z, g, 10).rotation.x = Math.PI / 2; }));
+    cyl(.03, .03, 1.2, Lg, -2, 2.3, -.8, g, 6); sph(.08, glow(0xff3b4f), -2, 2.9, -.8, g, 8); box(.1, .2, .25, glow(0xfff0c8), 2.52, 1.25, .7, g, false); box(.1, .2, .25, glow(0xfff0c8), 2.52, 1.25, -.7, g, false); obs(17.6, -43.5, 1.6); obs(20.4, -43.5, 1.6); }
+  [[24.6, -35.5], [24.6, -36.8]].forEach(([x, z]) => { cyl(.55, .55, 2.0, toon(0xff5a6e), x, 1.0, z, null, 16); cyl(.56, .56, .12, toon(0xffcc33), x, 1.4, z, null, 16); sph(.55, toon(0xff5a6e), x, 2.0, z, null, 14); }); obs(24.6, -36.15, 1.0);
+  { const hz = new THREE.Mesh(new THREE.PlaneGeometry(.5, 12), toon(0xffffff, { map: HAZ_T })); hz.rotation.x = -Math.PI / 2; hz.rotation.z = Math.PI / 2; hz.position.set(9, .014, -41); world.add(hz); }
+  box(.5, 2.0, 1.6, toon(0x5a6296), 6.3, 1.0, -36.5); [.7, 1.2, 1.7].forEach(y => box(.08, .08, 1.3, toon(0xffcc33), 6.58, y, -36.5, null, false));
+  // Mando: mapa holográfico y pantallas
+  cyl(.8, .9, .9, M, -11, .45, -6.8, null, 20); { const hm = new THREE.Mesh(new THREE.CircleGeometry(.7, 24), basic(0x5ab8ff, { op: .6 })); hm.rotation.x = -Math.PI / 2; hm.position.set(-11, .92, -6.8); world.add(hm); const hs = sph(.3, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), -11, 1.5, -6.8, null, 14); ANIM.rings.push({ m: hs, s: .8, ax: 'y', bob: 1.5 }); } obs(-11, -6.8, .9);
+  { const big = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.4), basic(0xffffff, { map: VIEW_T })); big.rotation.y = Math.PI; big.position.set(-2.5, 2.2, -4.04); world.add(big); box(2.8, .1, .1, D, -2.5, 2.95, -4.06, null, false); box(2.8, .1, .1, D, -2.5, 1.45, -4.06, null, false); }
   // ===== exterior =====
   // rocas, mesetas, charca y fumarolas
   OBS.filter(o => o.rock === 1).forEach((o, k) => { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * 1.05, 0), toon(k % 2 ? 0x5a3f80 : 0x6b4f92)); r.position.set(o.x, o.r * .55, o.z); r.scale.y = .75; r.rotation.set(k, k * 2.3, 0); world.add(r); hull(r, 1.03);
@@ -1697,6 +1731,11 @@ function decoratePlanet() {
     const in2 = new THREE.Mesh(new THREE.CircleGeometry(o.r * .6, 30), basic(0x9ffff0, { op: .5 })); in2.rotation.x = -Math.PI / 2; in2.position.set(o.x, .035, o.z); world.add(in2);
     for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2, b = new THREE.Mesh(new THREE.DodecahedronGeometry(.35 + (k % 3) * .12, 0), toon(k % 2 ? 0x4a3470 : 0x5a3f80)); b.position.set(o.x + Math.cos(a) * (o.r + .2), .15, o.z + Math.sin(a) * (o.r + .2)); b.rotation.set(k, k, 0); world.add(b); }
     EMIT.push({ k: 'glow', p: [o.x, .4, o.z], c: 0x3ff0d0 }); });
+  OBS.filter(o => o.lava).forEach(o => { const lv = new THREE.Mesh(new THREE.CircleGeometry(o.r, 40), basic(0xff5a1a)); lv.rotation.x = -Math.PI / 2; lv.position.set(o.x, .03, o.z); world.add(lv);
+    const in2 = new THREE.Mesh(new THREE.CircleGeometry(o.r * .62, 30), basic(0xffb347)); in2.rotation.x = -Math.PI / 2; in2.position.set(o.x, .035, o.z); world.add(in2);
+    for (let k = 0; k < 5; k++) { const a = k * 1.3, cr = new THREE.Mesh(new THREE.CircleGeometry(o.r * .09, 10), basic(0xc8401a)); cr.rotation.x = -Math.PI / 2; cr.position.set(o.x + Math.cos(a) * o.r * .55, .04, o.z + Math.sin(a) * o.r * .45); world.add(cr); }
+    const n = Math.round(o.r * 5); for (let k = 0; k < n; k++) { const a = k / n * Math.PI * 2, b = new THREE.Mesh(new THREE.DodecahedronGeometry(.4 + (k % 3) * .15, 0), toon(k % 2 ? 0x2a1a30 : 0x3a2440)); b.position.set(o.x + Math.cos(a) * (o.r + .25), .18, o.z + Math.sin(a) * (o.r + .25)); b.rotation.set(k, k, 0); world.add(b); }
+    EMIT.push({ k: 'glow', p: [o.x, .5, o.z], c: 0xff7a2a }, { k: 'spark', p: [o.x, .3, o.z] }); const L = new THREE.PointLight(0xff6a2a, .9, o.r * 4, 1.6); L.position.set(o.x, 1.2, o.z); L.userData.base = .9; world.add(L); LIGHTS.push(L); });
   OBS.filter(o => o.fum).forEach(o => { cyl(.6, .9, .4, toon(0x4a3470), o.x, .2, o.z, null, 14); const hl = new THREE.Mesh(new THREE.CircleGeometry(.4, 16), basic(0xff9f6a)); hl.rotation.x = -Math.PI / 2; hl.position.set(o.x, .41, o.z); world.add(hl); EMIT.push({ k: 'steam', p: [o.x, .45, o.z] }); });
   // aparatos del exterior
   PL_PROPS.forEach(pp => { const { x, z } = pp;
@@ -1757,7 +1796,7 @@ function buildShip() {
   });
   const corrWall = toon(IS_PLANET ? 0xa8b0c4 : 0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
   // paredes diagonales de las esquinas achaflanadas
-  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(0x78838b, R.a, .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
+  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(IS_PLANET ? 0xaeb2c4 : 0x78838b, R.a, IS_PLANET ? .1 : .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
     [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
       const L = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, th = Math.atan2(n[0], n[1]), g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
       const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m); aoStrip(mx, mz, L, th);
@@ -3084,7 +3123,7 @@ function updateHUD(t) {
   qs('#lockhint').hidden = isTouch || document.pointerLockElement === canvas || !canLook(); canvas.style.cursor = lockFail && canLook() ? 'none' : '';
   drawMap(mini, false);
 }
-const MB = IS_PLANET ? { x0: -80, z0: -60, w: 160, h: 120 } : { x0: -51, z0: -23, w: 101, h: 71 };
+const MB = IS_PLANET ? { x0: -71, z0: -56, w: 143, h: 110 } : { x0: -51, z0: -23, w: 101, h: 71 };
 function mapXf(cv, big) { const W = cv.width, Hh = cv.height; const sc = Math.min(W / MB.w, Hh / MB.h) * (big ? .96 : 1); return { sc, ox: (W - MB.w * sc) / 2, oz: (Hh - MB.h * sc) / 2 }; }
 function mapInv(cv, x, y) { const { sc, ox, oz } = mapXf(cv, true); return { x: (x - ox) / sc + MB.x0, z: (y - oz) / sc + MB.z0 }; }
 function drawMap(cv, big, opt = {}) {
