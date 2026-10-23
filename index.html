@@ -754,48 +754,86 @@ for (let k = 0; k < 7; k++) OBS.push({ x: -43 + k, z: 30.5, r: .5 });
 OBS.push({ x: -37.2, z: 37.1, r: .45 }, { x: 30, z: -11, r: 1.45 }, { x: 21.4, z: -7.3, r: .8 }, { x: -4.5, z: -4.4, r: .7 }, { x: 4.5, z: -4.4, r: .7 }, { x: 0, z: 30, r: 1.75 });
 
 // ================== PLANETA VIOLETA: datos del mapa ==================
-const PL_B = [-54, -40, 54, 40], PL_GAP = .25;
+const PL_B = [-78, -58, 78, 58], PL_GAP = .25, PL_HOLES = [], PL_TUBES = [], PL_PROPS = [];
 function planetData() {
   BTN.x = 0; BTN.z = 0;
+  // edificios: varios forman complejos (salas pegadas con puertas interiores) y otros se unen por pasillos-tubo
   const B = [
-    { n: 'Nave Lucero', r: [-8, -6, 8, 6], f: 0xdfe6ee, a: 0xff9f43, l: 0xffd59a, ring: [[0, -3.4], [3.4, 0], [0, 3.4], [-3.4, 0]] },
-    { n: 'Comunicaciones', r: [-44, -32, -30, -20], f: 0x9fb2c2, a: 0x52c7ff, l: 0xbfe4ff },
-    { n: 'Laboratorio', r: [26, -32, 44, -18], f: 0xc7e8dc, a: 0x36e0ad, l: 0xc8ffe9 },
-    { n: 'Seguridad', r: [-8, -34, 8, -24], f: 0x9fc4aa, a: 0x5fbf7a, l: 0xd2ffd8 },
-    { n: 'Electricidad', r: [-46, 16, -32, 28], f: 0xb3a77e, a: 0xffcc33, l: 0xfff0b0 },
-    { n: 'Invernadero', r: [28, 14, 44, 28], f: 0xa8c98e, a: 0x55c43a, l: 0xe0ffc8 },
-    { n: 'Almacén', r: [-8, 24, 10, 36], f: 0xb59a86, a: 0xc8834a, l: 0xffe0c0 }];
+    { n: 'Cúpula', r: [-10, -8, 10, 8], f: 0xe6e9f2, a: 0xff9f43, l: 0xffd59a, ring: [[0, -3.6], [3.6, 0], [0, 3.6], [-3.6, 0]], dome: 1 },
+    { n: 'Dormitorios', r: [-12, 8.5, 1, 19], f: 0xc9b8e8, a: 0xb18cff, l: 0xe6dcff },
+    { n: 'Enfermería', r: [1.5, 8.5, 14, 19], f: 0xd8eef0, a: 0x36e0ad, l: 0xd8fff4 },
+    { n: 'Laboratorio', r: [28, -42, 46, -28], f: 0xc7e8dc, a: 0x2fd0c0, l: 0xc8ffe9 },
+    { n: 'Muestras', r: [46.5, -42, 58, -32], f: 0xd0d8e8, a: 0x7fa8ff, l: 0xdfe8ff },
+    { n: 'Mando', r: [-6, -50, 12, -38], f: 0xb8c4dc, a: 0x5ab8ff, l: 0xd0e8ff },
+    { n: 'Comunicaciones', r: [-58, -46, -42, -34], f: 0x9fb2c2, a: 0x52c7ff, l: 0xbfe4ff },
+    { n: 'Seguridad', r: [-32, -48, -18, -36], f: 0x9fc4aa, a: 0x5fbf7a, l: 0xd2ffd8 },
+    { n: 'Electricidad', r: [-64, -8, -50, 6], f: 0xb3a77e, a: 0xffcc33, l: 0xfff0b0 },
+    { n: 'Taller', r: [-64, 6.5, -50, 18], f: 0xa8a0a0, a: 0xff7a3d, l: 0xffe0c8 },
+    { n: 'Almacén', r: [-46, 32, -28, 46], f: 0xb59a86, a: 0xc8834a, l: 0xffe0c0 },
+    { n: 'Hangar', r: [-8, 32, 16, 48], f: 0xa9b0ba, a: 0xff5a6e, l: 0xffd6dc, node: [4, 37] },
+    { n: 'Invernadero', r: [42, 2, 60, 18], f: 0x9ccf86, a: 0x55c43a, l: 0xe0ffc8, glass: 1 },
+    { n: 'Observatorio', r: [46, 30, 62, 44], f: 0x9a9ccf, a: 0xc9a0ff, l: 0xe8d8ff, node: [51, 34], dome: 2 }];
   ROOMS.length = 0;
-  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, a: b.a, l: b.l, node: b.ring ? b.ring[0] : c, ctr: c, ch: null, hall: 0, ring: b.ring || null }); });
-  // exterior: el terreno libre se divide en rectángulos transitables alrededor de los edificios
-  const holes = B.map(b => [b.r[0] - PL_GAP, b.r[1] - PL_GAP, b.r[2] + PL_GAP, b.r[3] + PL_GAP]);
-  const xs = [...new Set([PL_B[0], PL_B[2], ...holes.flatMap(h => [h[0], h[2]])])].sort((a, b) => a - b), zs = [...new Set([PL_B[1], PL_B[3], ...holes.flatMap(h => [h[1], h[3]])])].sort((a, b) => a - b);
-  const strips = []; for (let j = 0; j < zs.length - 1; j++) { const z0 = zs[j], z1 = zs[j + 1]; let cur = null;
-    for (let i = 0; i < xs.length - 1; i++) { const x0 = xs[i], x1 = xs[i + 1], cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, free = !holes.some(h => cx > h[0] && cx < h[2] && cz > h[1] && cz < h[3]);
-      if (free) { if (cur) cur[2] = x1; else cur = [x0, z0, x1, z1]; } else if (cur) { strips.push(cur); cur = null; } } if (cur) strips.push(cur); }
-  const merged = []; strips.forEach(st => { const m = merged.find(q => Math.abs(q[0] - st[0]) < 1e-6 && Math.abs(q[2] - st[2]) < 1e-6 && Math.abs(q[3] - st[1]) < 1e-6); if (m) m[3] = st[3]; else merged.push(st.slice()); });
-  merged.forEach(r => ROOMS.push({ n: 'Exterior', r, f: 0x7a5aa0, a: 0x9b7cd0, l: 0xc9b0ff, node: [(r[0] + r[2]) / 2, (r[1] + r[3]) / 2], ctr: null, ch: null, hall: 1, out: 1, ring: null }));
-  // puertas de los edificios: tramos cortos que atraviesan la pared hacia el exterior
+  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, a: b.a, l: b.l, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: null, hall: 0, ring: b.ring || null, dome: b.dome || 0, glass: b.glass || 0 }); });
+  // pasillos: puertas interiores, tubos entre edificios y salidas al exterior
   CORR.length = 0;
-  [[0, [0, -6], [0, -8.6]], [0, [0, 6], [0, 8.6]], [0, [-8, 0], [-10.6, 0]], [0, [8, 0], [10.6, 0]], [1, [-30, -26], [-27.4, -26]], [2, [26, -25], [23.4, -25]], [3, [0, -24], [0, -21.4]],
-   [4, [-32, 22], [-29.4, 22]], [5, [28, 21], [25.4, 21]], [6, [1, 24], [1, 21.4]]].forEach(([a, A, Bp]) => CORR.push({ p: [A, Bp], a, b: -1, w: 3 }));
-  // rocas (obstáculos redondos)
-  OBS.length = 0; [[-20, -18, 2.2], [16, -12, 1.8], [-22, 9, 2.0], [-14, 30, 2.0], [20, 34, 1.8], [-50, 3, 2.6], [50, -4, 2.6], [-28, -4, 1.5], [41, 2, 1.8], [-6, 15, 1.3], [12, -34, 1.6], [-50, -30, 2.2], [50, 32, 2.4], [-50, 34, 2.2], [24, -2, 1.2]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 1 }));
-  OBS.push({ x: 0, z: 0, r: 1.75 });
+  [[[-5, 8], [-5, 8.5], 0, 1], [[6, 8], [6, 8.5], 0, 2], [[1, 14], [1.5, 14], 1, 2], [[46, -37], [46.5, -37], 3, 4], [[-57, 6], [-57, 6.5], 8, 9]].forEach(([A, Bp, a, b]) => CORR.push({ p: [A, Bp], a, b, w: 2.8 }));
+  [[[[12, -40], [28, -40]], 5, 3], [[[-42, -41], [-32, -41]], 6, 7], [[[-57, 18], [-57, 39], [-46, 39]], 9, 10], [[[-4, 19], [-4, 32]], 1, 11], [[[54, 18], [54, 30]], 12, 13]].forEach(([p, a, b]) => CORR.push({ p, a, b, w: 3.5, tube: 1 }));
+  [[0, [0, -8], [0, -10.8]], [0, [-10, 0], [-12.8, 0]], [0, [10, 0], [12.8, 0]], [2, [14, 14], [16.8, 14]], [1, [-12, 14], [-14.8, 14]], [3, [37, -28], [37, -25.2]], [4, [52, -32], [52, -29.2]],
+   [5, [3, -38], [3, -35.2]], [6, [-50, -34], [-50, -31.2]], [7, [-25, -36], [-25, -33.2]], [8, [-50, -1], [-47.2, -1]], [9, [-50, 12], [-47.2, 12]], [10, [-28, 39], [-25.2, 39]], [10, [-37, 32], [-37, 29.2]],
+   [11, [4, 32], [4, 29.2]], [12, [42, 10], [39.2, 10]], [13, [46, 37], [43.2, 37]]].forEach(([a, A, Bp]) => CORR.push({ p: [A, Bp], a, b: -1, w: 3, exit: 1 }));
+  // huecos que ocupan los edificios y los tubos (el terreno libre es todo lo demás)
+  PL_HOLES.length = 0; PL_TUBES.length = 0;
+  B.forEach(b => PL_HOLES.push([b.r[0] - PL_GAP, b.r[1] - PL_GAP, b.r[2] + PL_GAP, b.r[3] + PL_GAP]));
+  CORR.forEach(c => { if (!c.tube) return; const h = c.w / 2, n = c.p.length;
+    for (let i = 0; i < n - 1; i++) { const A = c.p[i], Bq = c.p[i + 1], ea = i === 0 ? 0 : h, eb = i === n - 2 ? 0 : h; let r;
+      if (Math.abs(A[0] - Bq[0]) < 1e-6) { const up = A[1] < Bq[1], za = A[1] + (up ? -ea : ea), zb = Bq[1] + (up ? eb : -eb); r = [A[0] - h, Math.min(za, zb), A[0] + h, Math.max(za, zb)]; }
+      else { const rt = A[0] < Bq[0], xa = A[0] + (rt ? -ea : ea), xb = Bq[0] + (rt ? eb : -eb); r = [Math.min(xa, xb), A[1] - h, Math.max(xa, xb), A[1] + h]; }
+      PL_TUBES.push(r); PL_HOLES.push([r[0] - PL_GAP, r[1] - PL_GAP, r[2] + PL_GAP, r[3] + PL_GAP]); } });
+  // rocas, mesetas, fumarolas y aparatos del exterior (obstáculos redondos)
+  OBS.length = 0;
+  [[-22, -22, 2.2], [16, -30, 1.6], [-36, 6, 2.0], [-16, 40, 2.0], [24, 40, 1.8], [-72, -6, 2.6], [70, -12, 2.6], [-40, -13, 1.5], [66, 24, 1.8], [-25, 13, 1.3], [22, -50, 1.6], [-70, -46, 2.4],
+   [70, 50, 2.4], [-70, 50, 2.2], [31, 17, 1.4], [-8, -21, 1.2], [45, -14, 1.6], [-67, 40, 1.8], [62, -48, 2.0], [-40, 52, 1.8], [-62, -22, 1.6], [6, 53, 1.5], [36, -52, 1.4], [-48, 20, 1.2], [20, 24, 1.3]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 1 }));
+  [[-30, -54, 3.4], [50, -54.5, 3.0], [-74, 20, 3.4], [74, 6, 3.4], [-14, 54.5, 3.0], [73, -36, 3.0], [-74, -34, 3.0], [44, 55, 2.8]].forEach(([x, z, r]) => OBS.push({ x, z, r, rock: 2 }));
+  OBS.push({ x: 36, z: 50, r: 3.4, pond: 1 }, { x: 0, z: 0, r: 1.75 });
+  [[-12, -27], [40, -17], [-66, -30], [66, -2], [-24, 52]].forEach(([x, z]) => OBS.push({ x, z, r: .8, fum: 1 }));
+  PL_PROPS.length = 0;
+  const prop = (k, x, z, r) => { PL_PROPS.push({ k, x, z }); if (r) OBS.push({ x, z, r }); };
+  prop('antenna', -45, -25, .6); [12, 18, 24].forEach(x => prop('solar', x, -22.4, 1.3)); prop('probe', -30, -.4, 1.2); prop('seismo', -20, 22.9, .6); prop('drill', -68, 26.6, 1.4); prop('cristal', 28, .3, .8);
+  [[24.5, -2], [31.5, -2.5], [29, -5], [25, 4.8], [32, 4], [22, 1.5]].forEach(([x, z]) => prop('crystals', x, z, .7));
+  // nodos del terreno: un punto libre cerca del centro de cada trozo
+  const tiles = []; const holes = PL_HOLES;
+  const xs = [...new Set([PL_B[0], PL_B[2], ...holes.flatMap(h => [h[0], h[2]])])].sort((a, b) => a - b), zs = [...new Set([PL_B[1], PL_B[3], ...holes.flatMap(h => [h[1], h[3]])])].sort((a, b) => a - b);
+  const strips = []; for (let j = 0; j < zs.length - 1; j++) { const z0 = zs[j], z1 = zs[j + 1]; let cur = null; if (z1 - z0 < 1e-6) continue;
+    for (let i = 0; i < xs.length - 1; i++) { const x0 = xs[i], x1 = xs[i + 1]; if (x1 - x0 < 1e-6) continue; const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, free = !holes.some(h => cx > h[0] && cx < h[2] && cz > h[1] && cz < h[3]);
+      if (free) { if (cur) cur[2] = x1; else cur = [x0, z0, x1, z1]; } else if (cur) { strips.push(cur); cur = null; } } if (cur) strips.push(cur); }
+  strips.forEach(st => { const m = tiles.find(q => Math.abs(q[0] - st[0]) < 1e-6 && Math.abs(q[2] - st[2]) < 1e-6 && Math.abs(q[3] - st[1]) < 1e-6); if (m) m[3] = st[3]; else tiles.push(st.slice()); });
+  const okPt = (x, z) => !OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + 1.3) && !holes.some(h => x > h[0] - 1.2 && x < h[2] + 1.2 && z > h[1] - 1.2 && z < h[3] + 1.2) && x > PL_B[0] + 1.5 && x < PL_B[2] - 1.5 && z > PL_B[1] + 1.5 && z < PL_B[3] - 1.5;
+  tiles.forEach(r => { const cx = (r[0] + r[2]) / 2, cz = (r[1] + r[3]) / 2; let best = null, bd = 1e9;
+    for (let x = r[0] - 5; x <= r[2] + 5; x += .5) for (let z = r[1] - 5; z <= r[3] + 5; z += .5) { if (!okPt(x, z)) continue; const d = Math.hypot(x - cx, z - cz); if (d < bd) { bd = d; best = [x, z]; } }
+    ROOMS.push({ n: 'Exterior', r, f: 0x7a5aa0, a: 0x9b7cd0, l: 0xc9b0ff, node: best || [cx, cz], ctr: null, ch: null, hall: 1, out: 1, ring: null }); });
   // tareas
   ST.length = 0; ST.push(
-    { c: [-43.55, -26], t: 'dial', n: 'Sintonizar receptor' }, { c: [-37, -31.55], t: 'download', n: 'Descargar datos' },
-    { c: [35, -31.55], t: 'samples', n: 'Analizar muestras' }, { c: [43.55, -22], t: 'scan', n: 'Escáner médico' },
-    { c: [-7.55, -29], t: 'swipe', n: 'Pasar tarjeta' }, { c: [-45.55, 20], t: 'cables', n: 'Arreglar cables' }, { c: [-39, 27.55], t: 'power', n: 'Desviar energía' },
-    { c: [43.55, 18], t: 'plants', n: 'Regar plantas' }, { c: [36, 27.55], t: 'sort', n: 'Ordenar semillas' }, { c: [9.55, 30], t: 'sort', n: 'Ordenar minerales' }, { c: [-7.55, 30], t: 'fuel', n: 'Cargar combustible' },
-    { c: [4, -5.55], t: 'gauge', n: 'Fijar rumbo' }, { c: [-4, -5.55], t: 'upload', n: 'Subir datos' }, { c: [5, 5.55], t: 'trash', n: 'Vaciar basura' },
-    { man: 1, c: [-37, -14.4], p: [-37, -13.2], yaw: 0, t: 'dial', n: 'Reparar antena' }, { man: 1, c: [36, -10.4], p: [36, -9.2], yaw: 0, t: 'wipe', n: 'Limpiar paneles solares' },
-    { man: 1, c: [-24, 3.4], p: [-24, 4.6], yaw: 0, t: 'gauge', n: 'Revisar sonda' }, { man: 1, c: [16, 21.4], p: [16, 22.6], yaw: 0, t: 'samples', n: 'Recoger cristales' }, { man: 1, c: [-10, 12.4], p: [-10, 13.6], yaw: 0, t: 'align', n: 'Medir seísmos' });
-  FIX.length = 0; FIX.push({ k: 0, c: [-32.45, 18.5], t: 'levers', n: 'Panel de luces' }, { k: 1, c: [26.45, -30], t: 'hand', n: 'Estabilizador A' }, { k: 2, c: [26.45, -20], t: 'hand', n: 'Estabilizador B' },
-    { k: 3, c: [-30.45, -30], t: 'dial', n: 'Restaurar señal' }, { k: 4, c: [-7.55, 34.5], t: 'power', n: 'Generador de gravedad' });
-  CAMS.length = 0; CAMS.push({ n: 'Exterior oeste', p: [-10.6, 4.4, -7.4], t: [-24, 0, -12] }, { n: 'Exterior este', p: [10.6, 4.4, 7.4], t: [24, 0, 12] }, { n: 'Laboratorio', p: [43.4, 2.85, -31.4], t: [34, .4, -24] }, { n: 'Almacén', p: [9.4, 2.85, 35.4], t: [1, .4, 29] });
-  CAM_DESK.p = [0, -31.9];
-  VENTS.length = 0; VENTS.push({ p: [-5, 3.5], net: 0 }, { p: [-33.5, -23], net: 0 }, { p: [-35, 25.5], net: 0 }, { p: [5.5, -3.5], net: 1 }, { p: [29.5, -21], net: 1 }, { p: [31, 25.5], net: 1 }, { p: [5.5, -26.5], net: 2 }, { p: [7.5, 26.5], net: 2 });
+    { c: [-6, -7.55], t: 'upload', n: 'Subir datos' }, { c: [6, -7.55], t: 'numbers', n: 'Introducir código' },
+    { c: [-11.55, 11.6], t: 'trash', n: 'Vaciar basura' }, { c: [-8, 18.55], t: 'sort', n: 'Ordenar taquillas' },
+    { c: [13.55, 10.5], t: 'scan', n: 'Escáner médico' }, { c: [8, 18.55], t: 'samples', n: 'Analizar sangre' },
+    { c: [32, -41.55], t: 'samples', n: 'Analizar muestras' }, { c: [41, -41.55], t: 'align', n: 'Calibrar microscopio' }, { c: [57.55, -37], t: 'sort', n: 'Ordenar minerales' },
+    { c: [-5.55, -44], t: 'download', n: 'Descargar datos' }, { c: [3, -49.55], t: 'gauge', n: 'Fijar rumbo' },
+    { c: [-57.55, -40], t: 'dial', n: 'Sintonizar receptor' }, { c: [-50, -45.55], t: 'download', n: 'Enviar informe' }, { c: [-18.45, -42], t: 'swipe', n: 'Pasar tarjeta' },
+    { c: [-63.55, -4], t: 'cables', n: 'Arreglar cables' }, { c: [-57, -7.55], t: 'power', n: 'Desviar energía' }, { c: [-63.55, 12], t: 'weld', n: 'Soldar placa' }, { c: [-61, 17.55], t: 'fuel', n: 'Cargar combustible' },
+    { c: [-45.55, 43], t: 'sort', n: 'Ordenar cajas' }, { c: [15.55, 40], t: 'fuel', n: 'Repostar el rover' }, { c: [-7.55, 42], t: 'align', n: 'Alinear motor' },
+    { c: [59.55, 6], t: 'plants', n: 'Regar plantas' }, { c: [48, 17.55], t: 'sort', n: 'Ordenar semillas' }, { c: [61.55, 37], t: 'align', n: 'Alinear telescopio' }, { c: [54, 43.55], t: 'asteroids', n: 'Vigilar meteoritos' },
+    { man: 1, c: [-45, -22.6], p: [-45, -21.4], yaw: 0, t: 'dial', n: 'Reparar antena' }, { man: 1, c: [18, -19.6], p: [18, -18.4], yaw: 0, t: 'wipe', n: 'Limpiar paneles solares' },
+    { man: 1, c: [-30, 2.0], p: [-30, 3.2], yaw: 0, t: 'gauge', n: 'Revisar sonda' }, { man: 1, c: [28, 1.6], p: [28, 2.8], yaw: 0, t: 'samples', n: 'Recoger cristales' },
+    { man: 1, c: [-20, 24], p: [-20, 25.2], yaw: 0, t: 'align', n: 'Medir seísmos' }, { man: 1, c: [-68, 28.4], p: [-68, 29.6], yaw: 0, t: 'gauge', n: 'Revisar perforadora' });
+  FIX.length = 0; FIX.push({ k: 0, c: [-50.45, 3], t: 'levers', n: 'Panel de luces' }, { k: 1, c: [28.45, -35], t: 'hand', n: 'Estabilizador A' }, { k: 2, c: [45.55, -31], t: 'hand', n: 'Estabilizador B' },
+    { k: 3, c: [-42.45, -36.5], t: 'dial', n: 'Restaurar señal' }, { k: 4, c: [-34, 45.55], t: 'power', n: 'Generador de gravedad' });
+  CAMS.length = 0; CAMS.push({ n: 'Exterior norte', p: [6, 3.4, -37.45], t: [0, 0, -24] }, { n: 'Exterior sur', p: [10, 3.4, 31.45], t: [4, 0, 20] }, { n: 'Laboratorio', p: [45.4, 2.85, -41.4], t: [37, .4, -34] }, { n: 'Almacén', p: [-28.6, 2.85, 45.4], t: [-37, .4, 38] });
+  CAM_DESK.p = [-25, -45.9];
+  VENTS.length = 0; VENTS.push({ p: [-7, 6.6], net: 0 }, { p: [-54, -4], net: 0 }, { p: [-47, -37.5], net: 0 },
+    { p: [11, 16], net: 1 }, { p: [45.5, 13], net: 1 }, { p: [31, -38.5], net: 1 }, { p: [48.5, 42], net: 1 },
+    { p: [9, -45.5], net: 2 }, { p: [-21, -39], net: 2 },
+    { p: [-4, 45], net: 3 }, { p: [-31, 42.5], net: 3 }, { p: [-20, 9.5], net: 3 });
 }
 // pasillos: polilíneas; a/b = sala en cada extremo (-1 si enlaza con otro pasillo)
 const CORR = [
@@ -851,7 +889,7 @@ function setupPoint(s) {
 }
 ST.forEach((s, i) => { s.id = i; s.kind = 'st'; setupPoint(s); });
 // esclusas al espacio (w: punto de la pared, o: hacia fuera)
-const AIRLOCKS = IS_PLANET ? [{ n: 'zona de aterrizaje norte', w: [-20, -10], o: [0, 1] }, { n: 'zona de aterrizaje sur', w: [20, 12], o: [0, -1] }] : [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
+const AIRLOCKS = IS_PLANET ? [{ n: 'zona de aterrizaje oeste', w: [-38, -20], o: [0, 1] }, { n: 'zona de aterrizaje este', w: [30, 32], o: [0, -1] }] : [{ n: 'Sala de armas', w: [27.8, -18], o: [0, -1] }, { n: 'Taquillas', w: [-44, 31.6], o: [-1, 0] }];
 AIRLOCKS.forEach((a, i) => { a.id = i; if (IS_PLANET) { a.in = a.w.slice(); a.out = [a.w[0], 8, a.w[1]]; a.anchor = a.out; a.room = roomAt(a.in[0], a.in[1]); return; } a.in = [a.w[0] - a.o[0] * 1.3, a.w[1] - a.o[1] * 1.3]; a.anchor = [a.w[0] + a.o[0] * .5, 1.25, a.w[1] + a.o[1] * .5]; a.out = [a.w[0] + a.o[0] * 1.9, 1.25, a.w[1] + a.o[1] * 1.9]; a.room = roomAt(a.in[0], a.in[1]); });
 const ROPE_L = 24;
 // tareas exteriores (solo para jugadores humanos; se hacen flotando fuera de la nave)
@@ -861,7 +899,7 @@ const ROPE_L = 24;
   ST.push({ id, kind: 'st', ext: 1, n: e.n, t: e.t, al: e.al, c: e.c, p: e.c, py: e.y, room: a.room, yaw: 0, nr: [-a.o[0], -a.o[1]],
     proxy: { kind: 'st', id, p: a.in, room: a.room, nr: [a.o[0], a.o[1]] } }); });
 const ST_IN = ST.filter(s => !s.ext), ST_EXT = ST.filter(s => s.ext);
-const CANNON = IS_PLANET ? { c: [7.45, -29], p: [6.25, -29], yaw: -Math.PI / 2 } : { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
+const CANNON = IS_PLANET ? { c: [-31.55, -45], p: [-30.35, -45], yaw: Math.PI / 2 } : { c: [33.45, -7.4], p: [32.25, -7.4], yaw: -Math.PI / 2 };
 const roomOf = (x, z) => { const r = roomAt(x, z); return r >= 0 ? ROOMS[r].n : ''; };
 const taskTarget = s => s.ext ? s.proxy : s;
 function pickTasks(human) { const ins = shuffle(ST_IN.map(s => s.id)); if (!human || !ST_EXT.length) return ins.slice(0, TASKS_PER); const t = ins.slice(0, TASKS_PER - 1); t.splice(Math.floor(Math.random() * TASKS_PER), 0, pick(ST_EXT).id); return t; }
@@ -887,9 +925,11 @@ const nearCaf = (x, z) => nearRing(0, x, z);
 const NK = new Map(); const nodeAt = q => { const k = q[0].toFixed(2) + ',' + q[1].toFixed(2); if (!NK.has(k)) NK.set(k, addNode(q)); return NK.get(k); };
 CORR.forEach(c => { const ids = c.p.map(nodeAt); for (let i = 0; i < ids.length - 1; i++) link(ids[i], ids[i + 1]);
   [[c.a, ids[0]], [c.b, ids[ids.length - 1]]].forEach(([r, n]) => { if (r < 0) return; link(n, RING[r] ? nearRing(r, NODES[n][0], NODES[n][1]) : r); }); });
-if (IS_PLANET) { const ids = ROOMS.map((r, i) => r.out ? i : -1).filter(i => i >= 0); CORR.forEach(c => ids.push(nodeAt(c.p[c.p.length - 1])));
-  const clearO = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / .4)); for (let k = 1; k < n; k++) { const t = k / n, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t; if (!inWalk(x, z, .3)) return false; if (OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .45)) return false; } return true; };
-  for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) { const a = NODES[ids[i]], b = NODES[ids[j]]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 20 && clearO(a, b)) link(ids[i], ids[j]); } }
+if (IS_PLANET) { const clearO = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / .4)); for (let k = 1; k < n; k++) { const t = k / n, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t; if (!inWalk(x, z, .4)) return false; if (OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .5)) return false; } return true; };
+  const grid = []; for (let x = PL_B[0] + 4; x <= PL_B[2] - 4; x += 6) for (let z = PL_B[1] + 4; z <= PL_B[3] - 4; z += 6) if (inWalk(x, z, 1.1) && !OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + 1.2)) grid.push(addNode([x, z]));
+  const ids = [...ROOMS.map((r, i) => r.out ? i : -1).filter(i => i >= 0), ...CORR.filter(c => c.exit).map(c => nodeAt(c.p[c.p.length - 1]))];
+  for (let i = 0; i < grid.length; i++) for (let j = i + 1; j < grid.length; j++) { const a = NODES[grid[i]], b = NODES[grid[j]]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 8.6 && clearO(a, b)) link(grid[i], grid[j]); }
+  ids.forEach(k => { const a = NODES[k]; const near = grid.map(g => [Math.hypot(NODES[g][0] - a[0], NODES[g][1] - a[1]), g]).filter(q => q[0] < 13).sort((p, q) => p[0] - q[0]); let n = 0; for (const [, g] of near) { if (clearO(a, NODES[g])) { link(k, g); if (++n >= 3) break; } } }); }
 function losClear(x0, z0, x1, z1) { const d = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.ceil(d / .3)); for (let i = 1; i < n; i++) { const t = i / n; if (!inWalk(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, .05)) return false; } return true; }
 function navPath(s, t) {
   const n = NODES.length, D = Array(n).fill(1e9), Pv = Array(n).fill(-1), done = Array(n).fill(false); D[s] = 0;
@@ -897,14 +937,17 @@ function navPath(s, t) {
     for (const v of ADJ[u]) { const w = D[u] + Math.hypot(NODES[u][0] - NODES[v][0], NODES[u][1] - NODES[v][1]); if (w < D[v]) { D[v] = w; Pv[v] = u; } } }
   const out = []; for (let v = t; v !== -1; v = Pv[v]) out.unshift(v); return out;
 }
-function nearestNode(x, z) { const r = roomAt(x, z); if (r >= 0 && RING[r]) return nearRing(r, x, z); if (r >= 0) return r; let b = -1, bd = 1e9; NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd && losClear(x, z, nd[0], nd[1])) { bd = d; b = i; } }); if (b < 0) NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd) { bd = d; b = i; } }); return b; }
+function nearestNode(x, z) { const r = roomAt(x, z); if (r >= 0 && RING[r]) return nearRing(r, x, z); if (r >= 0 && !(IS_PLANET && ROOMS[r].out)) return r;
+  if (IS_PLANET) { const c = []; NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < 14) c.push([d, i]); }); c.sort((a, b) => a[0] - b[0]); for (const [, i] of c) if (losClear(x, z, NODES[i][0], NODES[i][1])) return i; } let b = -1, bd = 1e9; NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd && losClear(x, z, nd[0], nd[1])) { bd = d; b = i; } }); if (b < 0) NODES.forEach((nd, i) => { const d = Math.hypot(nd[0] - x, nd[1] - z); if (d < bd) { bd = d; b = i; } }); return b; }
 const DOOR_ROOMS = [...new Set(DOORS.map(d => d.room))];
 const SEC_ROOM = ROOMS.findIndex(r => r.n === 'Seguridad');
 let DOOR_ON = new Set();
 function doorBlocked(x, z, rad) { if (!DOOR_ON.size) return false; for (const d of DOORS) { if (!DOOR_ON.has(d.room)) continue; const r = d.rect; if (x > r[0] - rad && x < r[2] + rad && z > r[1] - rad && z < r[3] + rad) return true; } return false; }
 const BUMP = .82; // distancia mínima entre dos personajes
 function freeSpot(x, z) { if (!inWalk(x, z, PR) || doorBlocked(x, z, PR)) return false; for (const o of OBS) if (Math.hypot(x - o.x, z - o.z) < o.r + PR - .03) return false; return true; }
-function inWalk(x, z, rad) { for (let i = 0; i < WALK.length; i++) { const w = WALK[i]; if (x > w[0] + rad && x < w[2] - rad && z > w[1] + rad && z < w[3] - rad && (i >= ROOMS.length || !ROOMS[i].ch || inShape(i, x, z, rad))) return true; } return false; }
+function inWalk(x, z, rad) { for (let i = 0; i < WALK.length; i++) { const w = WALK[i]; if (IS_PLANET && i < ROOMS.length && ROOMS[i].out) continue; if (x > w[0] + rad && x < w[2] - rad && z > w[1] + rad && z < w[3] - rad && (i >= ROOMS.length || !ROOMS[i].ch || inShape(i, x, z, rad))) return true; }
+  if (IS_PLANET && x > PL_B[0] + rad + .5 && x < PL_B[2] - rad - .5 && z > PL_B[1] + rad + .5 && z < PL_B[3] - rad - .5) { for (const h of PL_HOLES) if (x > h[0] - rad && x < h[2] + rad && z > h[1] - rad && z < h[3] + rad) return false; return true; }
+  return false; }
 function movePos(p, dx, dz, rad, ghost) {
   const dchk = !ghost && DOOR_ON.size && !doorBlocked(p.x, p.z, rad);
   const ok = (x, z) => inWalk(x, z, rad) && !(dchk && doorBlocked(x, z, rad));
@@ -968,6 +1011,7 @@ addEventListener('resize', resize); resize();
 const hemi = new THREE.HemisphereLight(0xf2f4f6, 0x5c6266, .6); scene.add(hemi);
 const amb = new THREE.AmbientLight(0xffffff, .12); scene.add(amb);
 const sun = new THREE.DirectionalLight(0xfff4e6, .38); sun.position.set(8, 20, 10); scene.add(sun);
+if (IS_PLANET) { hemi.color.setHex(0xf2e6ff); hemi.groundColor.setHex(0x6a4a90); sun.color.setHex(0xffe6f2); sun.position.set(-14, 22, 9); }
 const LIGHTS = [];
 const GRAD = new THREE.DataTexture(new Uint8Array([105, 105, 105, 185, 185, 185, 255, 255, 255]), 3, 1, THREE.RGBFormat);
 GRAD.minFilter = GRAD.magFilter = THREE.NearestFilter; GRAD.generateMipmaps = false; GRAD.needsUpdate = true;
@@ -1145,6 +1189,7 @@ function buildExterior() {
   const pr = new THREE.Mesh(new THREE.RingGeometry(25, 34, 64), new THREE.MeshBasicMaterial({ color: 0xffd3a1, transparent: true, opacity: .55, side: THREE.DoubleSide, fog: false })); pr.position.copy(pl.position); pr.rotation.set(1.2, .3, .2); SKY.add(pr);
   const moon = new THREE.Mesh(new THREE.SphereGeometry(5, 24, 16), new THREE.MeshToonMaterial({ color: 0x9fb4ff, gradientMap: GRAD, fog: false })); moon.position.set(-75, 30, 70); SKY.add(moon);
   const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map: PART_T, color: 0xfff1c0, transparent: true, depthWrite: false, fog: false })); sunS.scale.set(34, 34, 1); sunS.position.set(40, 70, 60); SKY.add(sunS);
+  if (IS_PLANET) { const m2 = new THREE.Mesh(new THREE.SphereGeometry(10, 30, 20), new THREE.MeshToonMaterial({ color: 0xffb3e0, gradientMap: GRAD, fog: false })); m2.position.set(-38, 46, -84); SKY.add(m2); const m3 = new THREE.Mesh(new THREE.SphereGeometry(3, 18, 12), new THREE.MeshToonMaterial({ color: 0xbfe4ff, gradientMap: GRAD, fog: false })); m3.position.set(-20, 60, -78); SKY.add(m3); }
 }
 function animHatches(dt) { AIRLOCKS.forEach(a => { if (!a.hd) return; ['in', 'out'].forEach(k => { const h = a.hd[k]; if (!h) return; const o0 = h.o; h.o += (h.t - h.o) * Math.min(1, dt * 5); if (Math.abs(h.t - h.o) < .002) h.o = h.t; if (o0 === h.o) return;
   h.parts.forEach(o => o.position.set(o.userData.p0.x + h.sl[0] * h.o * 1.6, o.userData.p0.y, o.userData.p0.z + h.sl[1] * h.o * 1.6)); h.wheel.rotation.z = h.o * 7; }); }); }
@@ -1426,14 +1471,273 @@ const CLIFF_T = new THREE.CanvasTexture(cvs(256, 256, (g) => { const gr = g.crea
   for (let y = 0; y < 256; y += 18 + Math.random() * 14) { g.fillStyle = `rgba(20,8,40,${.25 + Math.random() * .2})`; g.fillRect(0, y, 256, 3 + Math.random() * 4); }
   for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(220,200,255,${Math.random() * .12})`; g.fillRect(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 10, 2); } }));
 CLIFF_T.wrapS = CLIFF_T.wrapT = THREE.RepeatWrapping;
+const VIEW_T = new THREE.CanvasTexture(cvs(256, 128, (g) => { const gr = g.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, '#1c1036'); gr.addColorStop(.62, '#6a3f8f'); gr.addColorStop(1, '#d58ab8'); g.fillStyle = gr; g.fillRect(0, 0, 256, 128);
+  for (let i = 0; i < 46; i++) { g.fillStyle = `rgba(255,255,255,${.4 + Math.random() * .6})`; g.fillRect(Math.random() * 256, Math.random() * 64, 1.6, 1.6); }
+  g.fillStyle = '#ffd6ee'; g.beginPath(); g.arc(198, 30, 11, 0, 7); g.fill(); g.fillStyle = '#ff9f6a'; g.beginPath(); g.arc(60, 40, 5, 0, 7); g.fill();
+  g.fillStyle = '#4a2d6e'; g.beginPath(); g.moveTo(0, 128); for (let x = 0; x <= 256; x += 12) g.lineTo(x, 94 - Math.abs(Math.sin(x * .045)) * 24 - (x * 7 % 9)); g.lineTo(256, 128); g.fill();
+  g.fillStyle = '#2f1c4a'; g.fillRect(0, 112, 256, 16); }));
+const SKYD_T = new THREE.CanvasTexture(cvs(256, 256, (g) => { const gr = g.createRadialGradient(128, 128, 10, 128, 128, 128); gr.addColorStop(0, '#3a2466'); gr.addColorStop(1, '#140a2a'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 120; i++) { g.fillStyle = `rgba(255,255,255,${.3 + Math.random() * .7})`; g.fillRect(Math.random() * 256, Math.random() * 256, 1.8, 1.8); } g.fillStyle = '#ffb3e0'; g.beginPath(); g.arc(170, 80, 18, 0, 7); g.fill(); }));
+const TUN_T = new THREE.CanvasTexture(cvs(256, 128, (g) => { g.fillStyle = '#4c3670'; g.fillRect(0, 0, 256, 128);
+  for (let i = 0; i < 520; i++) { g.fillStyle = Math.random() < .55 ? `rgba(20,8,40,${.18 + Math.random() * .3})` : `rgba(180,140,230,${.07 + Math.random() * .14})`; g.beginPath(); g.arc(Math.random() * 256, Math.random() * 128, 2 + Math.random() * 9, 0, 7); g.fill(); }
+  g.strokeStyle = 'rgba(18,6,36,.55)'; g.lineWidth = 2; for (let k = 0; k < 7; k++) { let x = Math.random() * 256, y = Math.random() * 128; g.beginPath(); g.moveTo(x, y); for (let j = 0; j < 5; j++) { x += (Math.random() - .5) * 50; y += (Math.random() - .5) * 40; g.lineTo(x, y); } g.stroke(); } }));
+TUN_T.wrapS = TUN_T.wrapT = THREE.RepeatWrapping;
+const HOLE_T = new THREE.CanvasTexture(cvs(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.72, 'rgba(10,4,20,.95)'); gr.addColorStop(.9, 'rgba(30,16,52,.6)'); gr.addColorStop(1, 'rgba(40,24,70,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }));
+const PATCH_T = new THREE.CanvasTexture(cvs(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.6, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }));
+const HAZ_T = new THREE.CanvasTexture(cvs(128, 32, (g) => { g.fillStyle = '#ffcc33'; g.fillRect(0, 0, 128, 32); g.fillStyle = '#2a2450'; for (let x = -32; x < 160; x += 24) { g.beginPath(); g.moveTo(x, 32); g.lineTo(x + 12, 32); g.lineTo(x + 44, 0); g.lineTo(x + 32, 0); g.fill(); } }));
+HAZ_T.wrapS = THREE.RepeatWrapping;
+// agujero real en el suelo: la máscara marca la plantilla (stencil) y el suelo no se pinta encima
+const HOLE_MASK = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+const inHole = m => { m.stencilWrite = true; m.stencilRef = 1; m.stencilFunc = THREE.EqualStencilFunc; m.stencilFail = m.stencilZFail = m.stencilZPass = THREE.KeepStencilOp; return m; };
+const notHole = m => { m.stencilWrite = true; m.stencilRef = 1; m.stencilFunc = THREE.NotEqualStencilFunc; m.stencilFail = m.stencilZFail = m.stencilZPass = THREE.KeepStencilOp; return m; };
+const SHAFT_M = inHole(new THREE.MeshToonMaterial({ color: 0x8a72b0, map: TUN_T, gradientMap: GRAD, side: THREE.BackSide })), SHAFT_B = inHole(new THREE.MeshBasicMaterial({ color: 0x07030e }));
 function planetWall(e) {
   const L = e.b - e.a, mid = (e.a + e.b) / 2, q = e.ax === 'z' ? [mid, e.v + e.out * .15] : [e.v + e.out * .15, mid];
-  const bi = ROOMS.findIndex(r => !r.out && q[0] > r.r[0] - PL_GAP - .05 && q[0] < r.r[2] + PL_GAP + .05 && q[1] > r.r[1] - PL_GAP - .05 && q[1] < r.r[3] + PL_GAP + .05);
-  const rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), at = (h, m2) => { const g = new THREE.PlaneGeometry(L, h); scaleUV(g, L / (h > 5 ? 8 : 3), h > 5 ? 1 : 1); const m = new THREE.Mesh(g, m2); m.rotation.y = rot; if (e.ax === 'z') m.position.set(mid, h / 2, e.v); else m.position.set(e.v, h / 2, mid); world.add(m); return m; };
-  if (bi >= 0) { const B = ROOMS[bi]; at(WALL_H + .12, toon(0xd2d6de, { map: WALL_T }));
-    const px = e.ax === 'z' ? mid : e.v - e.out * .03, pz = e.ax === 'z' ? e.v - e.out * .03 : mid, sx = e.ax === 'z' ? L : .07, sz = e.ax === 'z' ? .07 : L;
-    box(sx, .22, sz, toon(B.a, { e: B.a, ei: .25 }), px, 2.55, pz, null, false); box(sx, .3, sz, toon(0x3c3550), px, .15, pz, null, false); box(sx + (e.ax === 'z' ? .2 : .14), .16, sz + (e.ax === 'x' ? .2 : .14), toon(0x8a8fa0), px, WALL_H + .08, pz, null, false); }
-  else { at(9, toon(0xffffff, { map: CLIFF_T })); }
+  const near = (r, m) => q[0] > r[0] - m && q[0] < r[2] + m && q[1] > r[1] - m && q[1] < r[3] + m;
+  const bi = ROOMS.findIndex(r => !r.out && near(r.r, PL_GAP + .05)), tube = bi < 0 && PL_TUBES.some(t => near(t, PL_GAP + .05));
+  const rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
+  const P = (s, off) => e.ax === 'z' ? [s, e.v + e.out * off] : [e.v + e.out * off, s]; // off > 0: hacia dentro del edificio
+  const plane = (w, h, m2, s, y, off, r2 = rot, geo) => { const m = new THREE.Mesh(geo || new THREE.PlaneGeometry(w, h), m2); m.rotation.y = r2; const [x, z] = P(s, off); m.position.set(x, y, z); world.add(m); return m; };
+  const bar = (len, h, dep, m2, s, y, off) => { const [x, z] = P(s, off); return box(e.ax === 'z' ? len : dep, h, e.ax === 'z' ? dep : len, m2, x, y, z, null, false); };
+  if (bi < 0 && !tube) { const g = new THREE.PlaneGeometry(L, 9); scaleUV(g, L / 8, 1); plane(L, 9, toon(0xffffff, { map: CLIFF_T }), mid, 4.5, 0, rot, g); return; }
+  const B = bi >= 0 ? ROOMS[bi] : null, acc = B ? B.a : 0x8fb3d9, H = WALL_H + .12;
+  { const g = new THREE.PlaneGeometry(L, H); scaleUV(g, L / 3, 1); plane(L, H, toon(B ? mix(0xeae7f3, B.a, .1) : 0xd3d9e6, { map: WALL_T }), mid, H / 2, 0, rot, g); }
+  bar(L + .5, .12, .6, toon(0x4a4466), mid, .06, -.3);
+  bar(L, .5, .1, toon(0x3c3550), mid, .25, -.04);
+  bar(L, .14, .08, toon(acc, { e: acc, ei: .3 }), mid, 1.0, -.04);
+  bar(L + .1, .2, .24, toon(0x8a8fa0), mid, H + .02, 0);
+  if (B && L > 3.4) { // ventanas altas: por fuera se ve la luz de dentro y por dentro el paisaje
+    const n = Math.floor((L - 1.6) / 4), glowM = basic(lighter(B.l, .25)), frM = toon(0x4b5296), viewM = basic(0xffffff, { map: VIEW_T });
+    for (let k = 0; k < n; k++) { const s = e.a + (L - (n - 1) * 4) / 2 + k * 4; if (s < e.a + 1.3 || s > e.b - 1.3) continue;
+      const pin = P(s, PL_GAP + .2); if ([...ST, ...FIX].some(t => !t.man && Math.hypot(t.c[0] - pin[0], t.c[1] - pin[1]) < 1.7) || Math.hypot(CAM_DESK.p[0] - pin[0], CAM_DESK.p[1] - pin[1]) < 3.2 || Math.hypot(CANNON.c[0] - pin[0], CANNON.c[1] - pin[1]) < 1.6) continue;
+      plane(1.7, .8, glowM, s, 2.35, -.02);
+      bar(1.9, .1, .12, frM, s, 2.8, -.05); bar(1.9, .1, .12, frM, s, 1.9, -.05); bar(.1, .9, .12, frM, s - .9, 2.35, -.05); bar(.1, .9, .12, frM, s + .9, 2.35, -.05);
+      plane(1.7, .8, viewM, s, 2.35, PL_GAP + .015, rot + Math.PI);
+      bar(1.9, .08, .06, frM, s, 2.79, PL_GAP + .03); bar(1.9, .08, .06, frM, s, 1.91, PL_GAP + .03); bar(.08, .9, .06, frM, s - .89, 2.35, PL_GAP + .03); bar(.08, .9, .06, frM, s + .89, 2.35, PL_GAP + .03); } }
+  if (tube && L > 2.5) { // ojos de buey del pasillo-tubo
+    const n = Math.floor(L / 4), glowM = basic(0xbfe4ff), viewM = basic(0xffffff, { map: VIEW_T }), rimM = toon(0x4b5296);
+    for (let k = 0; k < n; k++) { const s = e.a + (L - (n - 1) * 4) / 2 + k * 4; if (s < e.a + .8 || s > e.b - .8) continue;
+      plane(0, 0, glowM, s, 1.85, -.02, rot, new THREE.CircleGeometry(.36, 18)); plane(0, 0, rimM, s, 1.85, -.05, rot, new THREE.TorusGeometry(.4, .06, 6, 20));
+      plane(0, 0, viewM, s, 1.85, PL_GAP + .015, rot + Math.PI, new THREE.CircleGeometry(.36, 18)); plane(0, 0, rimM, s, 1.85, PL_GAP + .03, rot + Math.PI, new THREE.TorusGeometry(.4, .05, 6, 20)); } }
+}
+// alcantarilla: un agujero de verdad en el suelo que baja a un túnel
+function buildHole(v) {
+  const g = new THREE.Group(); g.position.set(v.p[0], 0, v.p[1]); world.add(g); g.userData.keep = 1; g.userData.dyn = 1;
+  const out = ROOMS[v.room] && ROOMS[v.room].out, R = .6, depth = 1.35;
+  const mask = new THREE.Mesh(new THREE.CircleGeometry(R, 32), HOLE_MASK); mask.rotation.x = -Math.PI / 2; mask.position.y = .02; mask.renderOrder = -20; g.add(mask);
+  const sh = new THREE.Mesh(new THREE.CylinderGeometry(R, R, depth, 24, 1, true), SHAFT_M); sh.position.y = -depth / 2 + .01; sh.renderOrder = 5; g.add(sh);
+  const bt = new THREE.Mesh(new THREE.CircleGeometry(R, 24), SHAFT_B); bt.rotation.x = -Math.PI / 2; bt.position.y = -depth + .02; bt.renderOrder = 5; g.add(bt);
+  const fade = new THREE.Mesh(new THREE.CylinderGeometry(R * .98, R * .98, depth * .9, 24, 1, true), inHole(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: .45, side: THREE.BackSide, depthWrite: false }))); fade.position.y = -depth * .55; fade.renderOrder = 6; g.add(fade);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(R + .04, .07, 8, 30), toon(out ? 0x4a3470 : 0x5a6296)); rim.rotation.x = Math.PI / 2; rim.position.y = .03; g.add(rim);
+  if (out) for (let k = 0; k < 6; k++) { const a = k * 1.05 + .3, r = new THREE.Mesh(new THREE.DodecahedronGeometry(.13 + (k % 3) * .05, 0), toon(k % 2 ? 0x5a3f80 : 0x6b4f92)); r.position.set(Math.cos(a) * (R + .22), .06, Math.sin(a) * (R + .22)); r.rotation.set(k, k * 2, 0); g.add(r); }
+  else for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; box(.12, .03, .26, toon(0xffcc33), Math.cos(a) * (R + .2), .02, Math.sin(a) * (R + .2), g, false).rotation.y = -a; }
+  const lid = new THREE.Group(); g.add(lid); lid.userData.dyn = 1; v.lid = lid; v.pop = 0;
+}
+// túneles de roca bajo el planeta (sustituyen a los conductos metálicos)
+function buildTunnels() {
+  const wallM = toon(0xffffff, { map: TUN_T }), floorM = toon(0x9a88b8, { map: ROCK_T }), vaultM = new THREE.MeshToonMaterial({ color: 0xc8b8e6, map: TUN_T, gradientMap: GRAD, side: THREE.DoubleSide }), capM = new THREE.MeshToonMaterial({ color: 0xc8b8e6, map: TUN_T, gradientMap: GRAD, side: THREE.DoubleSide });
+  const flatM = toon(0x3a2858), lampM = basic(0xffd9a8), cableM = toon(0x2a2450), poolM = new THREE.MeshBasicMaterial({ map: POOL_T, transparent: true, depthWrite: false }), shaftM = basic(0xf3dcff), crysM = [0xc9a0ff, 0x7fe6ff, 0xff9fd8].map(c => toon(c, { e: c, ei: .8 }));
+  DUCT_MATS.push(wallM, floorM, vaultM, capM, flatM, lampM, cableM, poolM, shaftM, ...crysM);
+  const RV = DUCT_W / 2, WH = DUCT_H - RV;
+  const capGeo = (() => { const s = new THREE.Shape(); s.moveTo(-RV, 0); s.lineTo(-RV, RV + .002); s.lineTo(RV, RV + .002); s.lineTo(RV, 0); s.absarc(0, 0, RV, 0, Math.PI, false); return new THREE.ShapeGeometry(s, 10); })();
+  DUCTS.forEach(D => {
+    const y0 = D.y, y1 = D.y + DUCT_H, R = D.rects;
+    R.forEach((r, i) => { const [x0, z0, x1, z1] = r, w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, vert = w < d, dy = .003 * (i % 7);
+      const fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); scaleUV(fg, w / 3, d / 3); const fm = new THREE.Mesh(fg, floorM); fm.position.set(cx, y0 + dy, cz); world.add(fm);
+      // tramos de bóveda que no se cruzan con otro túnel; en los cruces, techo plano
+      const a0 = vert ? z0 : x0, a1 = vert ? z1 : x1, cov = [];
+      R.forEach((o, j) => { if (j === i) return; const oa = vert ? o[1] : o[0], ob = vert ? o[3] : o[2], ca = vert ? o[0] : o[1], cb = vert ? o[2] : o[3], ma = vert ? x0 : z0, mb = vert ? x1 : z1;
+        if (cb <= ma + .01 || ca >= mb - .01) return; const l = Math.max(a0, oa), h = Math.min(a1, ob); if (h - l > .01) cov.push([l, h]); });
+      const free = subtract([[a0, a1]], cov);
+      free.forEach(([l, h]) => { const L = h - l, m = (l + h) / 2; if (L < .02) return; const g = new THREE.CylinderGeometry(RV, RV, L, 16, 1, true, vert ? Math.PI / 2 : 0, Math.PI); if (vert) g.rotateX(Math.PI / 2); else g.rotateZ(Math.PI / 2);
+        scaleUV(g, 2, L / 2.4); const vm = new THREE.Mesh(g, vaultM); vm.position.set(vert ? cx : m, y0 + WH, vert ? m : cz); world.add(vm);
+        [l, h].forEach(e => { if (Math.abs(e - a0) < .01 || Math.abs(e - a1) < .01) { if (!cov.some(c => Math.abs(c[0] - e) < .02 || Math.abs(c[1] - e) < .02)) return; }
+          const cm = new THREE.Mesh(capGeo, capM); cm.position.set(vert ? cx : e, y0 + WH, vert ? e : cz); if (!vert) cm.rotation.y = Math.PI / 2; world.add(cm); });
+        // farolillos colgados y cristales que brillan
+        for (let s2 = l + 1.6; s2 < h - 1; s2 += 3.6) { const px = vert ? cx : s2, pz = vert ? s2 : cz; cyl(.012, .012, .32, cableM, px, y1 - .2, pz, null, 4); sph(.09, lampM, px, y1 - .4, pz, null, 8); }
+        for (let s2 = l + 1; s2 < h - .6; s2 += 2.3) { const side = (Math.round(s2 * 7) % 2) ? 1 : -1, px = vert ? cx + side * (RV - .12) : s2, pz = vert ? s2 : cz + side * (RV - .12);
+          const c = new THREE.Mesh(new THREE.ConeGeometry(.07, .3, 5), crysM[Math.abs(Math.round(s2 * 3)) % 3]); c.position.set(px, y0 + .14, pz); c.rotation.set(vert ? 0 : side * .5, 0, vert ? -side * .5 : 0); world.add(c); } });
+      cov.forEach(([l, h]) => { const L = h - l, m = (l + h) / 2; const g = new THREE.PlaneGeometry(vert ? w : L, vert ? L : d); g.rotateX(Math.PI / 2); const pm = new THREE.Mesh(g, flatM); pm.position.set(vert ? cx : m, y1 - dy - .001, vert ? m : cz); world.add(pm); }); });
+    wallSegs(R).forEach(e => { const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, DUCT_H); scaleUV(g, L / 2.4, 1); const m = new THREE.Mesh(g, wallM);
+      m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
+      if (e.ax === 'z') m.position.set(mid, y0 + DUCT_H / 2, e.v); else m.position.set(e.v, y0 + DUCT_H / 2, mid); world.add(m); });
+    D.vents.forEach(id => { const v = VENTS[id];
+      const lt = new THREE.Mesh(new THREE.CircleGeometry(.5, 24), shaftM); lt.rotation.x = Math.PI / 2; lt.position.set(v.p[0], y1 - .04, v.p[1]); world.add(lt);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(.52, .06, 6, 24), cableM); ring.rotation.x = Math.PI / 2; ring.position.set(v.p[0], y1 - .05, v.p[1]); world.add(ring);
+      const pool = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.8), poolM); pool.rotation.x = -Math.PI / 2; pool.position.set(v.p[0], y0 + .03, v.p[1]); world.add(pool);
+      const sg = sprText(ROOMS[v.room].out ? 'Exterior' : ROOMS[v.room].n, { size: 54, color: '#e6d0ff', w: 1.5 }); sg.position.set(v.p[0], y0 + 1.12, v.p[1]); world.add(sg); });
+  });
+}
+function decoratePlanet() {
+  const Y = WALL_H + .12, D = toon(0x2a2f5e), M = toon(0x5a6296), W = toon(0xe8eaf8), Lg = toon(0x9aa4d8), glow = c => toon(c, { e: c, ei: .8 });
+  const obs = (x, z, r) => OBS.push({ x, z, r });
+  const grp = (x, z, ry = 0) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; world.add(g); return g; };
+  let sd = 1234567; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const outside = (x, z, m = 0) => !PL_HOLES.some(h => x > h[0] - m && x < h[2] + m && z > h[1] - m && z < h[3] + m) && x > PL_B[0] + m && x < PL_B[2] - m && z > PL_B[1] + m && z < PL_B[3] - m;
+  const exitEnds = CORR.filter(c => c.exit).map(c => c.p[1]);
+  const freeOut = (x, z, m) => outside(x, z, m) && !OBS.some(o => Math.hypot(x - o.x, z - o.z) < o.r + m) && !exitEnds.some(p => Math.hypot(x - p[0], z - p[1]) < m + 3) && !VENTS.some(v => Math.hypot(x - v.p[0], z - v.p[1]) < m + 1) && !ST.some(s => s.man && Math.hypot(x - s.p[0], z - s.p[1]) < m + 1.5) && !AIRLOCKS.some(a => Math.hypot(x - a.in[0], z - a.in[1]) < m + 2.5);
+  // ---------- suelos: los agujeros de las alcantarillas no se tapan
+  world.traverse(o => { if (o.isMesh && o.position.y < .01 && o.position.y > -.01 && o.material && (o.material.map === FLOOR_T || o.material.map === ROCK_T || o.material.map === CHECK_T)) notHole(o.material); });
+  // ---------- tejados, cúpulas y tubos
+  const roofM = toon(0xb7bdc9, { map: HULL_T }), parM = toon(0x7d8496), acM = toon(0x6f7882);
+  ROOMS.forEach(r => { if (r.out) return; const [x0, z0, x1, z1] = r.r, X0 = x0 - PL_GAP, Z0 = z0 - PL_GAP, X1 = x1 + PL_GAP, Z1 = z1 + PL_GAP, w = X1 - X0, d = Z1 - Z0, cx = (X0 + X1) / 2, cz = (Z0 + Z1) / 2;
+    if (r.glass) { const gm = new THREE.Mesh(new THREE.PlaneGeometry(w, d), basic(0xc8ffe0, { op: .2, side: THREE.DoubleSide })); gm.rotation.x = -Math.PI / 2; gm.position.set(cx, WALL_H + .05, cz); world.add(gm);
+      const fr = toon(0x5a8a5a); for (let x = X0; x <= X1 + .01; x += w / 6) box(.1, .12, d, fr, x, WALL_H + .06, cz, null, false); for (let z = Z0; z <= Z1 + .01; z += d / 5) box(w, .12, .1, fr, cx, WALL_H + .06, z, null, false); }
+    else { const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); scaleUV(g, w / 4, d / 4); const m = new THREE.Mesh(g, roofM); m.position.set(cx, Y, cz); world.add(m); }
+    box(w, .35, .22, parM, cx, Y + .17, Z0 + .11, null, false); box(w, .35, .22, parM, cx, Y + .17, Z1 - .11, null, false); box(.22, .35, d, parM, X0 + .11, Y + .17, cz, null, false); box(.22, .35, d, parM, X1 - .11, Y + .17, cz, null, false);
+    if (r.dome === 1) { const R = Math.min(w, d) * .3, dm = new THREE.Mesh(new THREE.SphereGeometry(R, 30, 12, 0, Math.PI * 2, 0, Math.PI / 2), toon(0xbfe4ff, { op: .45 })); dm.position.set(cx, Y, cz); world.add(dm);
+      const rg = new THREE.Mesh(new THREE.TorusGeometry(R, .14, 8, 40), toon(r.a)); rg.rotation.x = Math.PI / 2; rg.position.set(cx, Y + .08, cz); world.add(rg);
+      for (let k = 0; k < 4; k++) { const rb = new THREE.Mesh(new THREE.TorusGeometry(R, .05, 6, 30, Math.PI), toon(0x8a8fa0)); rb.rotation.y = k * Math.PI / 4; rb.position.set(cx, Y, cz); world.add(rb); }
+      ANIM.pulse.push(sph(.22, glow(0xffd59a), cx, Y + R + .1, cz, null, 10)); }
+    else if (r.dome === 2) { const R = Math.min(w, d) * .32, dm = new THREE.Mesh(new THREE.SphereGeometry(R, 30, 12, 0, Math.PI * 2, 0, Math.PI / 2), toon(0xeef0f8)); dm.position.set(cx, Y, cz); world.add(dm); hull(dm, 1.02);
+      const sl = new THREE.Mesh(new THREE.SphereGeometry(R * 1.012, 4, 10, -.16, .32, 0, Math.PI / 2), D); sl.position.set(cx, Y, cz); sl.rotation.y = .6; world.add(sl); cyl(R + .1, R + .1, .3, toon(0x8a8fa0), cx, Y + .15, cz, null, 30); }
+    else if (!r.glass) { box(1.6, .6, 1.1, acM, cx + w * .25, Y + .3, cz - d * .2); cyl(.36, .36, .05, D, cx + w * .25, Y + .62, cz - d * .2, null, 14); cyl(.13, .13, .9, acM, cx - w * .3, Y + .45, cz + d * .25, null, 10); cyl(.2, .2, .08, D, cx - w * .3, Y + .92, cz + d * .25, null, 10);
+      cyl(.04, .04, 1.8, Lg, X1 - .8, Y + .9, Z0 + .8, null, 6); ANIM.pulse.push(sph(.1, glow(0xff3b4f), X1 - .8, Y + 1.85, Z0 + .8, null, 8)); }
+  });
+  const tubeM = new THREE.MeshToonMaterial({ color: 0xc3cad8, gradientMap: GRAD, side: THREE.DoubleSide }), ribM = toon(0x8a8fa0);
+  PL_TUBES.forEach(t => { const vert = (t[3] - t[1]) > (t[2] - t[0]), L = vert ? t[3] - t[1] : t[2] - t[0], R = (vert ? t[2] - t[0] : t[3] - t[1]) / 2 + PL_GAP, cx = (t[0] + t[2]) / 2, cz = (t[1] + t[3]) / 2;
+    const g = new THREE.CylinderGeometry(R, R, L, 20, 1, true, vert ? Math.PI / 2 : 0, Math.PI); if (vert) g.rotateX(Math.PI / 2); else g.rotateZ(Math.PI / 2);
+    const m = new THREE.Mesh(g, tubeM); m.scale.y = .5; m.position.set(cx, Y - .02, cz); world.add(m);
+    for (let s = 1.5; s < L - .5; s += 3) { const rb = new THREE.Mesh(new THREE.TorusGeometry(R + .03, .08, 6, 20, Math.PI), ribM); rb.scale.y = .5; if (!vert) rb.rotation.y = Math.PI / 2; rb.position.set(vert ? cx : t[0] + s, Y - .02, vert ? t[1] + s : cz); world.add(rb); } });
+  // pilares en las esquinas exteriores
+  const pilM = toon(0x5a6296), capM = glow(0x9cf7d8);
+  ROOMS.forEach(r => { if (r.out) return; const [x0, z0, x1, z1] = r.r; [[x0, z0], [x1, z0], [x0, z1], [x1, z1]].forEach(([x, z]) => { const sx = x === x0 ? -1 : 1, sz = z === z0 ? -1 : 1, px = x + sx * PL_GAP, pz = z + sz * PL_GAP;
+    if (!outside(px + sx * .35, pz + sz * .35) || !outside(px + sx * .35, pz - sz * .35) || !outside(px - sx * .35, pz + sz * .35)) return; box(.44, Y + .3, .44, pilM, px, (Y + .3) / 2, pz); sph(.12, capM, px, Y + .42, pz, null, 8); }); });
+  // salidas: marco, farol, cartel y farolas a los lados
+  CORR.forEach(c => { if (!c.exit) return; const B = ROOMS[c.a], A = c.p[0], E = c.p[1], dx = Math.sign(E[0] - A[0]), dz = Math.sign(E[1] - A[1]), h = c.w / 2;
+    const fx = A[0] + dx * (PL_GAP + .1), fz = A[1] + dz * (PL_GAP + .1), g = grp(fx, fz, Math.atan2(dx, dz)), frM = toon(B.a);
+    const wp = (lx, lz) => [fx + lx * dz + lz * dx, fz - lx * dx + lz * dz];
+    [-1, 1].forEach(s => box(.36, Y, .32, frM, s * (h + .16), Y / 2, 0, g)); box(c.w + .72, Y - 2.6, .32, frM, 0, (Y + 2.6) / 2, 0, g); box(c.w - .2, .08, .2, basic(lighter(B.l, .3)), 0, 2.56, .1, g, false);
+    box(.5, .12, .35, D, 0, 2.95, .32, g, false); sph(.11, glow(0xfff0c8), 0, 2.85, .32, g, 10);
+    box(c.w + .6, .05, 1.4, toon(0x4a4f6a), 0, .025, .85, g, false); box(c.w + .6, .06, .1, toon(0xffcc33), 0, .04, 1.52, g, false);
+    [-1, 1].forEach(s => { const [px, pz] = wp(s * (h + 1.7), 2.4); cyl(.07, .1, 2.4, M, px, 1.2, pz, null, 8); box(.34, .12, .34, D, px, 2.45, pz, null, false); sph(.14, glow(0xffe6b0), px, 2.32, pz, null, 10); obs(px, pz, .25); });
+    const sg = sprText(B.n, { size: 52, bg: hex(darker(B.a, .15)), w: 2.3 }); sg.position.set(fx + dx * .3, 3.75, fz + dz * .3); world.add(sg); });
+  // ===== interiores =====
+  // Cúpula: mesa del botón, bancos, plantas, holograma y claraboya
+  const tb = cyl(1.55, 1.35, .85, toon(0xff9f43), BTN.x, .43, BTN.z, null, 32); hull(tb, 1.03); cyl(1.6, 1.6, .08, toon(0xffcc33), BTN.x, .88, BTN.z, null, 32);
+  const btn = sph(.42, toon(0xff3b4f, { e: 0xff0022, ei: .4 }), BTN.x, .95, BTN.z, null, 20); btn.scale.y = .55; hull(btn, 1.06); const glassD = sph(.6, new THREE.MeshBasicMaterial({ color: 0xbfe4ff, transparent: true, opacity: .25, depthWrite: false }), BTN.x, .92, BTN.z, null, 20); glassD.scale.y = .8;
+  const se = sprText('EMERGENCIA', { size: 46, color: '#ff8a98', w: 1.6 }); se.position.set(BTN.x, 1.75, BTN.z); world.add(se);
+  const hp = sph(.34, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), 0, 2.45, 0, null, 18); const hr = new THREE.Mesh(new THREE.TorusGeometry(.56, .04, 6, 30), glow(0xffcc88)); hr.rotation.x = 1.2; hp.add(hr); ANIM.rings.push({ m: hp, s: .5, ax: 'y', bob: 2.45 });
+  { const sk = new THREE.Mesh(new THREE.CircleGeometry(2.6, 36), basic(0xffffff, { map: SKYD_T })); sk.rotation.x = Math.PI / 2; sk.position.set(0, WALL_H - .03, 0); world.add(sk); const fr = new THREE.Mesh(new THREE.TorusGeometry(2.65, .12, 8, 40), toon(0xff9f43)); fr.rotation.x = Math.PI / 2; fr.position.set(0, WALL_H - .05, 0); world.add(fr); }
+  [[-6.2, -4.2], [6.2, -4.2], [-6.2, 4.2], [6.2, 4.2]].forEach(([x, z]) => { const g = grp(x, z, Math.atan2(x, z)); box(2.2, .18, .7, toon(0x3d7bff), 0, .5, 0, g); box(2.2, .6, .14, toon(0x2f5fd0), 0, .9, .32, g); box(.14, .45, .6, D, -.95, .22, 0, g, false); box(.14, .45, .6, D, .95, .22, 0, g, false); obs(x, z, .9); });
+  [[-9, -7], [9, -7], [-9, 7], [9, 7]].forEach(([x, z]) => { plant(x, z, 1.2); obs(x, z, .45); });
+  // Dormitorios: literas, taquillas y alfombra
+  const bunk = (x, z, ry, col) => { const g = grp(x, z, ry), F = toon(0x8a90b8);
+    [[-.95, -.4], [.95, -.4], [-.95, .4], [.95, .4]].forEach(([a, b]) => box(.08, 2.0, .08, F, a, 1.0, b, g, false));
+    [.45, 1.45].forEach(y => { box(2.0, .12, .9, F, 0, y, 0, g); box(1.85, .16, .8, toon(0xf2f0fa), 0, y + .14, 0, g, false); box(1.1, .1, .82, toon(col), .3, y + .25, 0, g, false); box(.4, .12, .5, toon(0xffffff), -.7, y + .27, 0, g, false); });
+    box(.06, 1.2, .5, F, .99, 1.1, .1, g, false); };
+  [[-10.2, 0xb18cff], [-7.9, 0x5ab8ff], [-.6, 0xff7ac6]].forEach(([x, c]) => { bunk(x, 9.0, 0, c); obs(x - .55, 9.0, .55); obs(x + .55, 9.0, .55); });
+  [.6, -.1].forEach((x, i) => { box(.66, 2.0, .5, toon(i ? 0x8a6bd0 : 0x6a4fb0), x, 1.0, 18.7); box(.06, .3, .04, toon(0xffcc33), x - .2, 1.1, 18.43, null, false); }); obs(.25, 18.6, .6);
+  { const rug = new THREE.Mesh(new THREE.CircleGeometry(2.2, 30), toon(0x7a5ac0)); rug.rotation.x = -Math.PI / 2; rug.position.set(-6, .012, 13.8); world.add(rug); const r2 = new THREE.Mesh(new THREE.RingGeometry(1.5, 1.7, 30), toon(0xffcc88)); r2.rotation.x = -Math.PI / 2; r2.position.set(-6, .016, 13.8); world.add(r2); }
+  // Enfermería: camillas con gotero, armario con cruz
+  const medbed = (x, z) => { const g = grp(x, z); box(.95, .5, 2.1, toon(0xdfe6ee), 0, .45, 0, g); box(.85, .14, 1.95, toon(0xffffff), 0, .77, 0, g, false); box(.9, .1, .9, toon(0x7fe6c8), 0, .86, .45, g, false); box(.6, .12, .35, toon(0xffffff), 0, .88, -.72, g, false);
+    cyl(.03, .03, 1.8, Lg, .66, .9, -.85, g, 6); box(.18, .28, .08, toon(0xbfe4ff, { op: .7 }), .66, 1.7, -.85, g, false); box(.5, .4, .1, D, -.62, 1.45, -.95, g); const sc = new THREE.Mesh(new THREE.PlaneGeometry(.4, .3), basic(0x36e0ad)); sc.position.set(-.62, 1.45, -.89); g.add(sc); cyl(.03, .03, 1.0, Lg, -.62, .75, -.95, g, 6);
+    obs(x, z - .45, .6); obs(x, z + .45, .6); };
+  medbed(3.0, 9.6); medbed(10.5, 9.6);
+  box(.5, 1.8, 1.2, W, 1.8, .9, 17.6); box(.04, .5, .14, glow(0xff3b4f), 2.06, 1.3, 17.6, null, false); box(.04, .14, .5, glow(0xff3b4f), 2.06, 1.3, 17.6, null, false);
+  // Laboratorio: mesas con matraces, tanque con criatura y estantería
+  [[33, -31.5], [41.5, -31.5]].forEach(([x, z], k) => { box(2.6, .9, 1.1, W, x, .45, z); box(2.7, .06, 1.2, toon(0x2fd0c0), x, .93, z, null, false); [-.8, -.2, .5].forEach((dx, i) => { const c = [0x36e0ad, 0xff7ac6, 0xffd93d][i]; cyl(.1, .18, .36, toon(c, { e: c, ei: .5 }), x + dx, 1.14, z, null, 12); });
+    if (k) { box(.3, .1, .3, D, x + 1.0, 1.0, z, null, false); cyl(.05, .05, .5, D, x + 1.0, 1.3, z - .08, null, 6); cyl(.08, .06, .25, Lg, x + 1.0, 1.55, z, null, 8); } obs(x - .65, z, .7); obs(x + .65, z, .7); });
+  { const x = 30.4, z = -29.6; cyl(.8, .9, .4, D, x, .2, z, null, 20); cyl(.7, .7, 2.0, toon(0x9fffe8, { op: .3 }), x, 1.4, z, null, 24); cyl(.62, .62, 1.7, toon(0x2fd0c0, { e: 0x2fd0c0, ei: .5, op: .55 }), x, 1.3, z, null, 20); cyl(.78, .78, .25, D, x, 2.5, z, null, 20);
+    const cr = sph(.24, toon(0xff7ac6), x, 1.4, z, null, 14); sph(.07, toon(0xffffff), .1, .06, .2, cr, 8); sph(.07, toon(0xffffff), -.1, .06, .2, cr, 8); ANIM.rings.push({ m: cr, s: .6, ax: 'y', bob: 1.4 }); EMIT.push({ k: 'glow', p: [x, 2.2, z], c: 0x7fffd4 }); obs(x, z, .9); }
+  { box(2.2, 2.2, .45, toon(0x8a90b8), 36.5, 1.1, -41.7); [.5, 1.2, 1.9].forEach(y => { box(2.1, .05, .4, D, 36.5, y - .05, -41.65, null, false); for (let k = 0; k < 5; k++) { const c = [0xff7ac6, 0x36e0ad, 0xffd93d, 0x7fe6ff, 0xc9a0ff][(k + y * 3 | 0) % 5]; cyl(.09, .09, .3, toon(c, { e: c, ei: .4 }), 35.7 + k * .4, y + .15, -41.55, null, 8); } }); }
+  // Muestras: vitrinas con cristales y una roca rara
+  [48.5, 51.5, 54.5].forEach((x, k) => { box(1.2, .9, .8, M, x, .45, -41.3); box(1.1, .7, .7, toon(0xbfe4ff, { op: .3 }), x, 1.25, -41.3, null, false); const c = [0xc9a0ff, 0x7fe6ff, 0xff9fd8][k]; const cc = new THREE.Mesh(new THREE.ConeGeometry(.16, .5, 5), toon(c, { e: c, ei: .8 })); cc.position.set(x, 1.15, -41.3); world.add(cc); obs(x, -41.3, .55); });
+  cyl(.6, .7, .8, M, 49, .4, -34.2, null, 16); { const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(.5, 0), toon(0x7a4fb0, { e: 0x4a2a80, ei: .4 })); rk.position.set(49, 1.25, -34.2); world.add(rk); hull(rk, 1.06); ANIM.rings.push({ m: rk, s: .4, ax: 'y', bob: 1.25 }); } obs(49, -34.2, .75);
+  // Mando: consolas con pantallas, sillón y mapa holográfico
+  [-2.5, 8.5].forEach(x => { box(3.2, .9, .9, toon(0x4b5296), x, .45, -49.1); const s = new THREE.Mesh(new THREE.PlaneGeometry(2.8, .5), basic(0xffffff, { map: SCR[1].t })); s.rotation.x = -1.0; s.position.set(x, .95, -48.9); world.add(s);
+    const big = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), basic(0xffffff, { map: VIEW_T })); big.position.set(x, 2.25, -49.96); world.add(big); box(3.4, .12, .1, D, x, 3.1, -49.94, null, false); box(3.4, .12, .1, D, x, 1.4, -49.94, null, false); });
+  { const g = grp(5.8, -46.4, -.5); cyl(.1, .2, .5, D, 0, .25, 0, g, 10); box(.8, .16, .8, toon(0x5ab8ff), 0, .55, 0, g); box(.8, .9, .16, toon(0x3d7bff), 0, 1.0, .38, g); obs(5.8, -46.4, .55); }
+  cyl(.8, .9, .9, M, -1.5, .45, -41.5, null, 20); { const hm = new THREE.Mesh(new THREE.CircleGeometry(.7, 24), basic(0x5ab8ff, { op: .6 })); hm.rotation.x = -Math.PI / 2; hm.position.set(-1.5, .92, -41.5); world.add(hm); const hs = sph(.3, toon(0x9b7cd0, { e: 0x6a3fb0, ei: .5 }), -1.5, 1.5, -41.5, null, 14); ANIM.rings.push({ m: hs, s: .8, ax: 'y', bob: 1.5 }); } obs(-1.5, -41.5, .9);
+  // Comunicaciones: servidores y mesa de radio
+  [-56.4, -55.3, -54.2, -47, -45.9, -44.8].forEach(x => { box(.95, 2.1, .7, toon(0x2a3a5e), x, 1.05, -45.5); for (let j = 0; j < 4; j++) box(.6, .05, .02, glow(j % 2 ? 0x36e0ad : 0x52c7ff), x, .6 + j * .35, -45.14, null, false); }); obs(-55.3, -45.4, .8); obs(-45.9, -45.4, .8);
+  box(2.6, .85, .8, M, -55, .43, -34.55); box(.7, .4, .5, D, -55.7, 1.05, -34.6); box(.7, .5, .5, toon(0x52c7ff), -54.4, 1.1, -34.6); cyl(.02, .02, .4, D, -55, 1.1, -34.4, null, 6); sph(.06, D, -55, 1.32, -34.4, null, 8); obs(-55, -34.8, .9);
+  // Seguridad: mesa y pared de cámaras, trajes y taquillas
+  box(2.4, .8, .9, toon(0x4b5296), -25, .4, -46.95); box(2.5, .08, 1.0, D, -25, .82, -46.95); box(4.7, 2.5, .14, toon(0x2a2450), -25, 1.95, -47.86);
+  CAMS.forEach((c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.08), new THREE.MeshBasicMaterial({ map: RT[i].texture })); m.position.set(-25 + (i % 2 ? 1.1 : -1.1), i < 2 ? 2.55 : 1.38, -47.78); m.userData.dyn = 1; world.add(m); MON.push(m); });
+  { const sc2 = sprText('CÁMARAS', { size: 50, color: '#ff8a98', w: 1.4 }); sc2.position.set(-25, 3.0, -47.6); world.add(sc2); }
+  [[-20.6, 0xff9f43], [-19.4, 0x5ab8ff]].forEach(([x, c]) => { box(.6, .1, .5, D, x, .05, -36.6); cyl(.32, .3, .9, toon(c), x, .7, -36.6, null, 14); sph(.34, toon(0xe8eaf8), x, 1.45, -36.6, null, 14); const v = sph(.2, toon(0x2a2450), x, 1.48, -36.9, null, 12); v.scale.z = .5; }); obs(-20, -36.6, .8);
+  box(.5, 2.0, 1.4, toon(0x5fbf7a), -18.3, 1.0, -46.4); box(.04, 1.8, .03, D, -18.54, 1.0, -46.4, null, false); obs(-18.6, -46.4, .7);
+  // Electricidad: generadores y transformador con chispas
+  [[-61.8, -.5], [-61.8, 3.2]].forEach(([x, z]) => { box(1.6, 1.8, 1.4, toon(0x5a5a6a), x, .9, z); box(1.62, .2, 1.42, toon(0xffcc33), x, 1.5, z, null, false); box(.05, .5, .9, glow(0xffcc33), x + .82, 1.0, z, null, false); obs(x, z, .95); });
+  { const x = -52.5, z = -6.3; cyl(.55, .65, .5, D, x, .25, z, null, 16); cyl(.42, .42, 2.0, toon(0x8a6a42), x, 1.5, z, null, 16); [.9, 1.5, 2.1].forEach((y, i) => { const r = new THREE.Mesh(new THREE.TorusGeometry(.5, .07, 8, 26), glow(0xffcc33)); r.rotation.x = Math.PI / 2; r.position.set(x, y, z); world.add(r); ANIM.rings.push({ m: r, s: .6 + i * .3, ax: 'z' }); });
+    sph(.25, glow(0xfff0b0), x, 2.7, z, null, 12); EMIT.push({ k: 'spark', p: [x, 2.6, z] }); obs(x, z, .8); }
+  // Taller: banco de trabajo, brazo robótico y ruedas
+  box(3, .9, 1.0, toon(0x8a6a42), -61.5, .45, 7.1); box(3.1, .08, 1.1, toon(0x5a4a3a), -61.5, .93, 7.1, null, false); box(.4, .25, .3, toon(0xff5a6e), -62.4, 1.1, 7.1); box(.6, .1, .2, Lg, -61, 1.0, 7.2, null, false); cyl(.08, .08, .5, D, -60.5, 1.2, 7.0, null, 8); obs(-62.2, 7.2, .6); obs(-60.8, 7.2, .6);
+  { const x = -52.5, z = 8.4; cyl(.45, .55, .4, toon(0xff7a3d), x, .2, z, null, 14); const a1 = box(.25, 1.4, .25, toon(0xff9f43), x, 1.0, z); a1.rotation.z = .35; const a2 = box(.2, 1.0, .2, toon(0xff9f43), x - .55, 1.75, z); a2.rotation.z = 1.3; sph(.15, D, x - .9, 1.55, z, null, 10); obs(x, z, .7); }
+  [0, 1, 2].forEach(k => { const t = new THREE.Mesh(new THREE.TorusGeometry(.4, .17, 8, 18), toon(0x2a2450)); t.rotation.x = Math.PI / 2; t.position.set(-52.5, .17 + k * .34, 16.6); world.add(t); }); obs(-52.5, 16.6, .65); crate(-54.0, .5, 16.9, 0x8a6a42); obs(-54.0, 16.9, .7);
+  // Almacén: cajas, barriles, toro elevador y mineral
+  [[-44.2, 33.8, 0x8a6a42], [-43.0, 33.8, 0x9a7a52], [-44.2, 35.0, 0x5a7a9a], [-30, 33.8, 0x6a8aaa], [-30, 35.0, 0x8a6a42]].forEach(([x, z, c]) => crate(x, .5, z, c)); crate(-43.6, 1.5, 34.4, 0xc8834a); obs(-43.6, 34.4, 1.1); obs(-30, 34.4, .9);
+  [[-41, 45], [-41.8, 44.6], [-40.4, 44.4]].forEach(([x, z], i) => { cyl(.35, .35, 1.0, toon(i % 2 ? 0x3d7bff : 0xff5a6e), x, .5, z, null, 14); cyl(.36, .36, .08, D, x, .75, z, null, 14); }); obs(-41, 44.7, .9);
+  { const g = grp(-41.5, 37, .4); box(1.2, .8, 1.8, toon(0xffcc33), 0, .7, 0, g); box(1.0, .9, .1, D, 0, 1.55, -.5, g); [-.5, .5].forEach(x => { box(.08, 2.0, .08, D, x, 1.0, -.95, g, false); box(.12, .05, 1.0, D, x, .1, -1.45, g, false); });
+    [[-.6, .5], [.6, .5], [-.6, -.5], [.6, -.5]].forEach(([x, z]) => { const w2 = cyl(.25, .25, .2, D, x, .25, z, g, 12); w2.rotation.z = Math.PI / 2; }); obs(-41.5, 37, 1.0); }
+  [[-29.6, 45]].forEach(([x, z]) => { for (let k = 0; k < 7; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.18, .7, 5), toon(k % 2 ? 0xc9a0ff : 0x7fe6ff, { e: k % 2 ? 0x9b5cff : 0x3cc8ff, ei: .6 })); c.position.set(x + Math.cos(k) * .4, .35, z + Math.sin(k) * .35); c.rotation.z = Math.cos(k * 2) * .3; world.add(c); } obs(x, z, .8); });
+  // Hangar: rover, depósitos de combustible y portón
+  { const g = grp(5, 43); box(5.0, 1.1, 2.4, toon(0xf2f2f8), 0, 1.15, 0, g); box(5.02, .18, 2.42, toon(0xff5a6e), 0, 1.0, 0, g, false); const dm = sph(.95, toon(0x9fd8ff, { op: .6 }), 1.4, 1.7, 0, g, 18); dm.scale.y = .7;
+    [-1.7, 0, 1.7].forEach(x => [-1.3, 1.3].forEach(z => { const w2 = cyl(.5, .5, .35, D, x, .5, z, g, 16); w2.rotation.x = Math.PI / 2; cyl(.22, .22, .37, toon(0x8a8fa0), x, .5, z, g, 10).rotation.x = Math.PI / 2; }));
+    cyl(.03, .03, 1.2, Lg, -2, 2.3, -.8, g, 6); sph(.08, glow(0xff3b4f), -2, 2.9, -.8, g, 8); box(.25, .2, .1, glow(0xfff0c8), 2.52, 1.25, .7, g, false); box(.25, .2, .1, glow(0xfff0c8), 2.52, 1.25, -.7, g, false); obs(3.6, 43, 1.6); obs(6.4, 43, 1.6); }
+  [[14.6, 34.2], [14.6, 35.5]].forEach(([x, z]) => { cyl(.55, .55, 2.0, toon(0xff5a6e), x, 1.0, z, null, 16); cyl(.56, .56, .12, toon(0xffcc33), x, 1.4, z, null, 16); sph(.55, toon(0xff5a6e), x, 2.0, z, null, 14); }); obs(14.6, 34.85, 1.0);
+  { box(10, 2.9, .12, toon(0x8a8fa0), 4, 1.45, 47.9); for (let k = 0; k < 6; k++) box(10, .05, .14, D, 4, .4 + k * .45, 47.85, null, false); const hz = new THREE.Mesh(new THREE.PlaneGeometry(10, .5), toon(0xffffff, { map: HAZ_T })); hz.rotation.x = -Math.PI / 2; hz.position.set(4, .014, 47.3); world.add(hz); scaleUV(hz.geometry, 6, 1); }
+  box(.5, 2.0, 1.6, toon(0x5a6296), -7.7, 1.0, 35.5); [.7, 1.2, 1.7].forEach(y => box(.08, .08, 1.3, toon(0xffcc33), -7.42, y, 35.5, null, false));
+  // Invernadero: jardineras, árboles y una flor gigante
+  [45, 49, 53, 57].forEach(x => { box(3, .6, .9, toon(0x8a5a34), x, .3, 2.8); box(2.8, .05, .7, toon(0x3a2a1a), x, .61, 2.8, null, false); [-1, 0, 1].forEach(k => { const c = [0x55c43a, 0xff7ac6, 0x7fe6ff][(k + 1 + x) % 3]; const p = sph(.24, toon(c), x + k * .9, .85, 2.8, null, 10); hull(p, 1.1); cyl(.03, .03, .3, toon(0x3a8a3a), x + k * .9, .7, 2.8, null, 5); }); obs(x - .8, 2.8, .5); obs(x + .8, 2.8, .5); });
+  [[45, 15.5], [57.5, 15]].forEach(([x, z]) => { tree(x, z); [0, 2.1, 4.2].forEach(a => sph(.1, glow(0xffd93d), x + Math.cos(a) * .5, 1.9, z + Math.sin(a) * .5, null, 8)); obs(x, z, .55); });
+  { const x = 51, z = 5.6; cyl(.06, .09, 1.5, toon(0x3a8a3a), x, .75, z, null, 8); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, pt = new THREE.Mesh(new THREE.SphereGeometry(.3, 10, 8), toon(0xff7ac6, { e: 0xff3b9a, ei: .3 })); pt.scale.set(1, .35, .6); pt.position.set(x + Math.cos(a) * .35, 1.55, z + Math.sin(a) * .35); pt.rotation.y = -a; world.add(pt); } sph(.18, glow(0xffd93d), x, 1.6, z, null, 10); obs(x, z, .6); }
+  // Observatorio: telescopio y mesa de cartas estelares
+  { const g = grp(56, 39.5); cyl(1.1, 1.3, .8, M, 0, .4, 0, g, 22); box(.5, 1.2, .5, D, 0, 1.4, 0, g); const tl = cyl(.42, .55, 4.0, W, 0, 2.6, 0, g, 18); tl.rotation.set(-.75, 0, .3); hull(tl, 1.03); obs(56, 39.5, 1.5); }
+  { cyl(.75, .75, .1, M, 48.6, .85, 32.4, null, 20); cyl(.1, .2, .8, D, 48.6, .4, 32.4, null, 8); const sm = new THREE.Mesh(new THREE.CircleGeometry(.68, 24), basic(0xffffff, { map: SKYD_T })); sm.rotation.x = -Math.PI / 2; sm.position.set(48.6, .91, 32.4); world.add(sm); obs(48.6, 32.4, .8); }
+  // ===== exterior =====
+  // rocas, mesetas, charca y fumarolas
+  OBS.filter(o => o.rock === 1).forEach((o, k) => { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * 1.05, 0), toon(k % 2 ? 0x5a3f80 : 0x6b4f92)); r.position.set(o.x, o.r * .55, o.z); r.scale.y = .75; r.rotation.set(k, k * 2.3, 0); world.add(r); hull(r, 1.03);
+    if (k % 3 === 0) { const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * .45, 0), toon(0x7a5aa0)); r2.position.set(o.x + o.r * .9, o.r * .25, o.z + o.r * .3); world.add(r2); } });
+  OBS.filter(o => o.rock === 2).forEach((o, k) => { const h = 5 + (k % 3) * 1.6; const c = cyl(o.r * .75, o.r, h, toon(k % 2 ? 0x5a3f80 : 0x684a8e), o.x, h / 2, o.z, null, 7); c.rotation.y = k; hull(c, 1.02);
+    const top = cyl(o.r * .82, o.r * .75, .6, toon(0x7a5aa0), o.x, h + .3, o.z, null, 7); top.rotation.y = k;
+    for (let j = 0; j < 3; j++) { const b = new THREE.Mesh(new THREE.DodecahedronGeometry(.5 + j * .2, 0), toon(0x553a78)); const a = k + j * 2.1; b.position.set(o.x + Math.cos(a) * (o.r + .3), .35, o.z + Math.sin(a) * (o.r + .3)); world.add(b); } });
+  OBS.filter(o => o.pond).forEach(o => { const lq = new THREE.Mesh(new THREE.CircleGeometry(o.r, 36), basic(0x3ff0d0, { op: .85 })); lq.rotation.x = -Math.PI / 2; lq.position.set(o.x, .03, o.z); world.add(lq);
+    const in2 = new THREE.Mesh(new THREE.CircleGeometry(o.r * .6, 30), basic(0x9ffff0, { op: .5 })); in2.rotation.x = -Math.PI / 2; in2.position.set(o.x, .035, o.z); world.add(in2);
+    for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2, b = new THREE.Mesh(new THREE.DodecahedronGeometry(.35 + (k % 3) * .12, 0), toon(k % 2 ? 0x4a3470 : 0x5a3f80)); b.position.set(o.x + Math.cos(a) * (o.r + .2), .15, o.z + Math.sin(a) * (o.r + .2)); b.rotation.set(k, k, 0); world.add(b); }
+    EMIT.push({ k: 'glow', p: [o.x, .4, o.z], c: 0x3ff0d0 }); });
+  OBS.filter(o => o.fum).forEach(o => { cyl(.6, .9, .4, toon(0x4a3470), o.x, .2, o.z, null, 14); const hl = new THREE.Mesh(new THREE.CircleGeometry(.4, 16), basic(0xff9f6a)); hl.rotation.x = -Math.PI / 2; hl.position.set(o.x, .41, o.z); world.add(hl); EMIT.push({ k: 'steam', p: [o.x, .45, o.z] }); });
+  // aparatos del exterior
+  PL_PROPS.forEach(pp => { const { x, z } = pp;
+    if (pp.k === 'antenna') { [[-.9, -.9], [.9, -.9], [-.9, .9], [.9, .9]].forEach(([a, b]) => { const l = cyl(.07, .1, 9, toon(0xc9d2dc), x + a * .55, 4.5, z + b * .55, null, 6); l.rotation.set(-b * .1, 0, a * .1); });
+      for (let y = 1.5; y < 9; y += 1.8) box(1.3 - y * .07, .08, 1.3 - y * .07, toon(0xc9d2dc), x, y, z, null, false); box(1.6, .2, 1.6, M, x, 9.1, z);
+      const dish = new THREE.Mesh(new THREE.SphereGeometry(1.7, 22, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), new THREE.MeshToonMaterial({ color: 0xeef2f6, gradientMap: GRAD, side: THREE.DoubleSide })); dish.position.set(x, 9.9, z); dish.rotation.x = -2.3; world.add(dish);
+      ANIM.pulse.push(sph(.2, glow(0xff3b4f), x, 10.6, z, null, 10)); box(1.3, 1.0, .9, M, x, .5, z + 1.1); }
+    else if (pp.k === 'solar') { cyl(.09, .09, 1.2, toon(0x6f7882), x, .6, z, null, 8); const pn = box(3.2, .07, 1.8, toon(0xffffff, { map: SOLAR_T }), x, 1.25, z); pn.rotation.x = -.4; box(.4, .3, .4, D, x, .15, z, null, false); }
+    else if (pp.k === 'probe') { const bd = sph(.9, toon(0xd8dce6), x, .45, z, null, 18); hull(bd, 1.04); box(1.8, .06, .7, toon(0xffffff, { map: SOLAR_T }), x + 1.5, .2, z + .3).rotation.set(.3, .4, .5); [0, 2.1, 4.2].forEach(a => { const l = cyl(.04, .04, 1.2, Lg, x + Math.cos(a) * .9, .35, z + Math.sin(a) * .9, null, 6); l.rotation.set(Math.sin(a) * .9, 0, -Math.cos(a) * .9); });
+      const sc = new THREE.Mesh(new THREE.CircleGeometry(2.4, 24), toon(0x2f1f48)); sc.rotation.x = -Math.PI / 2; sc.position.set(x, .012, z - .4); world.add(sc); EMIT.push({ k: 'steam', p: [x + .3, 1.0, z] }); ANIM.pulse.push(sph(.1, glow(0xff9f43), x, 1.3, z, null, 8)); }
+    else if (pp.k === 'seismo') { [0, 2.1, 4.2].forEach(a => { const l = cyl(.04, .04, 1.4, Lg, x + Math.cos(a) * .35, .65, z + Math.sin(a) * .35, null, 6); l.rotation.set(Math.sin(a) * .3, 0, -Math.cos(a) * .3); }); box(.6, .4, .5, toon(0xffcc33), x, 1.35, z); cyl(.02, .02, .9, D, x + .2, 2.0, z, null, 4); ANIM.pulse.push(sph(.07, glow(0x5cff9a), x + .2, 2.5, z, null, 8)); }
+    else if (pp.k === 'drill') { [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => { const l = cyl(.08, .1, 5.2, toon(0xff9f43), x + a * .6, 2.6, z + b * .6, null, 6); l.rotation.set(-b * .1, 0, a * .1); }); box(1.6, .3, 1.6, M, x, .15, z); box(.9, .25, .9, D, x, 5.1, z);
+      const bit = new THREE.Group(); bit.position.set(x, 0, z); world.add(bit); bit.userData.dyn = 1; cyl(.18, .18, 4.2, toon(0x8a8fa0), 0, 2.6, 0, bit, 10); for (let k = 0; k < 6; k++) box(.5, .06, .1, toon(0xffcc33), 0, .9 + k * .65, 0, bit, false).rotation.y = k * .6; ANIM.rings.push({ m: bit, s: 2.4, ax: 'y' }); EMIT.push({ k: 'steam', p: [x, .3, z] }); }
+    else if (pp.k === 'cristal') { for (let k = 0; k < 7; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.22 + (k % 2) * .08, 1.4 + (k % 3) * .4, 5), toon(0xc9a0ff, { e: 0x9b5cff, ei: .8 })); c.position.set(x + Math.cos(k) * .3, .6, z + Math.sin(k) * .3); c.rotation.set(Math.sin(k) * .35, 0, Math.cos(k) * .35); world.add(c); } EMIT.push({ k: 'glow', p: [x, 1.2, z], c: 0xc9a0ff }); }
+    else if (pp.k === 'crystals') { const col = (Math.round(x + z) % 2) ? 0x7fe6ff : 0xff9fd8; for (let k = 0; k < 4; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.16, .8 + k * .18, 5), toon(col, { e: col, ei: .7 })); c.position.set(x + Math.cos(k * 1.7) * .3, .4, z + Math.sin(k * 1.7) * .3); c.rotation.set(Math.sin(k) * .35, 0, Math.cos(k) * .35); world.add(c); } } });
+  // las tareas del exterior se hacen en un panel sujeto al aparato
+  ST.forEach(s => { if (!s.man) return; const bx = s.c[0] - s.nr[0] * .45, bz = s.c[1] - s.nr[1] * .45; const b = box(1.3, 2.3, .2, M, bx, 1.15, bz); b.rotation.y = s.yaw; box(.12, 2.4, .12, D, bx - Math.cos(s.yaw) * .62, 1.2, bz + Math.sin(s.yaw) * .62, null, false); box(.12, 2.4, .12, D, bx + Math.cos(s.yaw) * .62, 1.2, bz - Math.sin(s.yaw) * .62, null, false); });
+  // zonas de aterrizaje del alien
+  AIRLOCKS.forEach(a => { const [x, z] = a.in; const pad = new THREE.Mesh(new THREE.CircleGeometry(2.6, 36), toon(0x3a2f5e)); pad.rotation.x = -Math.PI / 2; pad.position.set(x, .016, z); world.add(pad);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.7, 2.05, 40), basic(0x5cff9a, { op: .6, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, .022, z); world.add(ring);
+    for (let k = 0; k < 6; k++) { const an = k / 6 * Math.PI * 2; cyl(.08, .1, .25, D, x + Math.cos(an) * 2.8, .12, z + Math.sin(an) * 2.8, null, 8); ANIM.pulse.push(sph(.08, glow(0x5cff9a), x + Math.cos(an) * 2.8, .3, z + Math.sin(an) * 2.8, null, 8)); } });
+  // manchas, cráteres y piedrecitas en el suelo
+  const patchM = [0x2e1c4a, 0x9a7cc8, 0x3f2a63, 0xb08ad8].map(c => new THREE.MeshBasicMaterial({ map: PATCH_T, color: c, transparent: true, opacity: .32, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
+  for (let k = 0, n = 0; k < 400 && n < 46; k++) { const x = PL_B[0] + 3 + rnd() * (PL_B[2] - PL_B[0] - 6), z = PL_B[1] + 3 + rnd() * (PL_B[3] - PL_B[1] - 6), r = 2.5 + rnd() * 6; if (!freeOut(x, z, r * .7)) continue; n++;
+    const p = new THREE.Mesh(new THREE.CircleGeometry(r, 24), patchM[n % 4]); p.rotation.x = -Math.PI / 2; p.position.set(x, .008 + n * .0002, z); p.scale.y = .6 + rnd() * .6; world.add(p); }
+  for (let k = 0, n = 0; k < 200 && n < 7; k++) { const x = PL_B[0] + 6 + rnd() * (PL_B[2] - PL_B[0] - 12), z = PL_B[1] + 6 + rnd() * (PL_B[3] - PL_B[1] - 12), r = 1.6 + rnd() * 1.4; if (!freeOut(x, z, r + 1.2)) continue; n++;
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(r, .32, 6, 26), toon(0x7a5aa0)); rim.rotation.x = Math.PI / 2; rim.scale.z = .45; rim.position.set(x, .04, z); world.add(rim);
+    const fl = new THREE.Mesh(new THREE.CircleGeometry(r, 26), toon(0x4a3470)); fl.rotation.x = -Math.PI / 2; fl.position.set(x, .014, z); world.add(fl); }
+  const pebM = [toon(0x5a3f80), toon(0x7a5aa0), toon(0x4a3470)];
+  for (let k = 0, n = 0; k < 1200 && n < 320; k++) { const x = PL_B[0] + 1 + rnd() * (PL_B[2] - PL_B[0] - 2), z = PL_B[1] + 1 + rnd() * (PL_B[3] - PL_B[1] - 2); if (!outside(x, z, .4) || VENTS.some(v => Math.hypot(x - v.p[0], z - v.p[1]) < 1.2)) continue; n++;
+    const p = new THREE.Mesh(new THREE.DodecahedronGeometry(.06 + rnd() * .16, 0), pebM[n % 3]); p.position.set(x, .03, z); p.rotation.set(rnd() * 3, rnd() * 3, 0); p.scale.y = .6; world.add(p); }
+  for (let k = 0, n = 0; k < 300 && n < 26; k++) { const x = PL_B[0] + 2 + rnd() * (PL_B[2] - PL_B[0] - 4), z = PL_B[1] + 2 + rnd() * (PL_B[3] - PL_B[1] - 4); if (!freeOut(x, z, 1.4)) continue; n++;
+    const col = n % 3 ? 0xc9a0ff : 0x7fe6ff; for (let j = 0; j < 3; j++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.1, .4 + j * .15, 5), toon(col, { e: col, ei: .7 })); c.position.set(x + Math.cos(j * 2.1) * .18, .2, z + Math.sin(j * 2.1) * .18); c.rotation.set(Math.sin(j + n) * .4, 0, Math.cos(j + n) * .4); world.add(c); } }
+  // rocas al pie de los acantilados
+  for (let k = 0; k < 70; k++) { const side = k % 4, t = (k * 0.618) % 1; let x, z; if (side === 0) { x = PL_B[0] + 1; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 1) { x = PL_B[2] - 1; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 2) { z = PL_B[1] + 1; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); } else { z = PL_B[3] - 1; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); }
+    if (k % 3) { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(1.0 + (k % 4) * .45, 0), toon(k % 2 ? 0x553a78 : 0x604488)); r.position.set(x, .4, z); r.rotation.set(k, k, 0); world.add(r); }
+    else { const col = k % 2 ? 0xc9a0ff : 0x7fe6ff; for (let j = 0; j < 4; j++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.22, 1.1 + j * .2, 5), toon(col, { e: col, ei: .7 })); c.position.set(x + Math.cos(j * 1.7) * .4, .5, z + Math.sin(j * 1.7) * .4); c.rotation.z = Math.cos(j) * .35; c.rotation.x = Math.sin(j) * .35; world.add(c); } } }
+  // montañas lejanas detrás de los acantilados
+  const mt1 = new THREE.MeshToonMaterial({ color: 0x4a3270, gradientMap: GRAD, fog: false }), mt2 = new THREE.MeshToonMaterial({ color: 0x2e1f4c, gradientMap: GRAD, fog: false });
+  for (let k = 0; k < 44; k++) { const a = k / 44 * Math.PI * 2, far = k % 2, rx = PL_B[2] + (far ? 46 : 22) + (k * 37 % 9), rz = PL_B[3] + (far ? 46 : 22) + (k * 53 % 9), h = (far ? 30 : 16) + (k * 29 % 14), r = (far ? 26 : 15) + (k * 17 % 8);
+    const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), far ? mt2 : mt1); m.position.set(Math.cos(a) * rx, h / 2 - 1, Math.sin(a) * rz); m.rotation.y = k; world.add(m); }
 }
 function buildShip() {
   sharpTex();
@@ -1443,15 +1747,15 @@ function buildShip() {
     const chm = isRoom && room.ch; // salas achaflanadas: suelo y techo recortados por la diagonal
     let fg; if (chm) fg = chamferGeo(room.r, room.ch, true, 2); else { fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 2); }
     if (isRoom && room.out) { worldUV(fg, x0, z1, w, d, 6); const fo = new THREE.Mesh(fg, toon(0xffffff, { map: ROCK_T })); fo.position.set(cx, dy, cz); world.add(fo); return; }
-    const fm = new THREE.Mesh(fg, toon(isRoom ? (FLOORCOL[room.n] ?? 0xb4c0c9) : 0xb4c0c9, { map: isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm);
-    if (IS_PLANET && !isRoom) return;
+    const fm = new THREE.Mesh(fg, toon(isRoom ? ((IS_PLANET ? room.f : FLOORCOL[room.n]) ?? 0xb4c0c9) : 0xb4c0c9, { map: isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm);
+    if (IS_PLANET && (isRoom ? room.glass : CORR[CRECTS[idx - NR].k].exit)) return;
     let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); } const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm);
     const lampM = basic(0xfff3d6);
     if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
     else { const vert = CRECTS[idx - NR].vert, L = vert ? d : w; for (let s2 = 2; s2 < L - 1; s2 += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(vert ? 1.2 : .5, vert ? .5 : 1.2), lampM); l.rotation.x = Math.PI / 2; l.position.set(vert ? cx : x0 + s2, WALL_H - .012, vert ? z0 + s2 : cz); world.add(l); }
       const strip = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .14 : w, vert ? d : .14), basic(0x8fa8b5)); strip.rotation.x = -Math.PI / 2; strip.position.set(cx, .014, cz); world.add(strip); }
   });
-  const corrWall = toon(0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
+  const corrWall = toon(IS_PLANET ? 0xa8b0c4 : 0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
   // paredes diagonales de las esquinas achaflanadas
   ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : toon(mix(0x78838b, R.a, .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
     [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
@@ -1460,7 +1764,7 @@ function buildShip() {
       const q = R.hall ? .03 : .036, hA = R.hall ? .16 : .168, hB = R.hall ? .26 : .272, ix = n[0] * q / 1.414, iz = n[1] * q / 1.414; box(L - .02, hA, .07, accM, mx + ix, 1.2, mz + iz, null, false).rotation.y = th; box(L - .02, hB, .07, baseM, mx + ix, hB / 2, mz + iz, null, false).rotation.y = th; }); });
   wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const isRoom = e.ri < NR, room = isRoom ? ROOMS[e.ri] : null;
     if (isRoom && room.out) { planetWall(e); return; }
-    const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(0x78838b, room.a, .06), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(mix(room.a, 0x8a9399, .35), { e: room.a, ei: .18 }) : corrAcc, baseM = isRoom && !hl ? toon(0x3c444a) : corrBase;
+    const hl = isRoom && room.hall, wallM = isRoom && !hl ? toon(mix(IS_PLANET ? 0xaeb2c4 : 0x78838b, room.a, IS_PLANET ? .1 : .06), { map: WALL_T }) : corrWall, accM = isRoom && !hl ? toon(mix(room.a, 0x8a9399, .35), { e: room.a, ei: .18 }) : corrAcc, baseM = isRoom && !hl ? toon(0x3c444a) : corrBase;
     const L = e.b - e.a, mid = (e.a + e.b) / 2; const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
     const m = new THREE.Mesh(g, wallM); m.rotation.y = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
     if (e.ax === 'z') m.position.set(mid, WALL_H / 2, e.v); else m.position.set(e.v, WALL_H / 2, mid); world.add(m);
@@ -1676,6 +1980,7 @@ const DFLOOR_T = new THREE.CanvasTexture(cvs(128, 128, (g) => { g.fillStyle = '#
 DFLOOR_T.wrapS = DFLOOR_T.wrapT = THREE.RepeatWrapping;
 const POOL_T = new THREE.CanvasTexture(cvs(128, 128, (g) => { const rg = g.createRadialGradient(64, 64, 4, 64, 64, 62); rg.addColorStop(0, 'rgba(190,255,230,.85)'); rg.addColorStop(.6, 'rgba(120,240,200,.3)'); rg.addColorStop(1, 'rgba(120,240,200,0)'); g.fillStyle = rg; g.fillRect(0, 0, 128, 128); }));
 function buildDucts() {
+  if (IS_PLANET) return buildTunnels();
   const wallM = toon(0xffffff, { map: DWALL_T }), floorM = toon(0xffffff, { map: DFLOOR_T }), ceilM = toon(0x2f3654), ribM = toon(0x4a5578), lampM = basic(0x9cf7d8), stripM = basic(0x36e0ad);
   const poolM = new THREE.MeshBasicMaterial({ map: POOL_T, transparent: true, depthWrite: false });
   DUCT_MATS.push(wallM, floorM, ceilM, ribM, lampM, stripM, poolM, basic(0xffffff, { map: GRATE_T }));
@@ -1702,6 +2007,7 @@ function buildDucts() {
   });
 }
 function buildVent(v) {
+  if (IS_PLANET) return buildHole(v);
   const g = new THREE.Group(); g.position.set(v.p[0], 0, v.p[1]); world.add(g); g.userData.keep = 1;
   box(1.1, .05, 1.1, toon(0x3a3f72), 0, .025, 0, g);
   const lid = new THREE.Group(); lid.position.set(-.46, .065, 0); g.add(lid); lid.userData.dyn = 1;
@@ -1799,52 +2105,6 @@ function decorateNew() {
   box(3.6, .08, 3.4, toon(0xe8b923), 0, .015, 30, null, false); box(3.2, .09, 3.0, toon(0x5a6276), 0, .03, 30, null, false);
   // Cruce este: tanque y señales
   [[27.2, 37.7], [28.1, 38.5]].forEach(([x, z], k) => { const b = cyl(.4, .4, 1, toon(k ? 0xff5a6e : 0x5ab8ff), x, .5, z); hull(b, 1.06); });
-}
-function decoratePlanet() {
-  const D = toon(0x2a2f5e), M = toon(0x5a6296), W = toon(0xe8eaf8), Y = WALL_H + .12;
-  // techos de los edificios (se ven desde el platillo)
-  ROOMS.forEach(r => { if (r.out) return; const [x0, z0, x1, z1] = r.r, w = x1 - x0 + 2 * PL_GAP, d = z1 - z0 + 2 * PL_GAP; const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); const m = new THREE.Mesh(g, toon(0x9aa3ad, { map: HULL_T })); m.position.set((x0 + x1) / 2, Y, (z0 + z1) / 2); world.add(m);
-    box(1.4, .5, 1.0, toon(0x6f7882), x0 + w * .3, Y + .25, z0 + d * .3); box(.9, .7, .9, toon(0x6f7882), x1 - w * .25, Y + .35, z1 - d * .3); });
-  // mesa del botón de emergencia en la Nave Lucero
-  const tb = cyl(1.55, 1.35, .85, toon(0xff9f43), BTN.x, .43, BTN.z, null, 32); hull(tb, 1.03); cyl(1.6, 1.6, .08, toon(0xffcc33), BTN.x, .88, BTN.z, null, 32);
-  const btn = sph(.42, toon(0xff3b4f, { e: 0xff0022, ei: .4 }), BTN.x, .95, BTN.z, null, 20); btn.scale.y = .55; hull(btn, 1.06); const glassD = sph(.6, new THREE.MeshBasicMaterial({ color: 0xbfe4ff, transparent: true, opacity: .25, depthWrite: false }), BTN.x, .92, BTN.z, null, 20); glassD.scale.y = .8;
-  const se = sprText('EMERGENCIA', { size: 46, color: '#ff8a98', w: 1.6 }); se.position.set(BTN.x, 2.1, BTN.z); world.add(se);
-  [[-6.5, -3.5], [6.5, -3.5], [-6.5, 3.5], [6.5, 3.5]].forEach(([x, z]) => { box(1.0, .5, 1.0, toon(0x3d7bff), x, .25, z); box(1.0, .7, .2, toon(0x3d7bff), x, .7, z + (z < 0 ? -.4 : .4)); OBS.push({ x, z, r: .6 }); });
-  [[0, -5.95, 4, 1.4], [0, 5.95, 4, 1.4]].forEach(([x, z, w, h]) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), basic(0xffffff, { map: STAR_T })); m.position.set(x, 1.9, z); m.rotation.y = z > 0 ? Math.PI : 0; world.add(m); });
-  // Comunicaciones: armarios de servidores
-  for (let k = 0; k < 4; k++) { box(.9, 2.1, .7, toon(0x2a3a5e), -42 + k * 1.1, 1.05, -20.4); for (let j = 0; j < 4; j++) box(.6, .05, .02, toon(j % 2 ? 0x36e0ad : 0x52c7ff, { e: 0x52c7ff, ei: .8 }), -42 + k * 1.1, .6 + j * .35, -20.04, null, false); }
-  // Laboratorio: mesas con matraces
-  [[31, -25], [38, -25]].forEach(([x, z]) => { box(2.8, .9, 1.2, W, x, .45, z); [-.8, 0, .8].forEach((dx, i) => { cyl(.12, .2, .4, toon([0x36e0ad, 0xff7ac6, 0xffd93d][i], { e: [0x36e0ad, 0xff7ac6, 0xffd93d][i], ei: .5 }), x + dx, 1.1, z, null, 12); }); OBS.push({ x, z, r: 1.4 }); });
-  // Seguridad: mesa y pared de monitores
-  box(2.4, .8, .9, toon(0x4b5296), 0, .4, -32.95); box(2.5, .08, 1.0, toon(0x2a2f5e), 0, .82, -32.95); box(4.7, 2.5, .14, toon(0x2a2450), 0, 1.95, -33.86);
-  CAMS.forEach((c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.08), new THREE.MeshBasicMaterial({ map: RT[i].texture })); m.position.set(i % 2 ? 1.1 : -1.1, i < 2 ? 2.55 : 1.38, -33.78); m.userData.dyn = 1; world.add(m); MON.push(m); });
-  const sc2 = sprText('CÁMARAS', { size: 50, color: '#ff8a98', w: 1.4 }); sc2.position.set(0, 3.0, -33.6); world.add(sc2);
-  // Electricidad: generadores
-  [[-43, 25], [-40, 25]].forEach(([x, z]) => { box(1.6, 1.8, 1.4, toon(0x5a5a6a), x, .9, z); box(1.0, .3, .05, toon(0xffcc33, { e: 0xffcc33, ei: .8 }), x, 1.3, z - .72, null, false); OBS.push({ x, z, r: .95 }); }); EMIT.push({ k: 'spark', p: [-43, 1.9, 25] });
-  // Invernadero: plantas y árboles alienígenas
-  [[32, 18], [40, 24], [36, 21]].forEach(([x, z]) => { tree(x, z); OBS.push({ x, z, r: .55 }); }); [[29, 15], [43, 27], [29, 27], [43, 15]].forEach(([x, z]) => plant(x, z, 1.2));
-  // Almacén: cajas y montones de mineral
-  [[-4, 27], [-2.8, 27.2], [4, 33], [5.2, 32.8]].forEach(([x, z], i) => crate(x, .5, z, [0x8a6a42, 0x9a7a52, 0x5a7a9a, 0x6a8aaa][i])); OBS.push({ x: -3.4, z: 27.1, r: 1.1 }, { x: 4.6, z: 32.9, r: 1.1 });
-  [[3, 27.5], [-3, 33]].forEach(([x, z]) => { for (let k = 0; k < 6; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.18, .7, 5), toon(k % 2 ? 0xc9a0ff : 0x7fe6ff, { e: k % 2 ? 0x9b5cff : 0x3cc8ff, ei: .6 })); c.position.set(x + Math.cos(k) * .35, .35, z + Math.sin(k) * .35); c.rotation.z = Math.cos(k * 2) * .3; world.add(c); } });
-  // carteles con el nombre de cada edificio sobre sus puertas
-  CORR.forEach(c => { const B = ROOMS[c.a], o = c.p[1], sgn = sprText(B.n, { size: 52, bg: hex(darker(B.a, .15)), w: 2.3 }); sgn.position.set(o[0], 3.7, o[1]); world.add(sgn); });
-  // rocas grandes
-  OBS.filter(o => o.rock).forEach((o, k) => { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * 1.05, 0), toon(k % 2 ? 0x5a3f80 : 0x6b4f92)); r.position.set(o.x, o.r * .55, o.z); r.scale.y = .75; r.rotation.set(k, k * 2.3, 0); world.add(r); hull(r, 1.03);
-    if (k % 3 === 0) { const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(o.r * .45, 0), toon(0x7a5aa0)); r2.position.set(o.x + o.r * .9, o.r * .25, o.z + o.r * .3); world.add(r2); } });
-  // cristales que brillan y rocas al pie de los acantilados
-  for (let k = 0; k < 46; k++) { const side = k % 4, t = (k * 0.618) % 1; let x, z; if (side === 0) { x = PL_B[0] + 1.2; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 1) { x = PL_B[2] - 1.2; z = PL_B[1] + t * (PL_B[3] - PL_B[1]); } else if (side === 2) { z = PL_B[1] + 1.2; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); } else { z = PL_B[3] - 1.2; x = PL_B[0] + t * (PL_B[2] - PL_B[0]); }
-    if (k % 2) { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2 + (k % 3) * .5, 0), toon(0x553a78)); r.position.set(x, .5, z); r.rotation.set(k, k, 0); world.add(r); }
-    else { const col = k % 4 === 0 ? 0xc9a0ff : 0x7fe6ff; for (let j = 0; j < 4; j++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.22, 1.1 + j * .2, 5), toon(col, { e: col, ei: .7 })); c.position.set(x + Math.cos(j * 1.7) * .4, .5, z + Math.sin(j * 1.7) * .4); c.rotation.z = Math.cos(j) * .35; c.rotation.x = Math.sin(j) * .35; world.add(c); } } }
-  // antena gigante de Comunicaciones (fuera)
-  cyl(.25, .45, 8, toon(0xc9d2dc), -37, 4, -17.2, null, 10); const dish = new THREE.Mesh(new THREE.SphereGeometry(1.6, 22, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), new THREE.MeshToonMaterial({ color: 0xeef2f6, gradientMap: GRAD, side: THREE.DoubleSide })); dish.position.set(-37, 8.2, -17.2); dish.rotation.x = -2.3; world.add(dish); OBS.push({ x: -37, z: -17.2, r: .5 });
-  ANIM.pulse.push(sph(.18, toon(0xff3b4f, { e: 0xff3b4f, ei: 1 }), -37, 8.3, -17.2, null, 10));
-  // paneles solares junto al Laboratorio
-  [[32, -12], [40, -12]].forEach(([x, z]) => { cyl(.08, .08, 1.2, toon(0x6f7882), x, .6, z, null, 8); const pn = box(3.2, .07, 1.8, toon(0xffffff, { map: SOLAR_T }), x, 1.25, z); pn.rotation.x = -.4; OBS.push({ x, z, r: 1.2 }); });
-  // zonas de aterrizaje del alien y fumarolas
-  AIRLOCKS.forEach(a => { const ring = new THREE.Mesh(new THREE.RingGeometry(1.6, 2.0, 40), basic(0x5cff9a, { op: .55, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.set(a.in[0], .03, a.in[1]); world.add(ring); });
-  [[-46, -8], [10, 16], [46, 10]].forEach(([x, z]) => { const c = cyl(.6, .9, .4, toon(0x4a3470), x, .2, z, null, 14); EMIT.push({ k: 'steam', p: [x, .45, z] }); OBS.push({ x, z, r: .8 }); });
-  // patas de aterrizaje de la Nave Lucero
-  [[-8.8, -6.8], [8.8, -6.8], [-8.8, 6.8], [8.8, 6.8]].forEach(([x, z]) => { const l = cyl(.18, .3, 1.6, toon(0x8a8fa0), x, .8, z, null, 10); l.rotation.z = x < 0 ? .3 : -.3; cyl(.55, .6, .15, toon(0x5a6370), x + (x < 0 ? -.25 : .25), .08, z, null, 14); OBS.push({ x, z, r: .55 }); });
 }
 function crate(x, y, z, c) { box(1.0, 1.0, 1.0, toon(c), x, y, z); box(1.02, .16, 1.02, toon(darker(c, .35)), x, y, z, null, false); }
 function plant(x, z, s) { cyl(.32 * s, .25 * s, .5 * s, toon(0xff7a5a), x, .25 * s, z, null, 14); [[0, .75, 0, .34], [.2, .62, .12, .24], [-.18, .66, -.1, .26]].forEach(([dx, y, dz, r]) => { const m = sph(r * s, toon(0x3dbb5a), x + dx * s, y * s, z + dz * s, null, 14); hull(m, 1.1); }); }
@@ -2493,9 +2753,9 @@ function gameFrame(dt, t) {
   if (FLASH.intensity > .01) { const fx = -Math.sin(P.yaw) * Math.cos(local.cp || 0), fy = Math.sin(local.cp || 0), fz = -Math.cos(P.yaw) * Math.cos(local.cp || 0); FLASH.position.set(P.x + Math.cos(P.yaw) * .18, (local.eva ? P.ey : EYE) - .15, P.z - Math.sin(P.yaw) * .18); FLASH.target.position.set(P.x + fx * 10, (local.eva ? P.ey : EYE) + fy * 10 - .4, P.z + fz * 10); }
   const evL = local.eva || local.ufo ? 1.45 : 1; hemi.intensity = .52 * L * evL; amb.intensity = .12 * L; sun.intensity = .38 * L * (local.eva ? 1.8 : 1); LIGHTS.forEach(l => l.intensity = l.userData.base * (.25 + .75 * L) * (local.eva || local.ufo ? .15 : 1));
   qs('#darkV').style.opacity = dark && !local.camView ? 1 : 0;
-  const q = Math.max(0, (L - .2) / .8); scene.fog.near = 2 + 26 * q; scene.fog.far = 8 + 72 * q; scene.fog.color.copy(FOG_D).lerp(FOG_C, q);
+  const q = Math.max(0, (L - .2) / .8); scene.fog.near = 2 + (IS_PLANET ? 40 : 26) * q; scene.fog.far = 8 + (IS_PLANET ? 105 : 72) * q; scene.fog.color.copy(FOG_D).lerp(FOG_C, q);
   if (black && !me.im) { scene.fog.near = 4; scene.fog.far = 24; scene.fog.color.setHex(0x020308); }
-  if (inD && local.dropT <= 0 && local.exitT <= 0) { scene.fog.near = 1.5; scene.fog.far = 17; scene.fog.color.setHex(0x0c1824); }
+  if (inD && local.dropT <= 0 && local.exitT <= 0) { scene.fog.near = 1.5; scene.fog.far = 17; scene.fog.color.setHex(IS_PLANET ? 0x140a22 : 0x0c1824); }
   if (local.eva || local.ufo) { scene.fog.near = 90; scene.fog.far = 420; scene.fog.color.setHex(0x04050d); }
   else if (local.mini) { scene.fog.near = 14; scene.fog.far = 48; scene.fog.color.setHex(0x1a1030); }
   if (IS_PLANET && S.storm && S.ph === 'play' && !local.eva && !local.ufo && !local.mini) { const ri = roomAt(P.x, P.z); if (ri < 0 || ROOMS[ri].out) { scene.fog.near = 1.5; scene.fog.far = 13; scene.fog.color.setHex(0x9a7aa8); if (Math.random() < .5) spawnP('steam', P.x + rand(-4, 4), rand(.3, 2.2), P.z + rand(-4, 4)); } }
@@ -2646,7 +2906,7 @@ let ventKey = '';
 function updateVentUI(force) {
   const near = interact.use && interact.use.k === 'ventExit' ? interact.use.id : -1; const key = local.duct + ':' + near; if (!force && key === ventKey) return; ventKey = key;
   const dests = DUCTS[local.duct].vents.map(id => ROOMS[VENTS[id].room].n).join(' · ');
-  qs('#ventHere').textContent = near >= 0 ? 'Salida: ' + ROOMS[VENTS[near].room].n : 'En los conductos';
+  qs('#ventHere').textContent = near >= 0 ? 'Salida: ' + (ROOMS[VENTS[near].room].out ? 'exterior' : ROOMS[VENTS[near].room].n) : (IS_PLANET ? 'En los túneles' : 'En los conductos');
   const fanT = S && S.pl[ME] && S.pl[ME].ro === 'fan' ? (IS_TOUCH ? ' · Saltar: otra red' : ' · C: saltar a otra red') : '';
   qs('#ventBtns').textContent = (near >= 0 ? (IS_TOUCH ? 'Puedes salir por aquí' : 'Pulsa E para salir aquí') : 'Camina hasta una luz verde para salir · ' + dests) + fanT;
   qs('#ventOut').hidden = near < 0;
@@ -2755,7 +3015,7 @@ function showIntro() {
   if (me && me.xa) { h.textContent = S.pr ? 'Práctica · Alien' : 'Alien'; h.style.color = '#5cff9a'; p.textContent = 'Recorre tu propia nave: en los mandos pilotas el platillo, en el teletransportador te infiltras 30 s para eliminar a una persona (con el platillo acoplado a una esclusa), y tienes rayo tractor, consola de sabotajes y ariete. Ganas si quedan 2 o menos supervivientes.'; const d = el('div'); d.innerHTML = roleIcon('ali', 80); d.style.cssText = 'background:#2fd36f;border-radius:24px;padding:10px;display:inline-grid'; mates.append(d); }
   else if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas' + KB('E') + ' y sabotear' + KB('F') + '. Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre ' + (IS_PLANET ? 'la base' : 'la nave') + ' y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   else if (!me) { h.textContent = 'Espectador'; h.style.color = '#b9bff0'; p.textContent = 'La partida está llena. Puedes mirar como fantasma.'; }
-  else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas' + KB('E') + ': por dentro hay que caminar por los conductos. ' + (IS_TOUCH ? 'Sabotea la nave con el botón Sabotear.' : 'Sabotea la nave con F.');
+  else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas' + KB('E') + ': por dentro hay que caminar por ' + (IS_PLANET ? 'los túneles' : 'los conductos') + '. ' + (IS_TOUCH ? 'Sabotea la nave con el botón Sabotear.' : 'Sabotea la nave con F.');
     S.pl.filter(q => q.im).forEach(q => { const d = el('div'); d.innerHTML = avatarSVG(q.c, false, 70); mates.append(d); }); }
   else { h.textContent = S.impN ? 'Tripulante' : 'Modo práctica'; h.style.color = '#5ab8ff';
     p.textContent = S.impN ? `Hay ${S.impN} ${S.impN > 1 ? 'polizones' : 'polizón'} a bordo. Completa tus tareas, vigila las cámaras y descubre quién es.` : 'No hay polizones: explora la nave y completa todas las tareas.';
@@ -2787,7 +3047,7 @@ function updateHUD(t) {
     if (me && !me.im && !me.xa && comms) { tl.append(el('b', null, 'Comunicaciones caídas')); tl.append(el('div', null, 'Restaura la señal en Comunicaciones para ver tus tareas.')); }
     else if (me && !me.im && !me.xa) { tl.append(el('b', null, `Tus tareas · ${local.done.size}/${me.tk.length}`)); me.tk.forEach(sid => { const d = el('div', local.done.has(sid) ? 'done' : ''); d.append(el('span', null, ST[sid].n), el('i', null, ST[sid].ext ? 'Exterior' : ROOMS[ST[sid].room].n)); tl.append(d); }); }
     else if (me && me.xa) { tl.append(el('b', null, 'Misión alien')); ['Gana si quedan 2 o menos vivos.', 'Mandos: acopla el platillo a una esclusa.', 'Teletransportador: 30 s, 1 víctima.', `Daños del platillo: ${me.uh || 0}/${UFO_HITS}`].forEach(t2 => tl.append(el('div', null, t2))); }
-    else if (me && me.im) { tl.append(el('b', null, 'Misión secreta')); tl.append(el('div', null, 'Elimina a la tripulación.')); if (!isTouch) { tl.append(el('div', null, 'E en una alcantarilla para bajar a los conductos y recorrerlos.')); tl.append(el('div', null, 'F para sabotear la nave.')); } const mates = S.pl.filter(p => p.im && p.i !== ME); if (mates.length) tl.append(el('div', null, 'Compañeros: ' + mates.map(p => p.n).join(', '))); }
+    else if (me && me.im) { tl.append(el('b', null, 'Misión secreta')); tl.append(el('div', null, 'Elimina a la tripulación.')); if (!isTouch) { tl.append(el('div', null, 'E en una alcantarilla para bajar a ' + (IS_PLANET ? 'los túneles' : 'los conductos') + ' y recorrerlos.')); tl.append(el('div', null, 'F para sabotear la nave.')); } const mates = S.pl.filter(p => p.im && p.i !== ME); if (mates.length) tl.append(el('div', null, 'Compañeros: ' + mates.map(p => p.n).join(', '))); }
     else tl.append(el('b', null, 'Mirando la partida'));
     const total = S.pl.reduce((s, p) => s + (p.im ? 0 : p.tt), 0); const done = S.pl.reduce((s, p) => s + (p.im ? 0 : (p.i === ME ? local.done.size : p.td)), 0);
     qs('#barFill').style.width = (comms ? 0 : (total ? Math.min(100, done / total * 100) : 0)) + '%'; qs('#barLab').textContent = comms ? 'Sin señal' : 'Tareas de la tripulación';
@@ -2824,7 +3084,7 @@ function updateHUD(t) {
   qs('#lockhint').hidden = isTouch || document.pointerLockElement === canvas || !canLook(); canvas.style.cursor = lockFail && canLook() ? 'none' : '';
   drawMap(mini, false);
 }
-const MB = IS_PLANET ? { x0: -55, z0: -41, w: 110, h: 82 } : { x0: -51, z0: -23, w: 101, h: 71 };
+const MB = IS_PLANET ? { x0: -80, z0: -60, w: 160, h: 120 } : { x0: -51, z0: -23, w: 101, h: 71 };
 function mapXf(cv, big) { const W = cv.width, Hh = cv.height; const sc = Math.min(W / MB.w, Hh / MB.h) * (big ? .96 : 1); return { sc, ox: (W - MB.w * sc) / 2, oz: (Hh - MB.h * sc) / 2 }; }
 function mapInv(cv, x, y) { const { sc, ox, oz } = mapXf(cv, true); return { x: (x - ox) / sc + MB.x0, z: (y - oz) / sc + MB.z0 }; }
 function drawMap(cv, big, opt = {}) {
@@ -2833,8 +3093,8 @@ function drawMap(cv, big, opt = {}) {
   g.clearRect(0, 0, W, Hh);
   g.fillStyle = hex(darker(0xb4c0c9, .45)); CRECTS.forEach(c => g.fillRect(X(c.r[0]), Z(c.r[1]), (c.r[2] - c.r[0]) * sc, (c.r[3] - c.r[1]) * sc));
   const doors = (S && S.doors) || {}, dcs = (S && S.dc) || {};
-  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker(FLOORCOL[r.n] ?? 0xb4c0c9, .45)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else if (r.out) { g.beginPath(); g.rect(X(r.r[0]) - 1, Z(r.r[1]) - 1, (r.r[2] - r.r[0]) * sc + 2, (r.r[3] - r.r[1]) * sc + 2); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
-    if (big && !r.out) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * 1.7)}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
+  ROOMS.forEach((r, i) => { g.fillStyle = hex(darker((IS_PLANET ? r.f : FLOORCOL[r.n]) ?? 0xb4c0c9, .45)); if (r.ch) { const [x0, z0, x1, z1] = r.r, c = r.ch; g.beginPath(); g.moveTo(X(x0 + c[0]), Z(z0)); g.lineTo(X(x1 - c[1]), Z(z0)); g.lineTo(X(x1), Z(z0 + c[1])); g.lineTo(X(x1), Z(z1 - c[2])); g.lineTo(X(x1 - c[2]), Z(z1)); g.lineTo(X(x0 + c[3]), Z(z1)); g.lineTo(X(x0), Z(z1 - c[3])); g.lineTo(X(x0), Z(z0 + c[0])); g.closePath(); } else if (r.out) { g.beginPath(); g.rect(X(r.r[0]) - 1, Z(r.r[1]) - 1, (r.r[2] - r.r[0]) * sc + 2, (r.r[3] - r.r[1]) * sc + 2); } else rr(g, X(r.r[0]), Z(r.r[1]), (r.r[2] - r.r[0]) * sc, (r.r[3] - r.r[1]) * sc, sc * 1.2); g.fill(); if (r.hall) return; g.strokeStyle = hex(r.a); g.lineWidth = Math.max(2, sc * .25); g.stroke();
+    if (big && !r.out) { g.fillStyle = '#fff'; g.font = `${Math.round(sc * (IS_PLANET ? 2.5 : 1.7))}px "Lilita One", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = sc * .5; g.strokeStyle = 'rgba(10,12,40,.85)'; g.strokeText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); g.fillText(r.n, X((r.r[0] + r.r[2]) / 2), Z(r.r[1]) + sc * 2.4); }
     if (opt.sabo) { const cx = X((r.r[0] + r.r[2]) / 2), cz = Z((r.r[1] + r.r[3]) / 2) + sc * .8; const closed = doors[i], cd = dcs[i]; g.save(); g.translate(cx, cz); g.scale(1.6, 1.6); g.translate(-cx, -cz);
       g.fillStyle = closed ? '#ff5a6e' : cd ? 'rgba(255,255,255,.25)' : '#c9a0ff'; rr(g, cx - sc * 1.6, cz - sc * 1.1, sc * 3.2, sc * 2.4, sc * .6); g.fill();
       g.strokeStyle = '#1d1640'; g.lineWidth = sc * .3; g.beginPath(); g.arc(cx, cz - sc * .5, sc * .7, Math.PI, 0); g.stroke();

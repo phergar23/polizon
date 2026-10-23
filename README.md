@@ -42,7 +42,7 @@ Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño or
 Al crear una partida o en el modo práctica puedes elegir el mapa:
 
 - **Nave**: el mapa clásico, con pasillos, conductos y paseos espaciales.
-- **Planeta Violeta**: una base en un planeta de suelo morado. El exterior es terreno abierto, sin caminos marcados: puedes ir por donde quieras entre los edificios (Nave Lucero, Comunicaciones, Laboratorio, Seguridad, Electricidad, Invernadero y Almacén). Hay rocas, cristales, fumarolas y acantilados alrededor, tareas al aire libre y, de vez en cuando, una **tormenta de polvo** que casi no deja ver fuera de los edificios. El alien aterriza en las plataformas del exterior.
+- **Planeta Violeta**: una base grande en un planeta de suelo morado. Fuera, el terreno es abierto, sin caminos marcados: vas por donde quieras entre rocas, mesetas, cristales, fumarolas, una charca brillante, la antena, los paneles solares y una perforadora. Hay complejos de varias salas unidas (Cúpula con Dormitorios y Enfermería, Laboratorio con Muestras, Electricidad con Taller) y pasillos-tubo que conectan edificios (Mando–Laboratorio, Comunicaciones–Seguridad, Taller–Almacén, Dormitorios–Hangar, Invernadero–Observatorio). Las alcantarillas son agujeros en el suelo que bajan a túneles de roca. De vez en cuando llega una **tormenta de polvo** que casi no deja ver fuera, y el alien aterriza en las dos plataformas del exterior.
 
 Al cambiar de mapa la página se recarga. Si tus amigos se unen a una sala con otro mapa, su juego cambia solo al mapa de quien la ha creado.
 
