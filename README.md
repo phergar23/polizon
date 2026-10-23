@@ -76,6 +76,23 @@ El alien camina por su propia nave, de dos salas:
 
 Para pararle, cualquiera puede usar el **cañón de defensa** de la Sala de armas: tres impactos y el platillo queda destruido.
 
+Su nave ahora es más grande: puente de mando, sala central, **hangar de drones**, **arsenal** e **incubadora**, unidas por portales redondos.
+
+- **Dron espía**: vuela 15 s dentro de la base principal (los demás ven el dron).
+- **Lluvia de meteoritos**: caen meteoritos con aviso; en el planeta aturden 4 s a quien pille fuera.
+- **Hipnosis**: eliges a alguien y durante 7 s se le invierten los controles.
+- **Clon señuelo**: suelta en la base un clon de una víctima que camina solo y revienta si alguien lo toca.
+- **Pilotaje**: cámara en tercera persona con inclinación en las curvas, estelas de velocidad, campo de visión que se abre al acelerar y un panel con radar, velocidad y altura. Con **V** cambias a la vista desde la cabina.
+
+## El Asesino en serie (rol aparte)
+
+Va por libre: puede eliminar a cualquiera, tripulantes y polizones, con su cuchillo (Q). Gana si se queda solo.
+
+- **Guarida**: durante las votaciones puede entrar en su guarida (y volver a votar cuando quiera). Allí elige **arma** en el armero, marca a su **víctima** en el tablero de fotos con hilos rojos y escoge en la mesa del mapa **en qué sala aparecerá** en la siguiente ronda. En la sala de trofeos guarda un casco por cada víctima.
+- **Armas** (un uso por ronda, tecla C): ballesta (dispara a 8 m), cepo (trampa que solo ve él), bomba de humo (dentro nadie ve y él desaparece) y máscara (se disfraza de otro 20 s).
+- **Víctima marcada**: la ve con un anillo rojo y parpadea en su minimapa. Si la elimina, entra en **frenesí**: corre más y el cuchillo se recarga antes.
+- **Carta negra**: junto a sus víctimas deja una carta, así se sabe que no ha sido un polizón.
+
 ## Sabotajes especiales
 
 - **Gravedad cero**: todos flotan por la nave con inercia y rebotan contra paredes, suelo y techo. Se arregla reiniciando el generador del Observatorio (o vuelve sola a los 40 s).
