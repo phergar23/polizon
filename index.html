@@ -372,7 +372,7 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
 #hypnoV{position:fixed;inset:-30%;z-index:5;pointer-events:none;opacity:0;transition:opacity .4s;background:repeating-conic-gradient(rgba(255,122,198,.5) 0 12deg,rgba(201,160,255,.15) 12deg 24deg);animation:hyp 3s linear infinite;mix-blend-mode:screen}@keyframes hyp{to{transform:rotate(360deg)}}
 #stunV{position:fixed;left:50%;top:38%;transform:translateX(-50%);z-index:7;pointer-events:none;opacity:0;font-size:34px;color:#ffd93d;text-shadow:0 2px 0 #1d1640;animation:stn 1s linear infinite;transition:opacity .3s}@keyframes stn{50%{transform:translateX(-50%) rotate(12deg) scale(1.15)}}
 #pkL{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:12px 0;max-height:52vh;overflow:auto}#pkL button{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid #2c3590;background:#1a2060;color:var(--ink);font:inherit;font-weight:800;border-radius:14px;padding:10px 6px;cursor:pointer}#pkL button small{font-weight:600;opacity:.75;font-size:12px}#pkL button:hover{border-color:#ffcc33}
-#frenzyV{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(ellipse at center,transparent 45%,rgba(220,20,30,.55));animation:fzp .7s ease-in-out infinite alternate}@keyframes fzp{to{filter:brightness(1.4)}}
+#infV{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at center,transparent 50%,rgba(70,220,40,.45))}#frenzyV{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(ellipse at center,transparent 45%,rgba(220,20,30,.55));animation:fzp .7s ease-in-out infinite alternate}@keyframes fzp{to{filter:brightness(1.4)}}
 #lairHud{position:fixed;inset:0;z-index:32;pointer-events:none;box-shadow:inset 0 0 140px rgba(120,0,10,.6)}#lairHud .lt{position:absolute;top:12px;left:50%;transform:translateX(-50%);text-align:center;background:rgba(30,6,10,.82);border:3px solid #a8202c;border-radius:16px;padding:8px 16px;max-width:92vw}#lairHud .lt b{display:block;font:900 20px 'Lilita One',sans-serif;color:#ff6a6a;letter-spacing:3px}#lairHud .lt span{font-weight:800;font-size:14px;color:#ffd6d6}#lairHint{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);background:rgba(30,6,10,.82);color:#fff;font-weight:800;padding:8px 14px;border-radius:12px;max-width:90vw;text-align:center}#lairHud .lb{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto}#lairHud .lb .off{opacity:.45}
 #hitFlash{position:fixed;inset:0;z-index:44;pointer-events:none;background:radial-gradient(ellipse at center,rgba(255,60,80,.15),rgba(180,0,30,.65));opacity:0}
 #hitFlash.on{animation:hitF .6s ease-out}
@@ -486,6 +486,10 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
       <div class="step"><button id="iMinus" aria-label="Menos polizones">−</button><output id="iOut">1</output><button id="iPlus" aria-label="Más polizones">+</button></div>
     </div>
     <div class="set">
+      <div class="t"><b>Modo de juego</b><small id="moHint">Polizones escondidos y votaciones</small></div>
+      <div class="mapsel"><button class="mbtn" data-mo="cl" type="button">Clásico</button><button class="mbtn" data-mo="inf" type="button">Infectado</button></div>
+    </div>
+    <div class="set">
       <div class="t"><b>Mapa</b><small>Cambiarlo recarga la página</small></div>
       <div class="mapsel"><button class="mbtn" data-m="nave" type="button">Nave Lucero</button><button class="mbtn" data-m="sub" type="button">Base submarina</button></div>
     </div>
@@ -587,7 +591,7 @@ html.standalone,html.standalone body{overscroll-behavior:none;-webkit-user-selec
 <div class="ov" id="intro" hidden></div>
 <div class="ov" id="death" hidden></div>
 <div id="splash" hidden><div class="rays"></div><div class="stage" id="spStage"></div><h1 id="spTitle"></h1><p id="spSub"></p></div>
-<div id="hitFlash"></div><div id="frenzyV"></div><div id="lairHud" hidden><div class="lt"><b>GUARIDA</b><span id="lairInfo"></span></div><div id="lairHint"></div><div class="lb"><button class="btn coral" id="lairUse" type="button">Usar (E)</button><button class="btn sky" id="lairBack" type="button">Volver a la votación</button></div></div>
+<div id="hitFlash"></div><div id="frenzyV"></div><div id="infV"></div><div id="lairHud" hidden><div class="lt"><b>GUARIDA</b><span id="lairInfo"></span></div><div id="lairHint"></div><div class="lb"><button class="btn coral" id="lairUse" type="button">Usar (E)</button><button class="btn sky" id="lairBack" type="button">Volver a la votación</button></div></div>
 <section class="screen" id="end" hidden><div class="card" id="endCard"></div></section>
 <div class="ov dim" id="bigmap" hidden><div class="mapc"><canvas id="mapC" width="1400" height="984"></canvas><button class="ib x" id="mapX" aria-label="Cerrar mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 <div id="cams" hidden><div id="camBar"><span>Cámaras de seguridad · <span id="camClock"></span></span><button class="btn coral" id="camX" type="button">Salir (E)</button></div></div>
@@ -889,7 +893,7 @@ function subData() {
     { n: 'Sonar', r: [-30, -14, -18, -3], f: 0x4a5a62, ft: 'grate', a: 0x36e0ad, l: 0xb8ffe6, node: [-24, -5] },
     { n: 'Cantina', r: [-30, 3, -16, 15], f: 0xffffff, ft: 'check', a: 0xff7a5a, l: 0xffe2d0 },
     { n: 'Enfermería', r: [18, -14, 30, -3], f: 0xeef6f8, ft: 'tile', a: 0x5ad8ff, l: 0xe0f8ff },
-    { n: 'Acuario', r: [16, 3, 32, 15], f: 0x8ac8f0, ft: 'glass', a: 0x7fe6ff, l: 0xc0f0ff, ch: [0, 0, 4, 0], node: [20, 6] },
+    { n: 'Acuario', r: [16, 3, 32, 15], f: 0x8ac8f0, ft: 'glass', a: 0x7fe6ff, l: 0xc0f0ff, gf: 1, ch: [0, 0, 4, 0], node: [20, 6] },
     { n: 'Camarotes', r: [-8, 17, 10, 26], f: 0xffffff, ft: 'deck', a: 0xd9a441, l: 0xffe8c0 },
     { n: 'Comunicaciones', r: [-6, -24, 8, -15], f: 0x56606a, ft: 'grate', a: 0x52c7ff, l: 0xc8ecff },
     { n: 'Ascensor A', r: [-15, -14, -11, -10], f: 0xb0b6c0, ft: 'plate', a: 0xffcc33, l: 0xfff0c0, elev: 1 },
@@ -899,12 +903,12 @@ function subData() {
     { n: 'Electricidad', r: LR([-6, -22, 8, -13]), f: 0x5a5a48, ft: 'grate', a: 0xffd93d, l: 0xfff0b0 },
     { n: 'Seguridad', r: LR([16, -14, 30, -3]), f: 0x7a3440, ft: 'carpet', a: 0x5fbf7a, l: 0xd2ffd8 },
     { n: 'Bodega', r: LR([16, 3, 32, 15]), f: 0xb08a5a, ft: 'wood', a: 0xc8834a, l: 0xffe0c0 },
-    { n: 'Lastre', r: LR([-30, 12, -14, 24]), f: 0x6a90a4, ft: 'wet', a: 0x3d9bff, l: 0xc8e4ff },
+    { n: 'Lastre', r: LR([-30, 12, -14, 24]), f: 0x6a90a4, ft: 'wet', a: 0x3d9bff, l: 0xc8e4ff, gf: 1 },
     { n: 'Depuradora', r: LR([-6, 15, 10, 25]), f: 0xb8eae2, ft: 'tile', a: 0x2fd0c0, l: 0xd0fff6 },
     { n: 'Ascensor A', r: LR([-15, -14, -11, -10]), f: 0xb0b6c0, ft: 'plate', a: 0xffcc33, l: 0xfff0c0, elev: 1 },
     { n: 'Ascensor B', r: LR([11, 17, 15, 21]), f: 0xb0b6c0, ft: 'plate', a: 0xffcc33, l: 0xfff0c0, elev: 2 }];
   ROOMS.length = 0;
-  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, ft: b.ft, a: b.a, l: b.l, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: b.ch || null, hall: 0, ring: b.ring || null, elev: b.elev || 0 }); });
+  B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: b.f, ft: b.ft, a: b.a, l: b.l, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: b.ch || null, hall: 0, ring: b.ring || null, elev: b.elev || 0, gf: b.gf || 0 }); });
   SUB_ELEV.length = 0; [1, 2].forEach(k => { const ids = ROOMS.map((r, i) => r.elev === k ? i : -1).filter(i => i >= 0); SUB_ELEV.push(ids); });
   CORR.length = 0;
   const C = (p, a, b, w = 3) => CORR.push({ p, a, b, w }), CL = (p, a, b, w = 3) => C(p.map(q => L(q[0], q[1])), a, b, w);
@@ -1394,15 +1398,15 @@ function buildMothership() {
     // tubería con líquido verde a media altura
     if (L > 3) { const pp = cyl(.09, .09, L - .4, toon(0x6b5a9a), px - (e.ax === 'x' ? e.out * .12 : 0), Y + 2.45, pz - (e.ax === 'z' ? e.out * .12 : 0), null, 10); pp.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2;
       const lq = cyl(.05, .05, L - .4, GLOW(0x5cff9a), px - (e.ax === 'x' ? e.out * .2 : 0), Y + 2.45, pz - (e.ax === 'z' ? e.out * .2 : 0), null, 8); lq.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2; } });
-  // arcos (costillas) que cruzan las salas
-  [[R[0], 2.0], [R[2], 2.3], [R[4], 2.2], [R[6], 2.2], [R[8], 2.4]].forEach(([r, step]) => { const w = r[2] - r[0], rad = w / 2, cx = (r[0] + r[2]) / 2;
-    for (let z = r[1] + 1; z < r[3] - .5; z += step) { const a = new THREE.Mesh(new THREE.TorusGeometry(rad - .1, .13, 8, 30, Math.PI), RIB); a.scale.y = (WALL_H - .05) / rad; a.position.set(cx, Y, z); world.add(a);
-      const a2 = new THREE.Mesh(new THREE.TorusGeometry(rad - .22, .035, 6, 30, Math.PI), RIB2); a2.scale.y = (WALL_H - .2) / (rad - .1); a2.position.set(cx, Y, z); world.add(a2); } });
-  // portales redondos entre salas
-  [-3, 0].forEach(dz => { const [x, z] = mpt(0, dz); const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35, .16, 10, 36, Math.PI), RIB); ring.position.set(x, Y, z); ring.scale.y = 2.6 / 1.35; world.add(ring);
-    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.2, .04, 6, 36, Math.PI), RIB2); ring2.position.set(x, Y, z + (dz ? .1 : -.1)); ring2.scale.y = 2.45 / 1.2; world.add(ring2); });
-  [[-5, 3.6, 1], [5, 3.6, 1], [-8, 3.6, 1], [8, 3.6, 1], [0, 7, 0], [0, 10, 0]].forEach(([dx, dz, side]) => { const [x, z] = mpt(dx, dz); const ring = new THREE.Mesh(new THREE.TorusGeometry(1.12, .14, 10, 36, Math.PI), RIB); ring.position.set(x, Y, z); ring.scale.y = 2.5 / 1.12; if (side) ring.rotation.y = Math.PI / 2; world.add(ring);
-    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.0, .04, 6, 36, Math.PI), RIB2); ring2.position.copy(ring.position); ring2.scale.y = 2.35 / 1.0; ring2.rotation.y = ring.rotation.y; world.add(ring2); });
+  // vigas del techo y pilastras pegadas a las paredes
+  [[R[0], 2.0], [R[2], 2.3], [R[4], 2.2], [R[6], 2.2], [R[8], 2.4]].forEach(([r, step]) => { const w = r[2] - r[0], cx = (r[0] + r[2]) / 2;
+    for (let z = r[1] + 1; z < r[3] - .5; z += step) { box(w - .1, .22, .3, RIB, cx, Y + WALL_H - .14, z, null, false); box(w - .3, .05, .08, RIB2, cx, Y + WALL_H - .28, z, null, false);
+      [r[0] + .09, r[2] - .09].forEach(px => { const ox = px < cx ? r[0] - .3 : r[2] + .3; if (R.some(q => ox > q[0] && ox < q[2] && z > q[1] - .6 && z < q[3] + .6)) return; box(.18, WALL_H, .3, RIB, px, Y + WALL_H / 2, z, null, false); box(.04, WALL_H - .6, .08, RIB2, px + (px < cx ? .1 : -.1), Y + WALL_H / 2, z, null, false); }); } });
+  // marcos rectos en los pasos entre salas (sin arcos)
+  const pframe = (x, z, half, side) => { const H2 = WALL_H; [-1, 1].forEach(sd => { const px = side ? x : x + sd * (half + .02), pz = side ? z + sd * (half + .02) : z; box(side ? .3 : .22, H2, side ? .22 : .3, RIB, px, Y + H2 / 2, pz, null, false); box(side ? .34 : .05, H2 - .5, side ? .05 : .34, RIB2, px, Y + H2 / 2, pz, null, false); });
+    box(side ? .3 : half * 2 + .3, .3, side ? half * 2 + .3 : .3, RIB, x, Y + H2 - .15, z, null, false); box(side ? .34 : half * 2, .05, side ? half * 2 : .34, RIB2, x, Y + H2 - .32, z, null, false); };
+  [-3, 0].forEach(dz => { const [x, z] = mpt(0, dz); pframe(x, z, 1.2, 0); });
+  [[-5, 3.6, 1], [5, 3.6, 1], [-8, 3.6, 1], [8, 3.6, 1], [0, 7, 0], [0, 10, 0]].forEach(([dx, dz, side]) => { const [x, z] = mpt(dx, dz); pframe(x, z, side ? 1.0 : 1.2, side); });
   // ventanal del puente con marco
   const win = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 2.0), basic(0xffffff, { map: STAR_T })); win.position.set(MINI.x, Y + 1.8, MINI.z - 9 + .05); world.add(win);
   const fr = new THREE.Mesh(new THREE.TorusGeometry(1, .1, 8, 40), RIB2); fr.scale.set(3.4, 1.1, 1); fr.position.set(MINI.x, Y + 1.8, MINI.z - 9 + .08); world.add(fr);
@@ -1737,6 +1741,7 @@ function aseTick(dt, t, me) {
   // flecha de la ballesta
   if (S.bolt && S.bolt.n !== boltN) { boltN = S.bolt.n; if (!BOLT) { BOLT = cyl(.03, .03, .8, toon(0x6a4a2a), 0, 0, 0, null, 6); world.remove(BOLT); scene.add(BOLT); BOLT.rotation.order = 'YXZ'; } BOLT.userData.a = S.bolt.a; BOLT.userData.b = S.bolt.b; BOLT.userData.t = 0; BOLT.visible = true; snd('zap'); }
   if (BOLT && BOLT.visible) { const u = (BOLT.userData.t += dt * 4), a = BOLT.userData.a, b = BOLT.userData.b; BOLT.position.set(a[0] + (b[0] - a[0]) * Math.min(1, u), 1.2, a[1] + (b[1] - a[1]) * Math.min(1, u)); BOLT.rotation.set(Math.PI / 2, Math.atan2(b[0] - a[0], b[1] - a[1]), 0); if (u > 1.4) BOLT.visible = false; }
+  qs('#infV').style.opacity = me && S && S.inf && me.im && S.ph === 'play' ? .85 : 0;
   qs('#frenzyV').style.opacity = me && me.fz > 0 && S.ph === 'play' ? .9 : 0;
   if (me && me.fz > 0 && !local.wasFz) { toast('¡FRENESÍ! Más rápido unos segundos', '#ff5a5a'); snd('alarm'); } local.wasFz = !!(me && me.fz > 0);
   lairTick(dt, t, me);
@@ -1780,8 +1785,6 @@ const FISH = [], KELP = [];
 function fishMesh(c) { const g = new THREE.Group(); const b = sph(.22, toon(c), 0, 0, 0, g, 12); b.scale.set(1.6, 1, .7); const tl = new THREE.Mesh(new THREE.ConeGeometry(.16, .3, 4), toon(c)); tl.rotation.z = Math.PI / 2; tl.position.x = -.4; g.add(tl); sph(.05, toon(0x1d1640), .22, .06, .12, g, 6); return g; }
 // ---- ascensores
 function elevAt(x, z) { const r = roomAt(x, z); if (r < 0 || !ROOMS[r].elev) return null; const pair = SUB_ELEV[ROOMS[r].elev - 1]; const to = pair.find(i => i !== r); return { from: r, to }; }
-function startElev(e) { if (local.elev) return; const up = subFloor(P.x) === 1; local.elev = { t: 2.4, dx: ROOMS[e.to].r[0] - ROOMS[e.from].r[0], up }; snd('door'); toast(up ? 'Subiendo a la cubierta superior…' : 'Bajando a la cubierta inferior…', '#ffcc33'); }
-function elevTick(dt) { const E = local.elev; if (!E) return; E.t -= dt; local.shake = Math.max(local.shake || 0, .08); if (E.t < .5 && !E.flash) { E.flash = 1; local.flash = .7; } if (E.t <= 0) { P.x += E.dx; local.elev = null; snd('click'); toast(E.up ? 'Cubierta superior' : 'Cubierta inferior', '#ffcc33'); } }
 // ---- casco, fondo marino y decoración
 function buildSubHull() {
   const HM = toon(0xffffff, { map: SUBT.hull }), RM = toon(0x4a6672, { map: SUBT.hull }), allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], E = .14, H = WALL_H + E;
@@ -1812,13 +1815,7 @@ function decorateSub() {
   const waterM = basic(0xffffff, { map: SUBT.water });
   // ojos de buey en todas las paredes de las salas
   const allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], NR = ROOMS.length;
-  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { if (e.ri >= NR || ROOMS[e.ri].elev) return; const L2 = e.b - e.a; if (L2 < 3) return; const n = Math.floor((L2 - 1) / 3.6);
-    for (let k = 0; k < n; k++) { const s = e.a + (L2 - (n - 1) * 3.6) / 2 + k * 3.6; if (s < e.a + 1.1 || s > e.b - 1.1) continue; const x = e.ax === 'z' ? s : e.v, z = e.ax === 'z' ? e.v : s;
-      if ([...ST, ...FIX].some(q => Math.hypot(q.c[0] - x, q.c[1] - z) < 1.6) || Math.hypot(CAM_DESK.p[0] - x, CAM_DESK.p[1] - z) < 3 || Math.hypot(CANNON.c[0] - x, CANNON.c[1] - z) < 1.6 || AIRLOCKS.some(a => Math.hypot(a.w[0] - x, a.w[1] - z) < 2)) continue;
-      const rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), ix = e.ax === 'x' ? -e.out * .02 : 0, iz = e.ax === 'z' ? -e.out * .02 : 0;
-      const p = new THREE.Mesh(new THREE.CircleGeometry(.55, 24), waterM); p.rotation.y = rot; p.position.set(x + ix, 1.75, z + iz); world.add(p);
-      const rg = new THREE.Mesh(new THREE.TorusGeometry(.6, .09, 8, 24), BR); rg.rotation.y = rot; rg.position.set(x + ix * 2, 1.75, z + iz * 2); world.add(rg);
-      const ox = e.ax === 'x' ? e.out * .16 : 0, oz = e.ax === 'z' ? e.out * .16 : 0, pe = new THREE.Mesh(new THREE.CircleGeometry(.5, 20), basic(lighter(ROOMS[e.ri].l, .2))); pe.rotation.y = rot + Math.PI; pe.position.set(x + ox, 1.75, z + oz); world.add(pe); } });
+  // (las ventanas de verdad se construyen en subWall)
   // tuberías del techo en cada sala
   ROOMS.forEach(r => { const [x0, z0, x1, z1] = r.r, w = x1 - x0, d = z1 - z0; if (w < 6 && d < 6) return; const alongX = w >= d, Lp = (alongX ? w : d) - 1.2;
     [.7, 1.2].forEach((off, k) => { const px = alongX ? (x0 + x1) / 2 : x0 + off + .2, pz = alongX ? z0 + off + .2 : (z0 + z1) / 2; const c = cyl(.11 - k * .03, .11 - k * .03, Lp, k ? toon(0xd9a441) : M, px, Y - .28 - k * .18, pz, null, 8); c.rotation[alongX ? 'z' : 'x'] = Math.PI / 2; }); });
@@ -1906,15 +1903,150 @@ function subTex2() {
   SUBT.ceil = mk(256, 256, g => { g.fillStyle = '#20343c'; g.fillRect(0, 0, 256, 256); g.fillStyle = '#2c4650'; for (let k = 0; k < 256; k += 64) { g.fillRect(k, 0, 18, 256); g.fillRect(0, k, 256, 10); } g.fillStyle = '#4a6a74'; for (let k = 0; k < 256; k += 64) for (let j = 6; j < 256; j += 18) { g.beginPath(); g.arc(k + 9, j, 2, 0, 7); g.fill(); } });
   SUBT.caustic = mk(256, 256, g => { g.fillStyle = '#000'; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(160,240,255,.9)'; g.lineWidth = 3;
     for (let k = 0; k < 26; k++) { let x = Math.random() * 256, y = Math.random() * 256; g.beginPath(); g.moveTo(x, y); for (let j = 0; j < 5; j++) { const nx = x + (Math.random() - .5) * 70, ny = y + (Math.random() - .5) * 70; g.quadraticCurveTo((x + nx) / 2 + 12, (y + ny) / 2 - 12, nx, ny); x = nx; y = ny; } g.stroke(); } });
-  SUBT.caustic2 = SUBT.caustic.clone(); SUBT.caustic2.needsUpdate = true; SUBT.caustic2.repeat.set(1.3, 1.3);
+  SUBT.caustic2 = SUBT.caustic.clone(); SUBT.caustic2.needsUpdate = true; SUBT.caustic2.repeat.set(1.3, 1.3); subGlassTex();
+}
+// ---- cristales que dan al mar: paredes, techos de túnel y suelos
+function subGlassTex() {
+  const mk = (w, h, f) => { const t = new THREE.CanvasTexture(cvs(w, h, f)); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  SUBT.gwin = mk(256, 256, g => { g.clearRect(0, 0, 256, 256); g.fillStyle = 'rgba(120,215,255,.10)'; g.fillRect(0, 0, 256, 256);
+    [[40, .16, 38], [120, .09, 16], [190, .13, 26]].forEach(([x, a, w]) => { g.fillStyle = `rgba(255,255,255,${a})`; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + w, 0); g.lineTo(x + w - 90, 256); g.lineTo(x - 90, 256); g.fill(); });
+    g.strokeStyle = 'rgba(220,250,255,.35)'; g.lineWidth = 4; g.strokeRect(2, 2, 252, 252); });
+  SUBT.gfloor = mk(256, 256, g => { g.clearRect(0, 0, 256, 256); g.fillStyle = 'rgba(110,200,240,.13)'; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(200,240,255,.5)'; g.lineWidth = 6; g.strokeRect(3, 3, 250, 250);
+    g.strokeStyle = 'rgba(255,255,255,.2)'; g.lineWidth = 3; for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(30 + k * 70, 236); g.lineTo(92 + k * 70, 174); g.stroke(); }
+    g.fillStyle = 'rgba(220,240,255,.7)'; [[12, 12], [244, 12], [12, 244], [244, 244]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); }); });
+  SUBT.shaft = mk(128, 256, g => { g.fillStyle = '#1a2328'; g.fillRect(0, 0, 128, 256); g.fillStyle = '#2a363c'; for (let y = 0; y < 256; y += 64) g.fillRect(0, y, 128, 8); g.fillStyle = '#fff0b0'; for (let y = 30; y < 256; y += 128) g.fillRect(10, y, 108, 7);
+    g.fillStyle = '#0c1114'; g.fillRect(20, 0, 6, 256); g.fillRect(102, 0, 6, 256); g.fillStyle = '#ffcc33'; g.fillRect(0, 90, 128, 4); });
+  SUBT.shaft.repeat.set(1, 2);
+  const gm = (map, op) => new THREE.MeshBasicMaterial({ map, color: 0xffffff, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide });
+  SUBT.gwinM = gm(SUBT.gwin, 1); SUBT.gfloorM = gm(SUBT.gfloor, 1); SUBT.gceilM = gm(SUBT.gwin, .8);
+}
+const SUB_PANO = { 'Acuario': 1, 'Puente': 1, 'Cantina': 1, 'Depuradora': 1 };
+function subWinSpans(e, room) {
+  const L = e.b - e.a; if (!room || room.elev || L < 2.6) return [];
+  const bad = (x, z) => [...ST, ...FIX].some(q => Math.hypot(q.c[0] - x, q.c[1] - z) < 1.15) || Math.hypot(CAM_DESK.p[0] - x, CAM_DESK.p[1] - z) < 2.6 || Math.hypot(CANNON.c[0] - x, CANNON.c[1] - z) < 1.6 || AIRLOCKS.some(a => Math.hypot(a.w[0] - x, a.w[1] - z) < 2.2);
+  const pano = SUB_PANO[room.n], W = pano ? 2.6 : 2.0, step = pano ? 2.9 : 3.4, n = Math.max(1, Math.floor((L - .8) / step)), out = [];
+  for (let k = 0; k < n; k++) { const s = e.a + (L - (n - 1) * step) / 2 + k * step; if (s - W / 2 < e.a + .45 || s + W / 2 > e.b - .45) continue;
+    const P2 = q => e.ax === 'z' ? [q, e.v] : [e.v, q]; if ([s - W / 2 + .3, s, s + W / 2 - .3].some(q => bad(...P2(q)))) continue; out.push([s - W / 2, s + W / 2]); }
+  return out;
 }
 function subWall(e, isRoom, room) {
-  const L = e.b - e.a, mid = (e.a + e.b) / 2, rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2);
-  const g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1); const m = new THREE.Mesh(g, isRoom ? toon(mix(0xffffff, room.a, .16), { map: SUBT.wall2 }) : toon(0xd8ccb0, { map: SUBT.wall2 })); m.rotation.y = rot;
-  if (e.ax === 'z') m.position.set(mid, WALL_H / 2, e.v); else m.position.set(e.v, WALL_H / 2, mid); world.add(m);
-  const q = .09, px = e.ax === 'z' ? mid : e.v - e.out * q, pz = e.ax === 'z' ? e.v - e.out * q : mid; const rail = cyl(.05, .05, L, toon(0xd9a441), px, 1.12, pz, null, 8); rail.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2;
-  const q2 = .03, bx = e.ax === 'z' ? mid : e.v - e.out * q2, bz = e.ax === 'z' ? e.v - e.out * q2 : mid; box(e.ax === 'z' ? L : .06, .14, e.ax === 'z' ? .06 : L, toon(isRoom ? room.a : 0x5ad8ff, { e: isRoom ? room.a : 0x5ad8ff, ei: .35 }), bx, WALL_H - .3, bz, null, false);
+  const L = e.b - e.a, rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), dir = Math.round(e.ax === 'z' ? Math.cos(rot) : -Math.sin(rot));
+  const wm = isRoom ? toon(mix(0xffffff, room.a, .16), { map: SUBT.wall2 }) : toon(0xd8ccb0, { map: SUBT.wall2 }), FR = toon(0x2e3e46), BRM = toon(0xd9a441);
+  const at = (s, q) => e.ax === 'z' ? [s, e.v - e.out * q] : [e.v - e.out * q, s];
+  const piece = (a, b, y0, y1, mat, q = 0) => { if (b - a < .01 || y1 - y0 < .01) return null; const g = new THREE.PlaneGeometry(b - a, y1 - y0), uv = g.attributes.uv;
+    for (let i = 0; i < uv.count; i++) { const ux = uv.getX(i) > .5, uy = uv.getY(i) > .5; uv.setXY(i, ((dir > 0) === ux ? b : a) / 3, (uy ? y1 : y0) / WALL_H); }
+    const m = new THREE.Mesh(g, mat); m.rotation.y = rot; const [px, pz] = at((a + b) / 2, q); m.position.set(px, (y0 + y1) / 2, pz); world.add(m); return m; };
+  const along = (s0, s1, y, h, d, mat, q) => { const [px, pz] = at((s0 + s1) / 2, q); return box(e.ax === 'z' ? s1 - s0 : d, h, e.ax === 'z' ? d : s1 - s0, mat, px, y, pz, null, false); };
+  if (!isRoom) { // pasillo-túnel: casi todo cristal
+    const y0 = .32, y1 = WALL_H - .2; piece(e.a, e.b, 0, y0, wm); piece(e.a, e.b, y1, WALL_H, wm); piece(e.a, e.b, y0, y1, SUBT.gwinM);
+    along(e.a, e.b, y0 + .03, .06, .08, toon(0x5ad8ff, { e: 0x5ad8ff, ei: .6 }), .04); along(e.a, e.b, y1 - .03, .06, .08, FR, .04); return; }
+  const pano = SUB_PANO[room.n], y0 = pano ? .35 : .95, y1 = pano ? WALL_H - .45 : 2.55, sp = subWinSpans(e, room);
+  piece(e.a, e.b, 0, y0, wm); piece(e.a, e.b, y1, WALL_H, wm); let c = e.a;
+  sp.forEach(([a, b]) => { piece(c, a, y0, y1, wm); piece(a, b, y0, y1, SUBT.gwinM); const t = .1;
+    along(a - t, b + t, y0 - t / 2, t, .1, FR, .05); along(a - t, b + t, y1 + t / 2, t, .1, FR, .05); along(a - t, a, (y0 + y1) / 2, y1 - y0, .1, FR, .05); along(b, b + t, (y0 + y1) / 2, y1 - y0, .1, FR, .05);
+    along(a, b, y0 + .02, .04, .14, BRM, .08); c = b; });
+  piece(c, e.b, y0, y1, wm);
+  if (!pano || !sp.length) { const [rx, rz] = at((e.a + e.b) / 2, .09); const rail = cyl(.05, .05, L, BRM, rx, 1.12, rz, null, 8); rail.rotation[e.ax === 'z' ? 'z' : 'x'] = Math.PI / 2; }
+  along(e.a, e.b, WALL_H - .3, .14, .06, toon(room.a, { e: room.a, ei: .35 }), .03);
 }
+// tramos de un pasillo que quedan fuera de las salas
+function subSegOut(c) { const [x0, z0, x1, z1] = c.r, vert = c.vert, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2; let segs = [[vert ? z0 : x0, vert ? z1 : x1]];
+  ROOMS.forEach(r => { const [a0, b0, a1, b1] = r.r; if (!(vert ? (cx > a0 && cx < a1) : (cz > b0 && cz < b1))) return; const lo = vert ? b0 : a0, hi = vert ? b1 : a1;
+    segs = segs.flatMap(([s, e]) => e <= lo || s >= hi ? [[s, e]] : [[s, Math.min(e, lo)], [Math.max(s, hi), e]].filter(([p, q]) => q - p > .05)); });
+  return segs; }
+function subTunnels() {
+  const Y = WALL_H, RIB = toon(0x3a5a64), BR = toon(0xd9a441), GR = toon(0x9aa6ae, { map: SUBT.grate }), LT = basic(0x5ad8ff);
+  CRECTS.forEach(c => { const [x0, z0, x1, z1] = c.r, vert = c.vert, wd = vert ? x1 - x0 : z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+    subSegOut(c).forEach(([s0, s1]) => { const L = s1 - s0, m = (s0 + s1) / 2; if (L < .3) return;
+      // pasarela de rejilla sobre el suelo de cristal, con luces a los lados
+      const g = new THREE.PlaneGeometry(vert ? 1.2 : L, vert ? L : 1.2); g.rotateX(-Math.PI / 2); scaleUV(g, vert ? 1 : L / 1.2, vert ? L / 1.2 : 1); const w = new THREE.Mesh(g, GR); w.position.set(vert ? cx : m, .012, vert ? m : cz); world.add(w);
+      [-1, 1].forEach(sd => { const st = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .05 : L, vert ? L : .05), LT); st.rotation.x = -Math.PI / 2; st.position.set(vert ? cx + sd * .62 : m, .016, vert ? m : cz + sd * .62); world.add(st); });
+      // espina en el techo de cristal
+      box(vert ? .16 : L, .1, vert ? L : .16, RIB, vert ? cx : m, Y - .05, vert ? m : cz, null, false);
+      // marcos del túnel pegados al cristal
+      for (let s = s0 + 1.1; s < s1 - .5; s += 2.4) { const qx = vert ? cx : s, qz = vert ? s : cz; if (CRECTS.some(o => o !== c && qx > o.r[0] - .5 && qx < o.r[2] + .5 && qz > o.r[1] - .5 && qz < o.r[3] + .5)) continue;
+        [-1, 1].forEach(sd => { const px = vert ? cx + sd * (wd / 2 - .07) : qx, pz = vert ? qz : cz + sd * (wd / 2 - .07); box(vert ? .14 : .24, Y, vert ? .24 : .14, RIB, px, Y / 2, pz, null, false);
+          box(vert ? .04 : .1, Y - .8, vert ? .1 : .04, BR, px - (vert ? sd * .08 : 0), Y / 2, pz - (vert ? 0 : sd * .08), null, false); });
+        box(vert ? wd : .24, .18, vert ? .24 : wd, RIB, qx, Y - .09, qz, null, false); } }); });
+}
+// fondo marino visible bajo los suelos de cristal
+function subSeabedUnder() { let sd = 4242; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const areas = [...CRECTS.map(c => c.r), ...ROOMS.filter(r => r.gf).map(r => r.r)], STAR = [0xff7a5a, 0xffb347, 0xff7ac6, 0xc9a0ff], Y0 = -2.17;
+  areas.forEach(r => { const [x0, z0, x1, z1] = r, A = (x1 - x0) * (z1 - z0), n = Math.min(16, Math.ceil(A / 4));
+    for (let k = 0; k < n; k++) { const x = x0 + .3 + rnd() * (x1 - x0 - .6), z = z0 + .3 + rnd() * (z1 - z0 - .6), kind = k % 5;
+      if (kind === 0) { const s = new THREE.Mesh(new THREE.CircleGeometry(.3, 5), toon(STAR[k % 4])); s.rotation.x = -Math.PI / 2; s.rotation.z = rnd() * 6; s.position.set(x, Y0 + .03, z); world.add(s); }
+      else if (kind === 1) { for (let j = 0; j < 4; j++) { const c = cyl(.04, .08, .5 + j * .15, toon(STAR[(k + j) % 4]), x + Math.cos(j * 1.6) * .2, Y0 + .3, z + Math.sin(j * 1.6) * .2, null, 6); c.rotation.z = Math.cos(j) * .35; } }
+      else if (kind === 2) { const a = sph(.16, toon(0x7fffd4, { e: 0x3fd0b0, ei: .9 }), x, Y0 + .08, z, null, 10); a.scale.y = .5; for (let j = 0; j < 6; j++) { const t = cyl(.015, .02, .3, toon(0xbfffe8, { e: 0x5fe0c0, ei: .8 }), x + Math.cos(j) * .1, Y0 + .22, z + Math.sin(j) * .1, null, 4); t.rotation.z = Math.cos(j) * .4; } }
+      else if (kind === 3) { const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(.25 + rnd() * .35, 0), toon(0x6a7a80)); r2.position.set(x, Y0, z); r2.scale.y = .5; world.add(r2); }
+      else { const sh = sph(.14, toon(0xffe0c8), x, Y0 + .03, z, null, 8); sh.scale.set(1, .35, .8); } } });
+  CRECTS.forEach((c, i) => { if (i % 2) return; const [x0, z0, x1, z1] = c.r; const m = fishMesh([0xffd93d, 0x7fe6ff, 0xff7ac6][i % 3]); m.scale.setScalar(.7); m.userData.dyn = 1; scene.add(m);
+    FISH.push({ m, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, r: Math.min(3, Math.max(x1 - x0, z1 - z0) / 2), y: -1.4, a: rnd() * 6, s: .3 }); });
+}
+// ---- ascensores con puertas que se cierran y cabina que se mueve
+const ELEVD = [];
+function buildElevDoors() { const YM = toon(0xc8ced6), ST2 = toon(0xffcc33), H = WALL_H - .5;
+  ROOMS.forEach((r, ri) => { if (!r.elev) return; const rc = [(r.r[0] + r.r[2]) / 2, (r.r[1] + r.r[3]) / 2];
+    DOORS.filter(d => d.room === ri).forEach(d => { const a = (d.vert ? d.x0 : d.z0) + .36, b = (d.vert ? d.x1 : d.z1) - .36, half = (b - a) / 2;
+      const panels = [[a, 1], [b, -1]].map(([s, sg]) => { const g = new THREE.Group(); g.userData.dyn = 1; const inner = new THREE.Group(); g.add(inner);
+        box(1, 1.3, .1, YM, .5, .65, 0, inner, false); box(1, H - 2.1, .1, YM, .5, 2.1 + (H - 2.1) / 2, 0, inner, false); box(1, .8, .04, SUBT.gwinM, .5, 1.7, 0, inner, false); box(.08, H, .12, ST2, .96, H / 2, 0, inner, false);
+        if (d.vert) { g.position.set(s, 0, d.pt[1]); g.rotation.y = sg > 0 ? 0 : Math.PI; } else { g.position.set(d.pt[0], 0, s); g.rotation.y = sg > 0 ? -Math.PI / 2 : Math.PI / 2; }
+        g.visible = false; world.add(g); return { g, inner }; });
+      const sgn = d.vert ? Math.sign(d.pt[1] - rc[1]) : Math.sign(d.pt[0] - rc[0]), sm = new THREE.Mesh(new THREE.PlaneGeometry(b - a + .6, WALL_H), new THREE.MeshBasicMaterial({ map: SUBT.shaft, side: THREE.DoubleSide }));
+      if (d.vert) sm.position.set(d.pt[0], WALL_H / 2, d.pt[1] + sgn * .4); else { sm.position.set(d.pt[0] + sgn * .4, WALL_H / 2, d.pt[1]); sm.rotation.y = Math.PI / 2; }
+      sm.userData.dyn = 1; sm.visible = false; world.add(sm); ELEVD.push({ k: r.elev, half, panels, sm }); }); }); }
+const ELEV_T = { close: .7, go: .8, swap: 2.1, stop: 3.4, open: 3.5, end: 4.2 };
+function elevDoorC(t) { return t < ELEV_T.close ? t / ELEV_T.close : t < ELEV_T.open ? 1 : t < ELEV_T.end ? 1 - (t - ELEV_T.open) / (ELEV_T.end - ELEV_T.open) : 0; }
+function elevDoorsTick(dt) { const E = local.elev, c = E ? elevDoorC(E.t) : 0;
+  ELEVD.forEach(D => { const cc = E && E.k === D.k ? c : 0; D.panels.forEach(p => { p.g.visible = cc > .01; p.inner.scale.x = Math.max(.01, D.half * cc); }); D.sm.visible = cc > .995; });
+  if (E && SUBT.shaft && E.t > ELEV_T.go && E.t < ELEV_T.stop) { const v = Math.sin(Math.PI * (E.t - ELEV_T.go) / (ELEV_T.stop - ELEV_T.go)); SUBT.shaft.offset.y = (SUBT.shaft.offset.y + (E.up ? -1 : 1) * dt * 1.6 * v + 10) % 1; } }
+function startElev(e) { if (local.elev) return; const up = subFloor(P.x) === 1; local.elev = { t: 0, dx: ROOMS[e.to].r[0] - ROOMS[e.from].r[0], up, k: ROOMS[e.from].elev, moved: 0, hum: 0, op: 0 }; snd('door'); }
+function elevTick(dt) { const E = local.elev; if (!E) return; E.t += dt;
+  if (E.t > ELEV_T.go && E.t < ELEV_T.stop) { local.shake = Math.max(local.shake || 0, .035); if (!E.hum) { E.hum = 1; snd('beep'); toast(E.up ? 'Subiendo a la cubierta superior…' : 'Bajando a la cubierta inferior…', '#ffcc33'); } }
+  if (E.t >= ELEV_T.swap && !E.moved) { E.moved = 1; P.x += E.dx; }
+  if (E.t >= ELEV_T.open && !E.op) { E.op = 1; snd('door'); local.shake = Math.max(local.shake || 0, .15); }
+  if (E.t >= ELEV_T.end) { local.elev = null; snd('click'); toast(E.up ? 'Cubierta superior' : 'Cubierta inferior', '#ffcc33'); } }
+
+// ================== MODO INFECTADO ==================
+const INF_CD = 15;
+const mmss = s => Math.floor(Math.max(0, s) / 60) + ':' + String(Math.floor(Math.max(0, s) % 60)).padStart(2, '0');
+function infAI(p, ai, dt, sp) {
+  if (p.im) { // infectado: caza al superviviente más cercano
+    let best = null, bd = 1e9; S.pl.forEach(q => { if (q.al && !q.im && q.v < 0 && !q.ev) { const d = Math.hypot(q.x - p.x, q.z - p.z); if (d < bd) { bd = d; best = q; } } });
+    if (!best) return true; const zs = sp * (p.i === S.p0 ? 1.06 : .94);
+    if (bd < 1.4 && p.cd <= 0) { hostKill(p.i, best.i); ai.path = []; ai.wait = .8; return true; }
+    if (ai.wait > 0) { ai.wait -= dt; return true; }
+    if (bd < 9 && losClear(p.x, p.z, best.x, best.z)) { stepToward(p, best.x, best.z, zs, dt); ai.path = []; return true; }
+    ai.huntT = (ai.huntT || 0) - dt; const last = ai.path.length ? ai.path[ai.path.length - 1] : null;
+    if (!last || (ai.huntT <= 0 && Math.hypot(last[0] - best.x, last[1] - best.z) > 3)) { ai.atT = null; pathTo(p, ai, { p: [best.x, best.z], room: nearestNode(best.x, best.z) }); while (ai.path.length > 1 && Math.hypot(ai.path[1][0] - p.x, ai.path[1][1] - p.z) < Math.hypot(ai.path[1][0] - ai.path[0][0], ai.path[1][1] - ai.path[0][1]) && losClear(p.x, p.z, ai.path[1][0], ai.path[1][1])) ai.path.shift(); ai.huntT = 2.2; }
+    if (ai.path.length && stepPath(p, ai, zs, dt)) ai.path.shift(); return true; }
+  // superviviente: huye si ve a un infectado cerca
+  let Z = null, zd = 1e9; S.pl.forEach(q => { if (q.al && q.im) { const d = Math.hypot(q.x - p.x, q.z - p.z); if (d < zd) { zd = d; Z = q; } } });
+  if (Z && zd < 9 && losClear(p.x, p.z, Z.x, Z.z)) { ai.fleeT = (ai.fleeT || 0) - dt;
+    const tgt = ai.flee && ai.path.length ? ai.path[ai.path.length - 1] : null;
+    if (!tgt || ai.fleeT <= 0 && Math.hypot(tgt[0] - Z.x, tgt[1] - Z.z) < Math.hypot(tgt[0] - p.x, tgt[1] - p.z) + 2) { ai.flee = 1; ai.fleeT = 2; ai.doing = -1; ai.wait = 0; ai.atT = null; ai.goal = null; const me = nearestNode(p.x, p.z); let bk = -1, bs = -1e9;
+      NODES.forEach((nd, k) => { if (IS_SUB && subFloor(nd[0]) !== subFloor(p.x)) return; const dz2 = Math.hypot(nd[0] - Z.x, nd[1] - Z.z), dp = Math.hypot(nd[0] - p.x, nd[1] - p.z); if (dp < 4 || dz2 < dp) return; const sc = dz2 - .35 * dp; if (sc > bs) { bs = sc; bk = k; } });
+      if (bk < 0) NODES.forEach((nd, k) => { if (IS_SUB && subFloor(nd[0]) !== subFloor(p.x)) return; const sc = Math.hypot(nd[0] - Z.x, nd[1] - Z.z) - .2 * Math.hypot(nd[0] - p.x, nd[1] - p.z); if (sc > bs) { bs = sc; bk = k; } });
+      const path = bk >= 0 ? navPath(me, bk).map(k => NODES[k].slice()) : [];
+      while (path.length > 1 && (Math.hypot(path[1][0] - p.x, path[1][1] - p.z) < Math.hypot(path[1][0] - path[0][0], path[1][1] - path[0][1]) || Math.hypot(path[0][0] - Z.x, path[0][1] - Z.z) < Math.hypot(path[0][0] - p.x, path[0][1] - p.z))) path.shift();
+      ai.path = path; }
+    if (ai.path.length) { if (stepPath(p, ai, sp * 1.1, dt)) ai.path.shift(); } else { const dx = p.x - Z.x, dz = p.z - Z.z, d = Math.hypot(dx, dz) || 1; stepToward(p, p.x + dx / d * 2, p.z + dz / d * 2, sp * 1.05, dt); } return true; }
+  if (ai.flee && ai.path.length) { if (stepPath(p, ai, sp * 1.05, dt)) ai.path.shift(); return true; }
+  if (ai.flee) { ai.flee = 0; ai.path = []; ai.wait = .2; } return false;
+}
+function infCheckWin() { const sv = S.pl.filter(p => p.al && !p.im).length, total = S.pl.reduce((s, p) => s + (p.im ? 0 : p.tt), 0), done = S.pl.reduce((s, p) => s + (p.im ? 0 : p.td), 0); let w = null, r = '';
+  if (sv === 0) { w = 'imp'; r = 'Todos han sido infectados.'; } else if (S.it <= 0) { w = 'crew'; r = `Llega el rescate: ${sv} ${sv > 1 ? 'supervivientes han' : 'superviviente ha'} aguantado.`; } else if (total > 0 && done >= total) { w = 'crew'; r = 'Los supervivientes han terminado las tareas y escapan.'; }
+  if (w) { S.ph = 'end'; S.win = w; S.wr = r; S.m = null; S.ej = null; S.sab = null; S.doors = {}; return true; } return false; }
+function infEvent(f) { const V = AV[f.id]; if (V) burst('glow', V.rx, 1, V.rz, 22, 0x7dff5a);
+  if (f.id === ME) { const ov = qs('#death'); ov.replaceChildren(); const k = S.pl[f.by]; const a = el('div', 'pop'); if (k) a.innerHTML = avatarSVG(k.c, false, 90); const h = el('h1', 'pop', '¡Te han infectado!'); h.style.color = '#7dff5a';
+    const p = el('p', null, 'Ahora eres un infectado: persigue y contagia a los supervivientes antes de que llegue el rescate.'); p.style.fontSize = '18px'; ov.append(a, h, p); ov.hidden = false; closeTask(); closeCams(); snd('kill'); setTimeout(() => ov.hidden = true, 2600); local.shake = .4; hudT = 0; }
+  else if (f.by === ME) { snd('kill'); toast('¡Infectado!', '#7dff5a'); hudT = 0; }
+  else { const V2 = S.pl[f.id]; if (V2) toast(`${V2.n} ha sido infectado`, '#7dff5a'); hudT = 0; } }
+function addZombie(c) { const inner = c.inner, G = toon(0x6fd84a), GE = toon(0x9dff5a, { e: 0x7dff3a, ei: 1 });
+  [[.3, .9, .3], [-.35, .6, .3], [.1, .45, .42], [-.2, 1.15, .25], [.42, .55, -.1], [-.4, .9, -.2], [0, .7, -.45]].forEach(([x, y, z]) => { const b = sph(.12, G, x, y, z, inner, 8); b.scale.set(1, 1, .35); b.lookAt(0, .74, 0); });
+  [-.16, .16].forEach(x => sph(.075, GE, x, 1.0, .5, inner, 10));
+  const m = box(.22, .05, .03, toon(0x1d1640), 0, .8, .47, inner, false); m.rotation.z = .15;
+  const ring = new THREE.Mesh(new THREE.RingGeometry(.45, .6, 24), basic(0x7dff5a, { op: .45 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .02; c.g.add(ring);
+  c.zombie = 1; }
 function decorateSub2() {
   const Y = WALL_H, BR = toon(0xd9a441), RIB = toon(0x3a5a64), glow = c => toon(c, { e: c, ei: .9 });
   // cáusticas del agua sobre el suelo (luz que se mueve)
@@ -1925,15 +2057,7 @@ function decorateSub2() {
   ROOMS.forEach(r => { const [x0, z0, x1, z1] = r.r, w = x1 - x0, d = z1 - z0, nx = Math.max(1, Math.round(w / 6)), nz = Math.max(1, Math.round(d / 6));
     for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) { const x = x0 + w * (i + .5) / nx, z = z0 + d * (j + .5) / nz; if (Math.hypot(x - BTN.x, z - BTN.z) < 1 && r === ROOMS[0]) continue;
       cyl(.22, .26, .1, toon(0x2a3a44), x, Y - .05, z, null, 12); sph(.2, glow(0xfff0c8), x, Y - .3, z, null, 12); for (let k = 0; k < 3; k++) { const c = new THREE.Mesh(new THREE.TorusGeometry(.23, .02, 4, 14), BR); c.rotation.y = k * Math.PI / 3; c.position.set(x, Y - .3, z); world.add(c); } } });
-  // cuadernas de latón en los pasillos y tiras de luz azul en el suelo
-  CRECTS.forEach(c => { const [x0, z0, x1, z1] = c.r, vert = c.vert, L = vert ? z1 - z0 : x1 - x0, wd = vert ? x1 - x0 : z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2; if (L < 1.2) return;
-    for (let s = .8; s < L - .4; s += 1.8) { const qx = vert ? cx : x0 + s, qz = vert ? z0 + s : cz; if (CRECTS.some(o => o !== c && qx > o.r[0] - .6 && qx < o.r[2] + .6 && qz > o.r[1] - .6 && qz < o.r[3] + .6)) continue; const rb = new THREE.Mesh(new THREE.TorusGeometry(wd / 2 - .02, .09, 6, 20, Math.PI), RIB); rb.scale.y = (Y - .1) / (wd / 2); if (!vert) rb.rotation.y = Math.PI / 2; rb.position.set(vert ? cx : x0 + s, 0, vert ? z0 + s : cz); world.add(rb);
-      const rb2 = new THREE.Mesh(new THREE.TorusGeometry(wd / 2 - .1, .03, 4, 20, Math.PI), BR); rb2.scale.y = (Y - .25) / (wd / 2 - .1); rb2.rotation.y = rb.rotation.y; rb2.position.copy(rb.position); world.add(rb2); }
-    [-1, 1].forEach(sd => { const st = new THREE.Mesh(new THREE.PlaneGeometry(vert ? .08 : L, vert ? L : .08), basic(0x5ad8ff)); st.rotation.x = -Math.PI / 2; st.position.set(vert ? cx + sd * (wd / 2 - .25) : cx, .016, vert ? cz : cz + sd * (wd / 2 - .25)); world.add(st); }); });
-  // marcos ovalados de escotilla en cada puerta
-  DOORS.forEach(d => { const rg = new THREE.Mesh(new THREE.TorusGeometry(d.w / 2 + .15, .17, 10, 36), toon(0x4a6670)); rg.scale.y = (Y / 2 + .05) / (d.w / 2 + .15); rg.position.set(d.pt[0], Y / 2, d.pt[1]); if (!d.vert) rg.rotation.y = Math.PI / 2; world.add(rg);
-    const rg2 = new THREE.Mesh(new THREE.TorusGeometry(d.w / 2 + .32, .05, 6, 36), BR); rg2.scale.y = (Y / 2 + .2) / (d.w / 2 + .32); rg2.position.copy(rg.position); rg2.rotation.y = rg.rotation.y; world.add(rg2);
-    for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2, bx = Math.cos(a) * (d.w / 2 + .15), by = Math.sin(a) * (Y / 2 + .05); const b = sph(.06, BR, 0, 0, 0, null, 6); if (d.vert) b.position.set(d.pt[0] + bx, Y / 2 + by, d.pt[1] + .18); else b.position.set(d.pt[0] + .18, Y / 2 + by, d.pt[1] + bx); } });
+  subTunnels(); subSeabedUnder(); buildElevDoors();
   // burbujas que suben junto a las tuberías
   ROOMS.forEach((r, i) => { if (i % 2) return; const [x0, z0] = r.r; EMIT.push({ k: 'glow', p: [x0 + .6, .3, z0 + .6], c: 0xcff8ff }); });
 }
@@ -2344,9 +2468,9 @@ function buildShip() {
     const chm = isRoom && room.ch; // salas achaflanadas: suelo y techo recortados por la diagonal
     let fg; if (chm) fg = chamferGeo(room.r, room.ch, true, 2); else { fg = new THREE.PlaneGeometry(w, d); fg.rotateX(-Math.PI / 2); worldUV(fg, x0, z1, w, d, 2); }
     if (isRoom && room.out) { worldUV(fg, x0, z1, w, d, 6); const fo = new THREE.Mesh(fg, toon(0xffffff, { map: ROCK_T })); fo.position.set(cx, dy, cz); world.add(fo); return; }
-    const fm = new THREE.Mesh(fg, toon(isRoom ? ((IS_PLANET || IS_SUB ? room.f : FLOORCOL[room.n]) ?? 0xb4c0c9) : IS_SUB ? 0x9aa6ae : 0xb4c0c9, { map: isRoom && room.ft && SUBT[room.ft] ? SUBT[room.ft] : !isRoom && IS_SUB ? SUBT.grate : isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm);
+    const fm = new THREE.Mesh(fg, toon(isRoom ? ((IS_PLANET || IS_SUB ? room.f : FLOORCOL[room.n]) ?? 0xb4c0c9) : IS_SUB ? 0x9aa6ae : 0xb4c0c9, { map: isRoom && room.ft && SUBT[room.ft] ? SUBT[room.ft] : !isRoom && IS_SUB ? SUBT.grate : isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm); if (IS_SUB && (!isRoom || room.gf)) fm.material = SUBT.gfloorM;
     if (IS_PLANET && (isRoom ? room.glass : CORR[CRECTS[idx - NR].k].exit)) return;
-    if (IS_SUB) { let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); scaleUV(cg, w / 4, d / 4); } const cm = new THREE.Mesh(cg, toon(0xffffff, { map: SUBT.ceil })); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm); return; }
+    if (IS_SUB) { let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); scaleUV(cg, w / 4, d / 4); } const cm = new THREE.Mesh(cg, isRoom ? toon(0xffffff, { map: SUBT.ceil }) : SUBT.gceilM); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm); return; }
     let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); } const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm);
     const lampM = basic(0xfff3d6);
     if (isRoom) { for (let lx = x0 + 3; lx <= x1 - 2.9; lx += 3) for (let lz = z0 + 3; lz <= z1 - 2.9; lz += 3) { if ((Math.round(lx - x0) + Math.round(lz - z0)) % 2 || !inShape(idx, lx, lz, 1)) continue; const l = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), lampM); l.rotation.x = Math.PI / 2; l.position.set(lx, WALL_H - .01, lz); world.add(l); } }
@@ -2355,7 +2479,7 @@ function buildShip() {
   });
   const corrWall = IS_SUB ? toon(0xc8d6dc, { map: SUBT.wall }) : toon(IS_PLANET ? 0xa8b0c4 : 0x7d878f, { map: WALL_T }), corrAcc = toon(0x9fb3bf, { e: 0x5c7a8a, ei: .25 }), corrBase = toon(0x3c444a);
   // paredes diagonales de las esquinas achaflanadas
-  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : IS_SUB ? toon(mix(0xffffff, R.a, .12), { map: SUBT.wall }) : toon(mix(IS_PLANET ? 0xaeb2c4 : 0x78838b, R.a, IS_PLANET ? .1 : .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
+  ROOMS.forEach(R => { if (!R.ch) return; const [x0, z0, x1, z1] = R.r, c = R.ch, wallM = R.hall ? corrWall : IS_SUB ? toon(mix(0xffffff, R.a, .16), { map: SUBT.wall2 }) : toon(mix(IS_PLANET ? 0xaeb2c4 : 0x78838b, R.a, IS_PLANET ? .1 : .06), { map: WALL_T }), accM = R.hall ? corrAcc : toon(mix(R.a, 0x8a9399, .35), { e: R.a, ei: .18 }), baseM = R.hall ? corrBase : toon(0x3c444a);
     [[c[0], [x0 + c[0], z0], [x0, z0 + c[0]], [1, 1]], [c[1], [x1 - c[1], z0], [x1, z0 + c[1]], [-1, 1]], [c[2], [x1, z1 - c[2]], [x1 - c[2], z1], [-1, -1]], [c[3], [x0, z1 - c[3]], [x0 + c[3], z1], [1, -1]]].forEach(([k, A, B, n]) => { if (!k) return;
       const L = Math.hypot(B[0] - A[0], B[1] - A[1]), mx = (A[0] + B[0]) / 2, mz = (A[1] + B[1]) / 2, th = Math.atan2(n[0], n[1]), g = new THREE.PlaneGeometry(L, WALL_H); scaleUV(g, L / 3, 1);
       const m = new THREE.Mesh(g, wallM); m.rotation.y = th; m.position.set(mx, WALL_H / 2, mz); world.add(m); aoStrip(mx, mz, L, th);
@@ -2793,13 +2917,13 @@ const ROLES = {
   lim: { n: 'Limpiador', side: 'imp', col: '#ffcc33', d: 'Hace desaparecer cuerpos para que nadie los reporte.' },
   ali: { n: 'Alien', side: 'alien', col: '#2fd36f', d: 'Pilota su platillo, se infiltra 30 s para eliminar a 1 persona y sabotea desde fuera. Gana si quedan 2 o menos supervivientes.' },
   ase: { n: 'Asesino en serie', side: 'neutral', col: '#e0303a', d: 'Va por libre y elimina a cualquiera, también a los polizones. En las votaciones se esconde en su guarida: elige arma, marca a su víctima y decide por dónde entra. Gana si queda solo.' },
-  sup: { n: 'Suplantador', side: 'imp', col: '#b04aff', d: 'Tras eliminar a alguien, acércate a su cuerpo (C) para robarle la identidad para siempre: te conviertes en esa persona y dejas tu antiguo cuerpo como un cadáver vacío y extraño.' },
+  sup: { n: 'Suplantador', side: 'imp', col: '#b04aff', d: 'Cada vez que eliminas a alguien puedes acercarte a su cuerpo (C) para robarle la identidad: te conviertes en esa persona y dejas tu antiguo cuerpo como un cadáver vacío y extraño. Se recarga en 22 s.' },
   tre: { n: 'Araña', side: 'imp', col: '#7ad14a', d: 'Anda pegada al techo 20 s mirando hacia abajo. Solo la ve quien mira arriba. Desde el techo no puede eliminar.' } };
 const ROLE_KEYS = Object.keys(ROLES);
 const AB_CD = { mec: 25, det: 30, cam: 35, fan: 15, lim: 20, tre: 45, start: 12 };
 const CEIL_T = 20, CEIL_Y = WALL_H - .02, CEIL_LOOK = .6;
 const roleIcon = (k, size = 26) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${RIC[k] || RIC.none}</svg>`;
-const canVent = p => !!p && (p.im || p.ro === 'ing');
+const canVent = p => !!p && !(S && S.inf) && (p.im || p.ro === 'ing');
 const settings = Object.assign({ N: 6, npc: true, imp: 1, prRole: 'crew', prN: 6, ro: ROLE_KEYS.filter(k => k !== 'ali' && k !== 'ase'), prSub: '' }, store.get('settings', {}));
 const AL_IN_T = 30, AL_ENTER_CD = 40, AL_SAB_CD = 45, AL_SHAKE_CD = 30, AL_ABD_CD = 50, UFO_HITS = 3, UFO_HOME = [0, 9, -42], CANNON_RANGE = 55;
 if (!Array.isArray(settings.ro)) settings.ro = ROLE_KEYS.filter(k => k !== 'ali');
@@ -2885,7 +3009,7 @@ function hostPoll(peers) {
   if (!S) return; const map = {};
   peers.forEach(p => { if (p.sameTab || p.kind !== 'viewer' || !p.presence || p.presence.h === 1 || p.presence.k !== NET.code) return; map[p.peer] = p; });
   H.order = H.order || []; Object.keys(map).forEach(pe => { if (!H.order.includes(pe)) H.order.push(pe); }); H.order = H.order.filter(pe => map[pe]);
-  if (S.ph === 'lobby') { S.lob = lobbyHumans(map); S.set = { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID }; return; }
+  if (S.ph === 'lobby') { S.lob = lobbyHumans(map); S.set = { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID, mode: settings.mode || 'cl' }; return; }
   S.pl.forEach(p => {
     if (!p.pe || p.pe === NET.myPeer) return; const peer = map[p.pe];
     if (!peer) { const now = performance.now(); H.miss = H.miss || {}; if (!H.miss[p.pe]) H.miss[p.pe] = now; if (now - H.miss[p.pe] > 5000) { p.pe = ''; p.npc = 1; p.v = -1; p.w = 0; initAI(p, true); } return; }
@@ -2914,17 +3038,18 @@ function clientPoll(peers) {
 }
 
 /* ================== AUTORIDAD (anfitrión) ================== */
-function newLobbyState() { return { ph: 'lobby', set: { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID }, lob: lobbyHumans(null) }; }
+function newLobbyState() { return { ph: 'lobby', set: { N: settings.N, npc: settings.npc, imp: settings.imp, ro: settings.ro, map: MAPID, mode: settings.mode || 'cl' }, lob: lobbyHumans(null) }; }
 function hostStart(practice) {
   const map = {}; if (NET.online) { try { NET.R.peers().forEach(p => { if (p.presence && p.presence.k === NET.code && !p.sameTab) map[p.peer] = p; }); } catch (e) {} }
   const N = practice ? settings.prN + 1 : settings.N;
   const list = practice ? [{ pe: 'yo', n: profile.name || 'Jugador', c: profile.color }] : lobbyHumans(map).slice(0, settings.N);
   if (settings.npc || practice) { const used = new Set(list.map(h => h.c)); while (list.length < N) { let c = 0; while (used.has(c)) c++; used.add(c); list.push({ pe: '', n: COLORS[c].n, c }); } }
-  const n = list.length, impN = practice ? (settings.prRole === 'imp' ? 1 : 0) : Math.min(settings.imp, maxImp(n));
+  const n = list.length, INF = !practice && settings.mode === 'inf' && n >= 2, impN = INF ? 1 : practice ? (settings.prRole === 'imp' ? 1 : 0) : Math.min(settings.imp, maxImp(n));
   const imps = practice ? new Set(settings.prRole === 'imp' ? [0] : []) : new Set(shuffle([...Array(n).keys()]).slice(0, impN));
-  S = { aseN: 0, map: MAPID, ph: 'play', rd: 1, mid: 0, win: null, wr: '', pl: [], b: [], m: null, ej: null, ch: [], impN, kf: null, sab: null, sabCd: practice ? 3 : 15, doors: {}, dc: {}, cams: 0, pr: practice ? 1 : 0 };
+  S = { inf: INF ? 1 : 0, it: INF ? 90 + 10 * n : 0, aseN: 0, map: MAPID, ph: 'play', rd: 1, mid: 0, win: null, wr: '', pl: [], b: [], m: null, ej: null, ch: [], impN, kf: null, sab: null, sabCd: practice ? 3 : 15, doors: {}, dc: {}, cams: 0, pr: practice ? 1 : 0 };
   list.forEach((h, i) => { const st = seat(i, n), im = imps.has(i) ? 1 : 0;
-    S.pl.push({ i, n: h.n, c: h.c, pe: h.pe, npc: h.pe ? 0 : 1, al: 1, im, x: st.x, z: st.z, y: st.yaw, td: 0, tt: im ? 0 : TASKS_PER, tk: pickTasks(!!h.pe), cd: 14, em: 1, v: -1, w: 0 }); });
+    S.pl.push({ i, n: h.n, c: h.c, pe: h.pe, npc: h.pe ? 0 : 1, al: 1, im, x: st.x, z: st.z, y: st.yaw, td: 0, tt: im ? 0 : TASKS_PER, tk: pickTasks(!!h.pe), cd: INF ? (im ? 15 : 8) : 14, em: INF ? 0 : 1, v: -1, w: 0 }); });
+  S.p0 = INF ? [...imps][0] : -1;
   assignRoles(practice);
   if (practice) placePractice();
   H.ai = {}; H.lrSeq = H.lrSeq || {}; H.lastSeq = H.lastSeq || {}; H.chatSeen = H.chatSeen || {}; H.miss = {}; H.kills = {}; H.ev = []; H.introT = 4.2; H.prSab = 12; H.killN = 0; H.accuse = {}; H.accBy = {}; H.op = {}; H.thinkT = 0;
@@ -2976,7 +3101,7 @@ function alienAI(p, dt) {
   if (ai.path.length) { if (stepPath(p, ai, 3.5, dt)) ai.path.shift(); }
 }
 function assignRoles(practice) {
-  S.pl.forEach(p => { p.ro = ''; p.ac = 0; p.au = 0; p.sh = -1; p.st = 0; p.ce = 0; p.xa = 0; });
+  S.pl.forEach(p => { p.ro = ''; p.ac = 0; p.au = 0; p.sh = -1; p.st = 0; p.ce = 0; p.xa = 0; }); if (S.inf) return;
   if (practice && settings.prRole === 'ali') setAlien(S.pl[0], true);
   else if (practice && settings.prRole === 'ase') setAse(S.pl[0], true);
   else if (practice) { const me = S.pl[0], r = settings.prSub; if (r && ROLES[r] && (ROLES[r].side === 'imp') === !!me.im) me.ro = r; }
@@ -3018,6 +3143,7 @@ function npcUpdate(p, dt) {
   if (S.pr) return;
   const ai = H.ai[p.i]; if (!ai) return; const sp = (p.al ? 3.3 : 3.0) * (p.fz > 0 ? 1.35 : 1);
   if (p.al && p.stn > 0) return;
+  if (S.inf && p.al && infAI(p, ai, dt, sp)) return;
   if (p.al && p.hyp > 0) { ai.hw = ai.hw && Math.random() > .02 ? ai.hw : [p.x + rand(-4, 4), p.z + rand(-4, 4)]; stepToward(p, ai.hw[0], ai.hw[1], 2.2, dt); ai.path = []; ai.chase = -1; return; }
   if (ai.inVent) { ai.ventT -= dt; if (!ai.moved && ai.ventT < 1) { const d = VENTS[ai.ventDest]; p.x = d.p[0]; p.z = d.p[1]; p.v = ai.ventDest; ai.moved = true; }
     if (ai.ventT <= 0) { p.v = -1; ai.inVent = false; ai.atT = VENTS[ai.ventDest]; ai.wait = rand(.3, 1); } return; }
@@ -3050,7 +3176,7 @@ function npcThink() {
     let best = null, bd = 1e9; S.pl.forEach(p => { if (!p.npc || !p.al || p.im || p.xa) return; const ai = H.ai[p.i]; if (!ai || ai.fix >= 0) return; const d = Math.hypot(p.x - FIX[k].p[0], p.z - FIX[k].p[1]); if (d < bd) { bd = d; best = p; } });
     if (best && Math.random() < .35) { const ai = H.ai[best.i]; ai.fix = k; ai.wait = 0; ai.doing = -1; pathTo(best, ai, FIX[k]); }
   });
-  S.pl.forEach(p => { if (!p.npc || p.xa) return; const ai = H.ai[p.i]; if (!ai) return;
+  S.pl.forEach(p => { if (!p.npc || p.xa || S.inf) return; const ai = H.ai[p.i]; if (!ai) return;
     if (p.ro === 'ase') { aseAI(p, ai); return; }
     if (p.im) {
       if (Math.random() < .006 && !S.sab && S.sabCd <= 0 && H.introT <= 0) { const r = Math.random(); hostSabotage(p.i, r < .22 ? -1 : r < .42 ? -3 : r < .6 ? -2 : r < .8 ? -4 : -5); }
@@ -3069,6 +3195,8 @@ function hostAction(i, t, x) { if (!S || S.ph !== 'play' || H.introT > 0) return
   if (t === 'k') hostKill(i, x); else if (t === 'r') hostReport(i, x); else if (t === 'e') hostEmergency(i); else if (t === 's') hostSabotage(i, x); else if (t === 'f') hostFix(i, x); else if (t === 'a') hostAbility(i, x); else if (t === 'x') hostAlien(i, x); else if (t === 'y') hostCannon(i); }
 function hostKill(k, v) {
   const K = S.pl[k], V = S.pl[v];
+  if (S.inf) { if (!K || !V || !K.al || !K.im || !V.al || V.im || K.cd > 0 || V.ev || Math.hypot(K.x - V.x, K.z - V.z) > 3.4) return; V.im = 1; V.cd = 12; K.cd = INF_CD; S.kf = { id: V.i, by: K.i, n: ++H.killN, inf: 1 };
+    if (V.npc && H.ai[V.i]) { const ai = H.ai[V.i]; ai.path = []; ai.chase = -1; ai.wait = 2.2; ai.fix = -1; ai.doing = -1; ai.queue = []; ai.flee = 0; ai.goal = null; ai.atT = null; } checkWin(); return; }
   if (K && K.xa) { if (!V || !K.al || !K.xin || K.xk || !V.al || V.xa || V.v >= 0 || V.ev || Math.hypot(K.x - V.x, K.z - V.z) > 3.4) return;
     V.al = 0; V.w = 0; S.b.push({ id: V.i, x: V.x, z: V.z }); K.xk = 1; (S.av = S.av || []).push(V.c); if (K.npc) { K.x = V.x; K.z = V.z; }
     const wit = S.pl.filter(o => o.al && o !== K && !o.xa && o.v < 0 && !o.ev && Math.hypot(o.x - V.x, o.z - V.z) < 8 && sameArea(o, V)).map(o => o.i);
@@ -3084,7 +3212,7 @@ function hostKill(k, v) {
   H.kills[V.i] = { k, seen: K.sh >= 0 ? K.sh : k, wit, near, room: roomName(V.x, V.z) };
   S.kf = { id: V.i, by: k, n: ++H.killN };
   if (V.npc && H.ai[V.i]) { const ai = H.ai[V.i]; ai.path = []; ai.chase = -1; ai.wait = 1.5; ai.fix = -1; }
-  if (K.npc && H.ai[K.i] && K.ro === 'sup' && !K.su && Math.random() < .75) { const ai = H.ai[K.i]; ai.supB = V.i; ai.wait = 1.0; ai.path = []; ai.atT = null; ai.doing = -1; }
+  if (K.npc && H.ai[K.i] && K.ro === 'sup' && K.ac <= 0 && Math.random() < .75) { const ai = H.ai[K.i]; ai.supB = V.i; ai.wait = 1.0; ai.path = []; ai.atT = null; ai.doing = -1; }
   else if (K.npc && H.ai[K.i] && K.ro === 'lim' && Math.random() < .65) { const ai = H.ai[K.i]; ai.clean = V.i; ai.wait = 1.3; ai.path = []; ai.atT = null; ai.doing = -1; }
   else if (K.npc && H.ai[K.i]) { const ai = H.ai[K.i]; let bv = null, bd = 10; VENTS.forEach(vt => { const d = Math.hypot(vt.p[0] - K.x, vt.p[1] - K.z); if (d < bd) { bd = d; bv = vt; } }); ai.atT = null; if (bv && Math.random() < .8) pathTo(K, ai, bv); else ai.wait = rand(.5, 1.2); }
   checkWin();
@@ -3101,14 +3229,14 @@ function hostAbility(i, x) {
   else if (p.ro === 'cam') { const t = S.pl[x]; if (!t || t === p || !t.al || p.v >= 0) return; p.sh = x; p.st = 15; p.ac = AB_CD.cam; S.sf = { i: p.i, n: (S.sf ? S.sf.n : 0) + 1 }; }
   else if (p.ro === 'fan') p.ac = AB_CD.fan;
   else if (p.ro === 'tre') { if (p.v >= 0) return; p.ce = CEIL_T; p.ac = AB_CD.tre; S.sf = { i: p.i, n: (S.sf ? S.sf.n : 0) + 1 }; }
-  else if (p.ro === 'sup') { if (p.su || p.v >= 0) return; const b = S.b.find(q => q.id === x && q.kb === p.i); if (!b || Math.hypot(b.x - p.x, b.z - p.z) > 2.8) return; const V = S.pl[x]; if (!V || V.al) return;
-    p.orig = { n: p.n, c: p.c }; const tn = p.n, tc = p.c; p.n = V.n; p.c = V.c; V.n = tn; V.c = tc; p.su = 1; b.sup = 1; b.kb = -1; S.sf = { i: p.i, n: (S.sf ? S.sf.n : 0) + 1 }; p.cd = Math.max(p.cd, 8); }
+  else if (p.ro === 'sup') { if (p.v >= 0) return; const b = S.b.find(q => q.id === x && q.kb === p.i); if (!b || Math.hypot(b.x - p.x, b.z - p.z) > 2.8) return; const V = S.pl[x]; if (!V || V.al) return;
+    if (!p.orig) p.orig = { n: p.n, c: p.c }; const tn = p.n, tc = p.c; p.n = V.n; p.c = V.c; V.n = tn; V.c = tc; p.su = (p.su || 0) + 1; p.ac = S.pr ? 6 : 22; b.sup = 1; b.kb = -1; S.sf = { i: p.i, n: (S.sf ? S.sf.n : 0) + 1 }; p.cd = Math.max(p.cd, 8); }
   else if (p.ro === 'lim') { const b = S.b.find(b => b.id === x); if (!b || p.v >= 0 || Math.hypot(b.x - p.x, b.z - p.z) > 3.4) return; S.b = S.b.filter(q => q !== b); p.ac = AB_CD.lim; p.cd = Math.max(p.cd, 12); S.cl = { x: b.x, z: b.z, n: (S.cl ? S.cl.n : 0) + 1 }; }
 }
-function hostReport(i, bid, npc) { const R = S.pl[i]; if (!R || !R.al || R.v >= 0 || R.ce > 0 || R.ev) return; const b = S.b.find(b => b.id === bid); if (!b) return; if (!npc && Math.hypot(R.x - b.x, R.z - b.z) > 4) return; startMeeting(i, bid); }
-function hostEmergency(i) { const R = S.pl[i]; if (!R || !R.al || R.em <= 0 || S.sab || R.ce > 0 || R.ev) return; if (Math.hypot(R.x - BTN.x, R.z - BTN.z) > 2.6) return; R.em--; startMeeting(i, null); }
+function hostReport(i, bid, npc) { if (S.inf) return; const R = S.pl[i]; if (!R || !R.al || R.v >= 0 || R.ce > 0 || R.ev) return; const b = S.b.find(b => b.id === bid); if (!b) return; if (!npc && Math.hypot(R.x - b.x, R.z - b.z) > 4) return; startMeeting(i, bid); }
+function hostEmergency(i) { if (S.inf) return; const R = S.pl[i]; if (!R || !R.al || R.em <= 0 || S.sab || R.ce > 0 || R.ev) return; if (Math.hypot(R.x - BTN.x, R.z - BTN.z) > 2.6) return; R.em--; startMeeting(i, null); }
 function hostSabotage(i, x) {
-  const p = S.pl[i]; if (!p || !p.im || S.ph !== 'play' || H.introT > 0) return;
+  const p = S.pl[i]; if (!p || !p.im || S.inf || S.ph !== 'play' || H.introT > 0) return;
   if (x >= 0) { if (!DOOR_ROOMS.includes(x) || S.doors[x] || (S.dc[x] || 0) > 0) return; S.doors[x] = DOOR_T; S.dc[x] = S.pr ? 12 : DOOR_CD; return; }
   if (S.sab || S.sabCd > 0) return; const k = { '-1': 'lights', '-2': 'reactor', '-3': 'comms', '-4': 'grav', '-5': 'black' }[x]; if (!k) return;
   S.sab = { k, t: k === 'reactor' ? REACTOR_T : k === 'grav' ? GRAV_T : 0, f: [0, 0], age: 0 }; S.sabCd = S.pr ? 6 : SAB_CD;
@@ -3168,6 +3296,7 @@ function afterEject() {
   const n = S.pl.length; S.pl.forEach(p => { const st = seat(p.i, n); if (p.npc && !S.pr) { p.x = st.x; p.z = st.z; p.y = st.yaw; } if (p.npc && p.ro === 'ase' && p.al) { const q = aseSpawn(p); if (q) { p.x = q[0]; p.z = q[1]; } } if (p.ro === 'ase') p.cd = S.pr ? 3 : 14; if (p.im) p.cd = S.pr ? 3 : 16; if (p.ro) p.ac = Math.max(p.ac || 0, 10); if (S.pr && p.npc) return; const ai = H.ai[p.i]; if (ai) { ai.path = []; ai.atT = null; ai.goal = null; ai.doing = -1; ai.chase = -1; ai.wait = rand(.5, 2); } });
 }
 function checkWin() {
+  if (S.inf) return infCheckWin();
   const impA = S.pl.filter(p => p.al && p.im).length, crewA = S.pl.filter(p => p.al && !p.im && !p.xa && p.ro !== 'ase').length, alA = S.pl.some(p => p.xa && p.al), aseA = S.pl.filter(p => p.al && p.ro === 'ase').length;
   const total = S.pl.reduce((s, p) => s + (p.im ? 0 : p.tt), 0), done = S.pl.reduce((s, p) => s + (p.im ? 0 : p.td), 0);
   let w = null, r = '';
@@ -3184,6 +3313,7 @@ function hostTick(dt) {
   S.cams = S.pl.filter(p => p.w).length;
   if (S.ph === 'play') {
     if (H.introT > 0) { H.introT -= dt; return; }
+    if (S.inf) S.it = Math.max(0, S.it - dt);
     S.pl.forEach(p => { if ((p.im || p.ro === 'ase') && p.al && p.cd > 0) p.cd = Math.max(0, p.cd - dt); if (p.fz > 0) p.fz = Math.max(0, p.fz - dt); if (p.ac > 0) p.ac = Math.max(0, p.ac - dt); if (p.sh >= 0) { p.st -= dt; if (p.st <= 0 || !p.al) { p.sh = -1; p.st = 0; } } if (p.ce > 0) p.ce = Math.max(0, p.ce - dt); });
     if (S.pr) { const me = S.pl[ME]; if (me && !me.im && me.ro === 'ing') { H.prSab = (H.prSab ?? 12) - dt; if (H.prSab <= 0) { H.prSab = 30; if (!S.sab) { const k = pick(['lights', 'reactor', 'comms']); S.sab = { k, t: k === 'reactor' ? REACTOR_T : 0, f: [0, 0], age: 0 }; } me.au = 1; } } }
     if (S.sabCd > 0) S.sabCd = Math.max(0, S.sabCd - dt);
@@ -3227,10 +3357,11 @@ function clearAvatars() { Object.keys(AV).forEach(k => { scene.remove(AV[k].g); 
 function ensureAvatar(p) {
   const key = p.i, ghost = !p.al; let a = AV[key];
   const dc = ghost ? p.c : dispC(p), dn = p.xa ? '???' : ghost ? p.n : dispN(p);
-  if (a && a.ghost === ghost && a.c === dc && a.nm === dn && !!a.alien === !!p.xa) return a;
+  const zb = !!(S.inf && p.im && p.al);
+  if (a && a.ghost === ghost && a.c === dc && a.nm === dn && !!a.alien === !!p.xa && !!a.zb === zb) return a;
   if (a) { scene.remove(a.g); if (a.ghost === ghost && a.g.visible) burst('steam', a.rx, .8, a.rz, 14); }
   const meP = S.pl[ME]; const mate = meP && meP.im && p.im;
-  const c = p.xa ? makeAlienBody() : makeChar(dc, { ghost }); c.alien = !!p.xa; c.g.add(nameSprite(dn, p.xa ? '#9dffbf' : mate ? '#ff8a98' : '#ffffff'));
+  const c = p.xa ? makeAlienBody() : makeChar(dc, { ghost }); c.alien = !!p.xa; c.g.add(nameSprite(dn, p.xa ? '#9dffbf' : zb ? '#9dff7a' : mate ? '#ff8a98' : '#ffffff')); if (zb) addZombie(c); c.zb = zb;
   c.ghost = ghost; c.c = dc; c.nm = dn; c.rx = p.x; c.rz = p.z; c.ry = p.y; scene.add(c.g); AV[key] = c; return c;
 }
 function animChar(c, speed, t) {
@@ -3240,6 +3371,7 @@ function animChar(c, speed, t) {
   c.inner.position.y = Math.abs(Math.sin(ph)) * .06 * k + (c.ghost ? .35 + Math.sin(t * 2 + c.phase) * .08 : 0);
   c.inner.rotation.z = Math.sin(ph) * .06 * k; c.arms[0].position.z = .04 - Math.sin(ph) * .12 * k; c.arms[1].position.z = .04 + Math.sin(ph) * .12 * k;
   c.inner.scale.y = 1 + Math.sin(t * 2.4 + c.phase) * .015;
+  if (c.zombie) { c.arms.forEach((a, i) => { a.position.z = .36 + Math.sin(ph + i * 2) * .05; a.position.y = .82; }); c.inner.rotation.x = .14; }
 }
 function popVent(i) { if (VENTS[i]) VENTS[i].pop = 1; }
 function updateAvatars(dt, t) {
@@ -3422,7 +3554,7 @@ function gameFrame(dt, t) {
   animHatches(dt);
   VENTS.forEach(v => { if (v.pop > 0) v.pop = Math.max(0, v.pop - dt * 2.2); v.lid.rotation.z = Math.sin(Math.min(1, v.pop) * Math.PI) * 1.1; });
   ANIM.camLeds.forEach(l => l.material.emissiveIntensity = S.cams > 0 ? (Math.sin(t * 6) > 0 ? 1.2 : .3) : .05);
-  updateAvatars(dt, t); updateUfos(dt, t); miniTick(dt, t, me); updateDrones(dt, t); meteorTick(dt, t, me); aseTick(dt, t, me); if (me && local.myC !== undefined && local.myC !== me.c && S.ph === 'play') toast(me.al ? `¡Ahora eres ${me.n}!` : 'El suplantador te ha robado la identidad', '#d58aff'); local.myC = me ? me.c : undefined; if (IS_SUB) { subTick(dt, t); subTick2(t); } if (SKY && SKY.visible) SKY.position.copy(camera.position);
+  updateAvatars(dt, t); updateUfos(dt, t); miniTick(dt, t, me); updateDrones(dt, t); meteorTick(dt, t, me); aseTick(dt, t, me); if (me && local.myC !== undefined && local.myC !== me.c && S.ph === 'play') toast(me.al ? `¡Ahora eres ${me.n}!` : 'El suplantador te ha robado la identidad', '#d58aff'); local.myC = me ? me.c : undefined; if (IS_SUB) { subTick(dt, t); subTick2(t); elevDoorsTick(dt); } if (SKY && SKY.visible) SKY.position.copy(camera.position);
   if (local.flash > 0) { local.flash -= dt; irisSet(Math.min(1, 1.2 - local.flash * 1.6)); if (local.flash <= 0) irisSet(1); }
   const comms = crisis === 'comms';
   const myTasks = (me && !me.im) ? me.tk : [];
@@ -3481,7 +3613,7 @@ function abilityState(me) {
   if (r === 'ase') { const w = me.wp || 0, W = WEAPONS[w]; if (w === 4 && me.sh >= 0) return { lab: 'Quitarse', ok: local.abLock <= 0, x: -1, hint: `C · Quitarte la máscara (${Math.ceil(me.st)} s)` }; if (!w || !me.wu) return { lab: w ? 'Gastada' : 'Sin arma', ok: false, x: 0, hint: '' };
     if (w === 1) { let t = -1, bd = 8.5; S.pl.forEach(p => { if (p.i === ME || !p.al || p.xa || p.v >= 0 || p.ev) return; const a = AV[p.i]; if (!a || !a.g.visible) return; const d = Math.hypot(a.rx - P.x, a.rz - P.z); if (d < bd && losClear(P.x, P.z, a.rx, a.rz)) { bd = d; t = p.i; } }); return { lab: 'Ballesta', ok: t >= 0 && local.abLock <= 0, x: t, hint: t >= 0 ? `C · Disparar la ballesta a ${dispN(S.pl[t])}` : '' }; }
     return { lab: W.n, ok: !inV && local.abLock <= 0, x: 0, hint: `C · ${w === 2 ? 'Colocar el cepo aquí (solo tú lo ves)' : w === 3 ? 'Lanzar la bomba de humo' : 'Ponerte la máscara de otro (20 s)'}` }; }
-  if (r === 'sup') { if (me.su) return { lab: 'Usado', ok: false, x: 0, hint: '' }; let b = null, bd = 2.6; if (!inV) (S.b || []).forEach(q => { if (q.kb !== ME) return; const d = Math.hypot(q.x - P.x, q.z - P.z); if (d < bd) { bd = d; b = q; } }); return { lab: 'Suplantar', ok: !!b && !cd, x: b ? b.id : -1, hint: b ? `C · Robarle la identidad a ${nm(b.id)}` : '' }; }
+  if (r === 'sup') { let b = null, bd = 2.6; if (!inV) (S.b || []).forEach(q => { if (q.kb !== ME) return; const d = Math.hypot(q.x - P.x, q.z - P.z); if (d < bd) { bd = d; b = q; } }); return { lab: 'Suplantar', ok: !!b && !cd, x: b ? b.id : -1, hint: b ? `C · Robarle la identidad a ${nm(b.id)}` : '' }; }
   if (r === 'lim') { let b = null, bd = 2.6; if (!inV) (S.b || []).forEach(q => { const d = Math.hypot(q.x - P.x, q.z - P.z); if (d < bd) { bd = d; b = q; } }); return { lab: 'Limpiar', ok: !!b, x: b ? b.id : -1, hint: b ? `C · Hacer desaparecer a ${nm(b.id)}` : '' }; }
   return null;
 }
@@ -3617,7 +3749,7 @@ function closePick() { local.pickOpen = false; qs('#pick').hidden = true; lockMo
 qs('#pkX').onclick = () => closePick(); qs('#lairUse').onclick = () => lairUse(); qs('#lairBack').onclick = () => leaveLair(false); qs('#pick').addEventListener('click', e => { if (e.target.id === 'pick') closePick(); });
 function toggleSabo(on) {
   const me = S && S.pl ? S.pl[ME] : null; on = on === undefined ? !local.saboOpen : on;
-  if (on && (!me || !(me.im || (me.xa && me.al && !me.xin)) || S.ph !== 'play' || mode !== 'game')) return;
+  if (on && (!me || S.inf || !(me.im || (me.xa && me.al && !me.xin)) || S.ph !== 'play' || mode !== 'game')) return;
   const wasS = local.saboOpen; local.saboOpen = on; qs('#sabo').hidden = !on; if (!on && wasS) lockMouse(); if (on) { try { document.exitPointerLock(); } catch (e) {} closeTask(); renderSabo(true); snd('click'); }
 }
 qs('#sbX').onclick = () => toggleSabo(false); qs('#aSab').onclick = () => toggleSabo();
@@ -3657,7 +3789,7 @@ function syncPhase(dt) {
     local.lastPh = ph; local.lastMid = S.mid;
   }
   if (S.ph === 'meeting') { local.mt = (local.mt || 0) - dt; if (local.mt <= 0) { local.mt = .2; renderMeeting(); } }
-  if (S.kf && S.kf.n !== local.kfN) { local.kfN = S.kf.n; if (S.kf.id === ME && ME >= 0) killCutscene(S.kf.by); else if (S.kf.by === ME) { snd('kill'); const f = qs('#hitFlash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); toast('¡ZAS!', '#ff5a6e'); } }
+  if (S.kf && S.kf.n !== local.kfN) { local.kfN = S.kf.n; if (S.kf.inf) infEvent(S.kf); else if (S.kf.id === ME && ME >= 0) killCutscene(S.kf.by); else if (S.kf.by === ME) { snd('kill'); const f = qs('#hitFlash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); toast('¡ZAS!', '#ff5a6e'); } }
   if (S.shk && S.shk.n !== local.shkN) { local.shkN = S.shk.n; const m2 = S.pl[ME]; if (m2 && !m2.xa && !local.eva && S.ph === 'play') { local.shake = 1.6; closeTask(); snd('bad'); toast('¡Algo ha embestido la nave!', '#ff8a98'); } }
   if (S.uf && S.uf.n !== local.ufN) { local.ufN = S.uf.n; const m2 = S.pl[ME]; const A = alienP(); if (m2 && m2.xa) { local.shake = .8; snd('bad'); toast(`¡Te han dado! Daños ${S.uf.h}/${UFO_HITS}`, '#ff5a6e'); } else if (local.taskOpen === 'Cañón de defensa') toast(`¡Impacto en el platillo! ${S.uf.h}/${UFO_HITS}`, '#ffd966'); if (A && UFOS[A.i]) burst('spark', UFOS[A.i].position.x, UFOS[A.i].position.y, UFOS[A.i].position.z, 20); }
   if (S.ud && S.ud.n !== local.udN) { local.udN = S.ud.n; burst('conf', S.ud.x, S.ud.y, S.ud.z, 60); burst('spark', S.ud.x, S.ud.y, S.ud.z, 40); snd('kill'); toast('¡Platillo alien destruido!', '#5cff9a'); }
@@ -3688,6 +3820,9 @@ function showIntro() {
   if (me && me.xa) { h.textContent = S.pr ? 'Práctica · Alien' : 'Alien'; h.style.color = '#5cff9a'; p.textContent = 'Recorre tu propia nave: en los mandos pilotas el platillo, en el teletransportador te infiltras 30 s para eliminar a una persona (con el platillo acoplado a una esclusa), y tienes rayo tractor, consola de sabotajes y ariete. Ganas si quedan 2 o menos supervivientes.'; const d = el('div'); d.innerHTML = roleIcon('ali', 80); d.style.cssText = 'background:#2fd36f;border-radius:24px;padding:10px;display:inline-grid'; mates.append(d); }
   else if (S.pr && me) { h.textContent = me.im ? 'Práctica · Polizón' : 'Práctica · Tripulante'; h.style.color = me.im ? '#ff5a6e' : '#5ab8ff'; p.textContent = me.im ? 'Los NPCs no se mueven. Prueba a eliminar, usar las alcantarillas' + KB('E') + ' y sabotear' + KB('F') + '. Los sabotajes se arreglan solos.' : 'Los NPCs no se mueven y nadie te atacará. Recorre ' + (IS_PLANET ? 'la base' : 'la nave') + ' y completa tus tareas a tu ritmo.'; const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   else if (!me) { h.textContent = 'Espectador'; h.style.color = '#b9bff0'; p.textContent = 'La partida está llena. Puedes mirar como fantasma.'; }
+  else if (S.inf) { h.textContent = me.im ? 'Paciente cero' : 'Superviviente'; h.style.color = me.im ? '#7dff5a' : '#5ab8ff';
+    p.textContent = me.im ? `Estás infectado. Persigue a los demás y contágialos con ${IS_TOUCH ? 'el botón Infectar' : 'Q'}: cada contagiado se une a tu bando. Tenéis ${mmss(S.it)} antes de que llegue el rescate.` : `Alguien a bordo está infectado y contagiará a todo el que toque. Huye, haz tus tareas y aguanta ${mmss(S.it)} hasta que llegue el rescate.`;
+    const d = el('div'); d.innerHTML = avatarSVG(me.c, false, 80); mates.append(d); }
   else if (me.im) { h.textContent = 'Polizón'; h.style.color = '#ff5a6e'; p.textContent = 'Elimina a la tripulación sin que te pillen. Viaja por las alcantarillas' + KB('E') + ': por dentro hay que caminar por ' + (IS_PLANET ? 'los túneles' : 'los conductos') + '. ' + (IS_TOUCH ? 'Sabotea la nave con el botón Sabotear.' : 'Sabotea la nave con F.');
     S.pl.filter(q => q.im).forEach(q => { const d = el('div'); d.innerHTML = avatarSVG(q.c, false, 70); mates.append(d); }); }
   else { h.textContent = S.impN ? 'Tripulante' : 'Modo práctica'; h.style.color = '#5ab8ff';
@@ -3711,6 +3846,7 @@ function updateHUD(t) {
   const chip = qs('#roleChip');
   if (!me) { chip.className = 'chip ghost'; chip.textContent = 'Espectador'; }
   else if (!me.al) { chip.className = 'chip ghost'; chip.textContent = me.im ? 'Polizón fantasma' : 'Fantasma'; }
+  else if (S.inf) { chip.className = me.im ? 'chip imp' : 'chip crew'; chip.textContent = (me.im ? (me.i === S.p0 ? 'Paciente cero' : 'Infectado') : 'Superviviente') + ` · ⏱ ${mmss(S.it)} · ${S.pl.filter(p => p.al && !p.im).length} sin infectar`; }
   else if (me.xa) { chip.className = 'chip alien'; chip.textContent = me.xin ? `Alien · infiltrado ${Math.max(0, Math.ceil(me.xt))} s` : local.ufo ? 'Alien · pilotando' : local.drone ? 'Alien · dron espía' : 'Alien · en tu nave'; }
   else if (me.ro === 'ase') { chip.className = 'chip imp'; chip.textContent = 'Asesino en serie · ' + WEAPONS[me.wp || 0].n + (me.wp && !me.wu ? ' (gastada)' : '') + (me.fz > 0 ? ' · ¡FRENESÍ!' : '') + (me.sh >= 0 ? ` · como ${nm(me.sh)} ${Math.ceil(me.st)} s` : ''); }
   else if (me.im) { chip.className = 'chip imp'; chip.textContent = (me.ro ? ROLES[me.ro].n : 'Polizón') + (me.ro === 'sup' && me.su ? ` · ahora eres ${me.n}` : '') + (local.vent >= 0 ? ' · en la alcantarilla' : me.sh >= 0 ? ` · como ${nm(me.sh)} ${Math.ceil(me.st)} s` : me.ce > 0 ? ` · en el techo ${Math.ceil(me.ce)} s` : ''); } else { chip.className = 'chip crew'; chip.textContent = (me.ro ? ROLES[me.ro].n : 'Tripulante') + (local.vent >= 0 ? ' · en la alcantarilla' : local.eva ? ' · en el espacio' : ''); }
@@ -3720,13 +3856,14 @@ function updateHUD(t) {
     const tl = qs('#taskList'); tl.replaceChildren();
     if (me && me.al && me.ro && !isTouch) tl.append(el('div', 'rolei', `${ROLES[me.ro].n} (C): ${ROLES[me.ro].d}`));
     if (me && me.ro === 'ase') { tl.append(el('b', null, 'Asesino en serie')); ['Elimina a todos: tripulantes y polizones. Ganas si quedas solo.', `Arma: ${WEAPONS[me.wp || 0].n}${me.wp ? (me.wu ? ' (lista, C)' : ' (gastada)') : ''}`, `Víctima marcada: ${me.tg >= 0 && S.pl[me.tg] ? S.pl[me.tg].n + (S.pl[me.tg].al ? '' : ' (ya cayó)') : 'ninguna'}`, 'En cada reunión, entra en tu guarida para preparar la siguiente ronda.'].forEach(t2 => tl.append(el('div', null, t2))); }
+    else if (me && S.inf && me.im) { tl.append(el('b', null, 'Eres un infectado')); ['Persigue a los supervivientes y contágialos' + (isTouch ? '.' : ' (Q).'), `Rescate en ${mmss(S.it)}: contagia a todos antes.`, 'Cada contagiado se une a tu bando.'].forEach(t2 => tl.append(el('div', null, t2))); }
     else if (me && !me.im && !me.xa && comms) { tl.append(el('b', null, 'Comunicaciones caídas')); tl.append(el('div', null, 'Restaura la señal en Comunicaciones para ver tus tareas.')); }
     else if (me && !me.im && !me.xa) { tl.append(el('b', null, `Tus tareas · ${local.done.size}/${me.tk.length}`)); me.tk.forEach(sid => { const d = el('div', local.done.has(sid) ? 'done' : ''); d.append(el('span', null, ST[sid].n), el('i', null, ST[sid].ext ? 'Exterior' : ROOMS[ST[sid].room].n)); tl.append(d); }); }
     else if (me && me.xa) { tl.append(el('b', null, 'Misión alien')); ['Gana si quedan 2 o menos vivos.', 'Mandos: acopla el platillo a una esclusa.', 'Teletransportador: 30 s, 1 víctima.', 'Hangar: dron espía · Arsenal: meteoritos e hipnosis · Incubadora: clon señuelo.', `Daños del platillo: ${me.uh || 0}/${UFO_HITS}`].forEach(t2 => tl.append(el('div', null, t2))); }
     else if (me && me.im) { tl.append(el('b', null, 'Misión secreta')); tl.append(el('div', null, 'Elimina a la tripulación.')); if (!isTouch) { tl.append(el('div', null, 'E en una alcantarilla para bajar a ' + (IS_PLANET ? 'los túneles' : 'los conductos') + ' y recorrerlos.')); tl.append(el('div', null, 'F para sabotear la nave.')); } const mates = S.pl.filter(p => p.im && p.i !== ME); if (mates.length) tl.append(el('div', null, 'Compañeros: ' + mates.map(p => p.n).join(', '))); }
     else tl.append(el('b', null, 'Mirando la partida'));
     const total = S.pl.reduce((s, p) => s + (p.im ? 0 : p.tt), 0); const done = S.pl.reduce((s, p) => s + (p.im ? 0 : (p.i === ME ? local.done.size : p.td)), 0);
-    qs('#barFill').style.width = (comms ? 0 : (total ? Math.min(100, done / total * 100) : 0)) + '%'; qs('#barLab').textContent = comms ? 'Sin señal' : 'Tareas de la tripulación';
+    qs('#barFill').style.width = (comms ? 0 : (total ? Math.min(100, done / total * 100) : 0)) + '%'; qs('#barLab').textContent = comms ? 'Sin señal' : S.inf ? 'Tareas de los supervivientes' : 'Tareas de la tripulación';
   }
   // banner de crisis
   const cr = qs('#crisis');
@@ -3745,10 +3882,11 @@ function updateHUD(t) {
   if (!ab.hidden) { ab.classList.toggle('impab', !!me.im || me.ro === 'ase'); ab.classList.toggle('off', !(st && st.ok)); const rk = me.xa ? 'ali' : me.ro; if (ab.dataset.r !== rk) { ab.dataset.r = rk; qs('#abIc').innerHTML = roleIcon(rk, 38); }
     const lab = st ? st.lab : ROLES[me.xa ? 'ali' : me.ro].n; if (qs('#abLab').textContent !== lab) qs('#abLab').textContent = lab;
     qs('#aCd').textContent = me.ro === 'ase' ? '' : me.xa ? (me.xr > 0 ? Math.ceil(me.xr) : '') : me.ro === 'det' && local.detT > 0 ? '' : (me.ac > 0 && !(me.ro === 'cam' && me.sh >= 0) && !(me.ro === 'tre' && me.ce > 0)) ? Math.ceil(me.ac) : ''; }
-  sb.hidden = !isImp; sb.classList.toggle('off', S.ph !== 'play'); qs('#sCd').textContent = isAl ? (!S.sab && me.xs > 0 ? Math.ceil(me.xs) : '') : !S.sab && S.sabCd > 0 ? Math.ceil(S.sabCd) : '';
+  sb.hidden = !isImp || !!S.inf; sb.classList.toggle('off', S.ph !== 'play'); qs('#sCd').textContent = isAl ? (!S.sab && me.xs > 0 ? Math.ceil(me.xs) : '') : !S.sab && S.sabCd > 0 ? Math.ceil(S.sabCd) : '';
   qs('#useLab').textContent = interact.use ? ({ m_pilot: 'Pilotar', m_tele: 'Infiltrar', m_tractor: 'Abducir', m_sab: 'Sabotear', m_ram: 'Embestir', aenter: 'Entrar', abduct: 'Abducir', cannon: 'Cañón', eva: 'Salir', vent: 'Entrar', ventExit: 'Salir', elev: 'Ascensor', cams: 'Cámaras', fix: 'Arreglar', btn: 'Reunión', task: 'Usar' })[interact.use.k] : (canVent(me) && me.al ? 'Alcantarilla' : 'Usar');
   const hint = qs('#hint'); let ht = '';
-  if (interact.kill != null) ht = `Q · Eliminar a ${dispN(S.pl[interact.kill])}`; else if (interact.rep != null) ht = `R · Reportar a ${nm(interact.rep)}`;
+  { const kt = [...k.childNodes].find(n => n.nodeType === 3 && n.textContent.trim()), kl = S.inf ? 'Infectar' : 'Eliminar'; if (kt && kt.textContent !== kl) kt.textContent = kl; }
+  if (interact.kill != null) ht = `Q · ${S.inf ? 'Infectar' : 'Eliminar'} a ${dispN(S.pl[interact.kill])}`; else if (interact.rep != null) ht = `R · Reportar a ${nm(interact.rep)}`;
   else if (interact.use && interact.use.h) ht = interact.use.h;
   else if (interact.use) { const iu = interact.use; ht = iu.k === 'task' ? `E · ${ST[iu.sid].n}` : iu.k === 'fix' ? `E · ${FIX[iu.id].n}` : iu.k === 'cams' ? 'E · Ver cámaras de seguridad' : iu.k === 'eva' ? 'E · Salir al espacio por la esclusa' : iu.k === 'aenter' ? 'E · Infiltrarte en la nave por la esclusa' : iu.k === 'abduct' ? `E · Abducir a ${nm(iu.i)}` : iu.k === 'cannon' ? 'E · Disparar al platillo alien' : iu.k === 'vent' ? 'E · Meterse en la alcantarilla' : iu.k === 'ventExit' ? `E · Salir en ${ROOMS[VENTS[iu.id].room].n}` : (S.sab ? 'No se puede convocar durante un sabotaje' : `E · Llamar a reunión (${me.em} restante)`); }
   if (!ht && interact.ab && interact.ab.ok && interact.ab.hint) ht = interact.ab.hint;
@@ -4326,9 +4464,9 @@ function showEnd() {
   ['#meeting', '#eject', '#task', '#intro', '#sabo', '#cams'].forEach(s => qs(s).hidden = true); try { document.exitPointerLock(); } catch (e) {}
   const me = S.pl[ME]; const won = me && (me.xa ? S.win === 'alien' : me.ro === 'ase' ? S.win === 'ase' : ((me.im && S.win === 'imp') || (!me.im && S.win === 'crew')));
   const c = qs('#endCard'); c.replaceChildren();
-  const h = el('h1', 'pop', S.win === 'crew' ? '¡Gana la tripulación!' : S.win === 'alien' ? '¡Gana el alien!' : S.win === 'ase' ? '¡Gana el asesino en serie!' : '¡Ganan los polizones!'); h.style.color = S.win === 'crew' ? '#5ab8ff' : S.win === 'alien' ? '#5cff9a' : S.win === 'ase' ? '#ff4a4a' : '#ff5a6e';
+  const h = el('h1', 'pop', S.inf ? (S.win === 'crew' ? '¡Ganan los supervivientes!' : '¡Ganan los infectados!') : S.win === 'crew' ? '¡Gana la tripulación!' : S.win === 'alien' ? '¡Gana el alien!' : S.win === 'ase' ? '¡Gana el asesino en serie!' : '¡Ganan los polizones!'); h.style.color = S.inf && S.win !== 'crew' ? '#7dff5a' : S.win === 'crew' ? '#5ab8ff' : S.win === 'alien' ? '#5cff9a' : S.win === 'ase' ? '#ff4a4a' : '#ff5a6e';
   const sub = el('p', 'r', (me ? (won ? '¡Has ganado! ' : 'Has perdido. ') : '') + S.wr);
-  const list = el('div', 'plist'); S.pl.forEach(p => { const d = el('div', 'pchip'); const a = el('span'); a.innerHTML = avatarSVG(p.c, !p.al, 34); const t = el('div', 'two'); t.append(el('span', null, p.n), el('small', p.im || p.ro === 'ase' ? 'imp' : '', p.xa ? 'Alien' : p.ro === 'ase' ? 'Asesino en serie' : (p.im ? 'Polizón' : 'Tripulante') + (p.ro && ROLES[p.ro] ? ' · ' + ROLES[p.ro].n : '') + (p.orig ? ' (antes ' + p.orig.n + ')' : ''))); d.append(a, t); list.append(d); });
+  const list = el('div', 'plist'); S.pl.forEach(p => { const d = el('div', 'pchip'); const a = el('span'); a.innerHTML = avatarSVG(p.c, !p.al, 34); const t = el('div', 'two'); t.append(el('span', null, p.n), el('small', p.im || p.ro === 'ase' ? 'imp' : '', p.xa ? 'Alien' : p.ro === 'ase' ? 'Asesino en serie' : (S.inf ? (p.i === S.p0 ? 'Paciente cero' : p.im ? 'Infectado' : 'Superviviente') : p.im ? 'Polizón' : 'Tripulante') + (p.ro && ROLES[p.ro] ? ' · ' + ROLES[p.ro].n : '') + (p.orig ? ' (antes ' + p.orig.n + ')' : ''))); d.append(a, t); list.append(d); });
   const row = el('div', 'row');
   if (S.pr) { const again = el('button', 'btn mint', 'Repetir práctica'); again.onclick = () => { teardownGame(); startPractice(); }; const out = el('button', 'btn ghost', 'Menú principal'); out.onclick = () => leaveToMenu(null); row.append(out, again); }
   else if (NET.isHost) { const again = el('button', 'btn mint', 'Volver a la sala'); again.onclick = () => { S = newLobbyState(); teardownGame(); showScreen('lobby'); renderLobby(); }; const out = el('button', 'btn ghost', 'Menú principal'); out.onclick = () => leaveToMenu(null); row.append(out, again); }
@@ -4358,7 +4496,8 @@ qs('#bPractice').onclick = () => { ensureName(); snd('click'); goLandscape(); sh
 if (IS_TOUCH) { qs('#ventOut').textContent = 'Salir aquí'; qs('#camX').textContent = 'Salir'; const rn = qs('#roles .note'); if (rn) rn.textContent = rn.textContent.replace('con la tecla C', 'con el botón verde de habilidad'); }
 { const tl = qs('#taskList'); if (IS_TOUCH && store.get('tasksMini', false)) tl.classList.add('mini');
   tl.addEventListener('click', () => { if (!IS_TOUCH) return; tl.classList.toggle('mini'); store.set('tasksMini', tl.classList.contains('mini')); }); }
-document.querySelectorAll('.mbtn').forEach(b => { b.setAttribute('aria-pressed', b.dataset.m === MAPID ? 'true' : 'false'); b.onclick = () => { const m = b.dataset.m; if (m === MAPID) return; snd('click'); store.set('map', m); const scr = cur === 'practice' ? 'practica' : 'crear'; location.href = location.pathname + '?pantalla=' + scr + (QS.has('pztest') ? '&pztest' : ''); }; });
+document.querySelectorAll('.mbtn[data-mo]').forEach(b => b.onclick = () => { settings.mode = b.dataset.mo; snd('click'); renderCreate(); });
+document.querySelectorAll('.mbtn[data-m]').forEach(b => { b.setAttribute('aria-pressed', b.dataset.m === MAPID ? 'true' : 'false'); b.onclick = () => { const m = b.dataset.m; if (m === MAPID) return; snd('click'); store.set('map', m); const scr = cur === 'practice' ? 'practica' : 'crear'; location.href = location.pathname + '?pantalla=' + scr + (QS.has('pztest') ? '&pztest' : ''); }; });
 if (QS.get('mapa')) store.set('map', MAPID);
 setTimeout(() => { const ps = QS.get('pantalla'); if (ps === 'crear') qs('#bCreate').click(); else if (ps === 'practica') qs('#bPractice').click(); }, 50);
 qs('#bFull').onclick = async () => { snd('click'); if (canRealFullscreen()) { await goLandscape(); updateFullBtn(); } else showFsHelp(); };
@@ -4388,7 +4527,7 @@ function startPractice() { if (NET.R) { try { NET.R.leave(); } catch (e) {} } NE
 qs('#pGo').onclick = () => { snd('click'); startPractice(); };
 qs('#bJoin').onclick = () => { ensureName(); snd('click'); goLandscape(); showScreen('join'); joinMsg(NET.avail ? '' : 'No se ha podido cargar el sistema online. Comprueba tu conexión a internet y recarga la página.'); qs('#codeIn').focus(); };
 function renderCreate() { qs('#nOut').textContent = settings.N; qs('#npcTog').setAttribute('aria-checked', settings.npc ? 'true' : 'false'); qs('#iOut').textContent = settings.imp;
-  const eff = Math.min(settings.imp, maxImp(settings.N)); qs('#impHint').textContent = maxImp(settings.N) === 0 ? 'Con menos de 3 jugadores no hay polizón' : eff < settings.imp ? `Con ${settings.N} jugadores habrá ${eff}` : 'Impostores escondidos'; qs('#roHint').textContent = roleSummary(settings.ro); store.set('settings', settings); }
+  const eff = Math.min(settings.imp, maxImp(settings.N)); qs('#impHint').textContent = maxImp(settings.N) === 0 ? 'Con menos de 3 jugadores no hay polizón' : eff < settings.imp ? `Con ${settings.N} jugadores habrá ${eff}` : 'Impostores escondidos'; qs('#roHint').textContent = roleSummary(settings.ro); document.querySelectorAll('.mbtn[data-mo]').forEach(b => b.setAttribute('aria-pressed', (settings.mode || 'cl') === b.dataset.mo ? 'true' : 'false')); qs('#moHint').textContent = settings.mode === 'inf' ? 'Uno empieza infectado y contagia al resto' : 'Polizones escondidos y votaciones'; store.set('settings', settings); }
 qs('#nMinus').onclick = () => { settings.N = Math.max(1, settings.N - 1); snd('click'); renderCreate(); };
 qs('#nPlus').onclick = () => { settings.N = Math.min(10, settings.N + 1); snd('click'); renderCreate(); };
 qs('#iMinus').onclick = () => { settings.imp = Math.max(1, settings.imp - 1); snd('click'); renderCreate(); };
@@ -4424,10 +4563,10 @@ function renderLobby() {
   else note.textContent = 'Esperando a que el anfitrión empiece la partida.';
   qs('#lShare').hidden = !(NET.isHost && NET.online && NET.p2p && /^https?:/.test(location.protocol));
   const humans = lob.slice(0, set.N); const npcN = set.npc ? Math.max(0, set.N - humans.length) : 0; const total = humans.length + npcN; const ei = Math.min(set.imp, maxImp(total));
-  qs('#lCount').textContent = `Tripulación · ${total} de ${set.N}${set.npc ? '' : ' (sin NPCs)'} · ${ei} ${ei === 1 ? 'polizón' : 'polizones'}`;
+  qs('#lCount').textContent = set.mode === 'inf' ? `Jugadores · ${total} de ${set.N}${set.npc ? '' : ' (sin NPCs)'} · 1 infectado al empezar` : `Tripulación · ${total} de ${set.N}${set.npc ? '' : ' (sin NPCs)'} · ${ei} ${ei === 1 ? 'polizón' : 'polizones'}`;
   humans.forEach(h => { const d = el('div', 'pchip'); const a = el('span'); a.innerHTML = avatarSVG(h.c, false, 32); d.append(a, el('span', null, h.n + (h.pe === NET.myPeer || (!NET.online && h.pe === 'yo') ? ' (tú)' : ''))); list.append(d); });
   for (let i = 0; i < npcN; i++) { const d = el('div', 'pchip npc'); const a = el('span'); a.innerHTML = avatarSVG(9 - (i % 10), false, 32); d.append(a, el('span', null, 'NPC')); list.append(d); }
-  qs('#lRoles').textContent = 'Mapa: ' + (MAP_NAMES[set.map || MAPID] || 'Nave Lucero') + ' · Roles: ' + roleSummary(set.ro).toLowerCase().replace(/^sin/, 'sin');
+  qs('#lRoles').textContent = 'Mapa: ' + (MAP_NAMES[set.map || MAPID] || 'Nave Lucero') + (set.mode === 'inf' ? ' · Modo infectado' : '') + ' · Roles: ' + roleSummary(set.ro).toLowerCase().replace(/^sin/, 'sin');
   start.hidden = !NET.isHost;
 }
 qs('#lShare').onclick = async () => { const u = location.origin + location.pathname + '?sala=' + NET.code; const b = qs('#lShare');
