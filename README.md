@@ -42,7 +42,7 @@ Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño or
 Al crear una partida o en el modo práctica puedes elegir el mapa:
 
 - **Nave**: el mapa clásico, con pasillos, conductos y paseos espaciales.
-- **Base submarina**: una base bajo el mar con **dos cubiertas unidas por ascensores** (Ascensor A y Ascensor B). Arriba: Puente (con el botón de emergencia, timón y periscopio), Sonar (con la torpedera contra el alien), Cantina, Enfermería, Acuario, Camarotes y Comunicaciones. Abajo: Distribuidor, Máquinas (reactor), Electricidad, Seguridad (cámaras), Bodega, Lastre y Depuradora. Cada sala tiene su suelo (moqueta, rejilla, ajedrez, baldosas, cristal, madera, chapa…), ojos de buey con peces y tuberías en el techo. El mapa muestra la cubierta en la que estás y te avisa de cuántas tareas te quedan en la otra. Por fuera hay fondo marino con algas, rocas, corales y peces.
+- **Base submarina**: una base bajo el mar con **dos cubiertas unidas por ascensores** (Ascensor A y Ascensor B). Arriba: Puente (con el botón de emergencia, timón y periscopio), Sonar (con la torpedera contra el alien), Cantina, Enfermería, Acuario, Camarotes y Comunicaciones. Abajo: Distribuidor, Máquinas (reactor), Electricidad, Seguridad (cámaras), Bodega, Lastre y Depuradora. Tiene estética propia de submarino, distinta de la nave: paredes de paneles crema remachados con zócalo verde y pasamanos de latón, techos de vigas, suelos de cubierta de madera, reflejos del agua moviéndose por el suelo, faroles enjaulados, cuadernas de latón en los pasillos y escotillas ovaladas en las puertas. Cada sala tiene su suelo (moqueta, rejilla, ajedrez, baldosas, cristal, madera, chapa…) y ojos de buey con peces. El mapa muestra la cubierta en la que estás y te avisa de cuántas tareas te quedan en la otra. Por fuera hay fondo marino con algas, rocas, corales y peces.
 
 Al cambiar de mapa la página se recarga. Si tus amigos se unen a una sala con otro mapa, su juego cambia solo al mapa de quien la ha creado.
 
@@ -64,6 +64,10 @@ Al crear la partida, el botón **Elegir** de "Roles especiales" abre un menú pa
 Tras usar una habilidad hay que esperar a que se recargue: Mecánico 25 s, Detective 30 s, Cambiaformas 35 s, Fantasma 15 s, Limpiador 20 s y Araña 45 s. Al empezar la partida todas tardan 12 s en estar listas. El Ingeniero solo puede reparar a distancia una vez.
 
 En el modo práctica también se puede elegir un rol especial para probar su habilidad.
+
+## El Suplantador (impostor)
+
+Un impostor especial. Después de matar a alguien, si se acerca a ese cadáver y pulsa la habilidad (**Suplantar**), se convierte para siempre en esa persona: se queda con su nombre y su color, y la víctima pasa a tener los suyos. El cuerpo que queda en el suelo está **vacío por dentro**, con baba morada, una cremallera y un «?» encima: si alguien lo reporta, la reunión avisa de que ese muerto era en realidad un suplantador disfrazado de otra persona. Al final de la partida se ve quién era antes («antes X»).
 
 ## El Alien (rol aparte)
 
