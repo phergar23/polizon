@@ -42,7 +42,7 @@ Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño or
 Al crear una partida o en el modo práctica puedes elegir el mapa:
 
 - **Nave**: el mapa clásico, con pasillos, conductos y paseos espaciales.
-- **Planeta Violeta**: una base densa en un planeta de suelo morado. Casi todo son bloques de salas pegadas con puertas interiores (Cúpula con Cocina, Dormitorios, Enfermería y Despensa; Electricidad, Taller, Almacén, Comunicaciones, Seguridad y Trastero; Laboratorio, Muestras, Invernadero y Bombas), con salas achaflanadas y un Observatorio octogonal. Pasillos-tubo con recodos llevan a dos torres apartadas y a la sala de Mando de la plaza central; el Hangar está solo, lejos del resto. Fuera el terreno es abierto, con lava, rocas, mesetas, cristales y fumarolas. Las alcantarillas son agujeros que bajan a túneles de roca, hay tormentas de polvo y el alien aterriza en dos plataformas.
+- **Base submarina**: una base bajo el mar con **dos cubiertas unidas por ascensores** (Ascensor A y Ascensor B). Arriba: Puente (con el botón de emergencia, timón y periscopio), Sonar (con la torpedera contra el alien), Cantina, Enfermería, Acuario, Camarotes y Comunicaciones. Abajo: Distribuidor, Máquinas (reactor), Electricidad, Seguridad (cámaras), Bodega, Lastre y Depuradora. Cada sala tiene su suelo (moqueta, rejilla, ajedrez, baldosas, cristal, madera, chapa…), ojos de buey con peces y tuberías en el techo. El mapa muestra la cubierta en la que estás y te avisa de cuántas tareas te quedan en la otra. Por fuera hay fondo marino con algas, rocas, corales y peces.
 
 Al cambiar de mapa la página se recarga. Si tus amigos se unen a una sala con otro mapa, su juego cambia solo al mapa de quien la ha creado.
 
