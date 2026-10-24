@@ -37,6 +37,10 @@ En el móvil el juego se pone en horizontal automáticamente.
 
 Hecho con [Three.js](https://threejs.org/) r128. Personajes y nave de diseño original.
 
+## Personalizar
+
+En el menú principal, el botón **Personalizar** abre el vestidor con una vista previa en 3D. Hay 15 **sombreros** (chistera, corona, vaquero, gorro de fiesta, de chef, casco vikingo, pirata, gorra con hélice, sombrero de mago, flor, aureola, auriculares, sombrero de ala ancha, gorro de lana y orejas de gato), 12 **trajes** (corbata, pajarita, bufanda, capa de héroe, mochila, cinturón de herramientas, chaleco salvavidas, traje de astronauta, tutú, collar de flores, bata de laboratorio y traje de buzo) y 10 **mascotas** que te siguen por el mapa (perrito, gatito, robot, pulpo, pollito, fantasmita, medusa, mini platillo, pingüino y rana). La elección se guarda en el dispositivo y los demás jugadores la ven en las partidas online. Los NPCs llevan accesorios al azar. El cambiaformas y el suplantador copian también los accesorios.
+
 ## Mapas
 
 Al crear una partida o en el modo práctica puedes elegir el mapa:
