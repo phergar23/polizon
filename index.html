@@ -2191,9 +2191,9 @@ function coleTex() {
   SUBT.cwall = mk(256, 256, g => { g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 900, .018); });
   SUBT.cbrick = mk(256, 256, g => { g.fillStyle = '#d8c6b0'; g.fillRect(0, 0, 256, 256); for (let r = 0; r < 16; r++) for (let c = -1; c < 9; c++) { const x = c * 32 + (r % 2 ? 16 : 0) + 1.5, y = r * 16 + 1.5; g.fillStyle = ['#c8603a', '#cf6a40', '#bb5a3a', '#d4774a', '#c4643f'][(r * 3 + c * 7 + 20) % 5]; g.fillRect(x, y, 29, 13); g.fillStyle = 'rgba(255,255,255,.1)'; g.fillRect(x, y, 29, 2); } noise(g, 256, 256, 1400, .04); });
   // túnel: hormigón oscuro con manchas de humedad
-  SUBT.ctun = mk(256, 256, g => { g.fillStyle = '#7a7670'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 3500, .08); for (let k = 0; k < 6; k++) { const x = Math.random() * 256, gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(40,50,40,.0)'); gr.addColorStop(1, 'rgba(40,50,40,.35)'); g.fillStyle = gr; g.fillRect(x, 60 + Math.random() * 80, 18 + Math.random() * 30, 200); }
-    g.strokeStyle = 'rgba(30,30,30,.4)'; g.lineWidth = 2; g.beginPath(); g.moveTo(40, 30); g.lineTo(70, 90); g.lineTo(60, 140); g.stroke(); g.fillStyle = '#4a4844'; g.fillRect(0, 225, 256, 31); g.strokeStyle = 'rgba(0,0,0,.35)'; [0, 128].forEach(x => { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 256); g.stroke(); }); });
-  SUBT.ctunf = mk(256, 256, g => { g.fillStyle = '#5e5b56'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 3000, .08); g.strokeStyle = 'rgba(20,20,20,.4)'; g.lineWidth = 3; g.strokeRect(1, 1, 254, 254); });
+  SUBT.ctun = mk(256, 256, g => { g.fillStyle = '#f4f2ec'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 1600, .03); for (let k = 0; k < 4; k++) { const x = Math.random() * 256, gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(150,140,120,0)'); gr.addColorStop(1, 'rgba(150,140,120,.18)'); g.fillStyle = gr; g.fillRect(x, 80 + Math.random() * 60, 16 + Math.random() * 24, 180); }
+    g.strokeStyle = 'rgba(120,115,105,.3)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(40, 30); g.lineTo(70, 90); g.lineTo(60, 140); g.stroke(); g.fillStyle = '#dedad0'; g.fillRect(0, 228, 256, 28); });
+  SUBT.ctunf = mk(256, 256, g => { g.fillStyle = '#e6e4de'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 2000, .04); g.strokeStyle = 'rgba(150,145,135,.45)'; g.lineWidth = 3; g.strokeRect(1, 1, 254, 254); });
   SUBT.ctile = mk(128, 128, g => { g.fillStyle = '#f2f8fa'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d6ecf4'; g.fillRect(0, 76, 128, 52); g.strokeStyle = '#b8d4dc'; g.lineWidth = 2; for (let k = 0; k <= 128; k += 16) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 128); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(128, k); g.stroke(); } });
   SUBT.cceil = mk(256, 256, g => { g.fillStyle = '#f4f2ea'; g.fillRect(0, 0, 256, 256); g.fillStyle = 'rgba(120,115,100,.18)'; for (let i = 0; i < 500; i++) g.fillRect(Math.random() * 256, Math.random() * 256, 2, 2); grid(g, 2, '#c9c4b2', 5); });
   SUBT.cstucco = mk(256, 256, g => { g.fillStyle = '#efe0bd'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 3000, .05); g.fillStyle = '#c9a86a'; g.fillRect(0, 230, 256, 26); });
@@ -2217,7 +2217,7 @@ const COLE_WIN = [{ rooms: ['Aula de Inglés 2', 'Aula de Inglés 1'], a: 32, b:
 function coleWall(e, isRoom, room) {
   const L = e.b - e.a, rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), dir = Math.round(e.ax === 'z' ? Math.cos(rot) : -Math.sin(rot));
   const fl = subFloor(e.ax === 'z' ? (e.a + e.b) / 2 : e.v), NR = ROOMS.length, tun = !isRoom && CRECTS[e.ri - NR] && CRECTS[e.ri - NR].k === COLE_TUN;
-  const tex = tun ? SUBT.ctun : room && room.n === 'Baños' ? SUBT.ctile : fl ? SUBT.cbrick : SUBT.cwall, wm = toon(tun ? 0xb0aca4 : 0xffffff, { map: tex }), BASE = toon(fl ? 0x6a3a24 : tun ? 0x3a3834 : 0xc8c4b8);
+  const tex = tun ? SUBT.ctun : room && room.n === 'Baños' ? SUBT.ctile : fl ? SUBT.cbrick : SUBT.cwall, wm = toon(0xffffff, { map: tex }), BASE = toon(fl ? 0x6a3a24 : 0xc8c4b8);
   const at = (s, q) => e.ax === 'z' ? [s, e.v - e.out * q] : [e.v - e.out * q, s];
   const piece = (a, b, y0, y1, mat) => { if (b - a < .01 || y1 - y0 < .01) return; const g = new THREE.PlaneGeometry(b - a, y1 - y0), uv = g.attributes.uv;
     for (let i = 0; i < uv.count; i++) { const ux = uv.getX(i) > .5, uy = uv.getY(i) > .5; uv.setXY(i, ((dir > 0) === ux ? b : a) / 3, (uy ? y1 : y0) / WALL_H); }
@@ -2443,7 +2443,7 @@ function decorateCole() {
   coleDoors();
 }
 function coleDoors() {
-  const fr0 = toon(0xb07a46), fr1 = toon(0x6a3a1e), leaf0 = toon(0xc8955a), leaf1 = toon(0x7a4a2a), knob = toon(0xd9a441), wW = toon(0xfbfaf6), wB = toon(0xc0603c), wT = toon(0x8a8680);
+  const fr0 = toon(0xb07a46), fr1 = toon(0x6a3a1e), leaf0 = toon(0xc8955a), leaf1 = toon(0x7a4a2a), knob = toon(0xd9a441), wW = toon(0xfbfaf6), wB = toon(0xc0603c), wT = toon(0xf4f2ec);
   const drawn = []; DOORS.forEach(d => { if (drawn.some(o => o.vert === d.vert && Math.hypot(o.pt[0] - d.pt[0], o.pt[1] - d.pt[1]) < 1.2)) return; drawn.push(d); const r = ROOMS[d.room], fl = subFloor(d.pt[0]), big = r.elev || r.n.startsWith('Escalera'), top = r.elev ? 2.75 : 2.45, w = d.w, pt = d.pt, FR = fl ? fr1 : fr0;
     const tunD = r.n === 'Almacén' && Math.abs(pt[0] + 15) < .1 || r.n === 'Capilla' && Math.abs(pt[1] - 17.6) < .1, WM = tunD ? wT : fl ? wB : wW;
     if (d.vert) { box(w, WALL_H - top, .22, WM, pt[0], (WALL_H + top) / 2, pt[1], null, false); [d.x0 + .05, d.x1 - .05].forEach(x => box(.1, top, .28, FR, x, top / 2, pt[1], null, false)); box(w, .1, .28, FR, pt[0], top - .05, pt[1], null, false); }
@@ -2880,7 +2880,7 @@ function buildShip() {
     if (isRoom && room.out) { worldUV(fg, x0, z1, w, d, 6); const fo = new THREE.Mesh(fg, toon(0xffffff, { map: ROCK_T })); fo.position.set(cx, dy, cz); world.add(fo); return; }
     const fm = new THREE.Mesh(fg, toon(isRoom ? ((IS_PLANET || IS_SUB || IS_COLE ? room.f : FLOORCOL[room.n]) ?? 0xb4c0c9) : IS_SUB ? 0x9aa6ae : IS_COLE ? 0xffffff : 0xb4c0c9, { map: isRoom && room.ft && SUBT[room.ft] ? SUBT[room.ft] : !isRoom && IS_SUB ? SUBT.grate : !isRoom && IS_COLE ? (CRECTS[idx - NR].k === COLE_TUN ? SUBT.ctunf : subFloor(cx) ? SUBT.cwhite : SUBT.cfloor) : isRoom && room.n === 'Comedor' ? CHECK_T : FLOOR_T })); fm.position.set(chm ? 0 : cx, dy, chm ? 0 : cz); world.add(fm); if (IS_SUB && (!isRoom || room.gf)) fm.material = SUBT.gfloorM;
     if (IS_PLANET && (isRoom ? room.glass : CORR[CRECTS[idx - NR].k].exit)) return;
-    if (IS_COLE) { const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); scaleUV(cg, w / 2.4, d / 2.4); const cm = new THREE.Mesh(cg, !isRoom && CRECTS[idx - NR].k === COLE_TUN ? toon(0x4a4640, { map: SUBT.cconc }) : toon(0xffffff, { map: SUBT.cceil })); cm.position.set(cx, WALL_H - dy, cz); world.add(cm); return; }
+    if (IS_COLE) { const cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); scaleUV(cg, w / 2.4, d / 2.4); const cm = new THREE.Mesh(cg, !isRoom && CRECTS[idx - NR].k === COLE_TUN ? toon(0xf0eee8, { map: SUBT.cconc }) : toon(0xffffff, { map: SUBT.cceil })); cm.position.set(cx, WALL_H - dy, cz); world.add(cm); return; }
     if (IS_SUB) { let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); scaleUV(cg, w / 4, d / 4); } const cm = new THREE.Mesh(cg, isRoom ? toon(0xffffff, { map: SUBT.ceil }) : SUBT.gceilM); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm); return; }
     let cg; if (chm) cg = chamferGeo(room.r, room.ch, false, 2); else { cg = new THREE.PlaneGeometry(w, d); cg.rotateX(Math.PI / 2); } const cm = new THREE.Mesh(cg, toon(isRoom && !room.hall ? 0x30363b : 0x2b3035)); cm.position.set(chm ? 0 : cx, WALL_H - dy, chm ? 0 : cz); world.add(cm);
     const lampM = basic(0xfff3d6);
@@ -4051,7 +4051,8 @@ function gameFrame(dt, t) {
   local.light += ((black ? (me.im ? .45 : .05) : dark ? .2 : 1) - local.light) * Math.min(1, dt * 2.2); const L = local.light;
   const flashOn = black && !me.im && local.vent < 0; FLASH.intensity += ((flashOn ? 2.4 : 0) - FLASH.intensity) * Math.min(1, dt * 6);
   if (FLASH.intensity > .01) { const fx = -Math.sin(P.yaw) * Math.cos(local.cp || 0), fy = Math.sin(local.cp || 0), fz = -Math.cos(P.yaw) * Math.cos(local.cp || 0); FLASH.position.set(P.x + Math.cos(P.yaw) * .18, (local.eva ? P.ey : EYE) - .15, P.z - Math.sin(P.yaw) * .18); FLASH.target.position.set(P.x + fx * 10, (local.eva ? P.ey : EYE) + fy * 10 - .4, P.z + fz * 10); }
-  const evL = local.eva || local.ufo ? 1.45 : 1; hemi.intensity = .52 * L * evL; amb.intensity = .12 * L; sun.intensity = .38 * L * (local.eva ? 1.8 : 1); LIGHTS.forEach(l => l.intensity = l.userData.base * (.25 + .75 * L) * (local.eva || local.ufo ? .15 : 1));
+  local.tunD = (local.tunD ?? 1) + ((IS_COLE && !local.eva && !local.ufo && !local.mini && inColeTunnel(P.x, P.z) ? .4 : 1) - (local.tunD ?? 1)) * Math.min(1, dt * 3); const TD = local.tunD;
+  const evL = local.eva || local.ufo ? 1.45 : 1; hemi.intensity = .52 * L * evL * TD; amb.intensity = .12 * L * TD; sun.intensity = .38 * L * (local.eva ? 1.8 : 1) * TD; LIGHTS.forEach(l => l.intensity = l.userData.base * (.25 + .75 * L) * (local.eva || local.ufo ? .15 : 1));
   qs('#darkV').style.opacity = dark && !local.camView ? 1 : 0;
   const q = Math.max(0, (L - .2) / .8); scene.fog.near = 2 + (IS_PLANET ? 40 : 26) * q; scene.fog.far = 8 + (IS_PLANET ? 105 : 72) * q; scene.fog.color.copy(FOG_D).lerp(FOG_C, q);
   if (black && !me.im) { scene.fog.near = 4; scene.fog.far = 24; scene.fog.color.setHex(0x020308); }
