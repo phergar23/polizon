@@ -988,7 +988,7 @@ function coleData() {
     { n: 'Iglesia', r: O([-14, -20.5, 1.5, -3.5]), ft: 'cmarble', a: 0xc9a0ff, node: Q(-6.5, -5) },
     { n: 'Escalera iglesia oeste', r: O([-15.5, -3, -12, .6]), ft: 'cwhite', a: 0x9aa4b0, node: Q(-13.75, 0), sl: 3 },
     { n: 'Escalera iglesia este', r: O([2.5, -3, 6, .6]), ft: 'cwhite', a: 0x9aa4b0, node: Q(4.25, 0), sl: 2 },
-    { n: 'Recepción', r: O([-10, 5.6, -3, 14.5]), ft: 'cwhite', a: 0xff9f43, node: Q(-6.5, 7) },
+    { n: 'Recepción', r: O([-11, -3, -2, 17]), ft: 'cmarble', a: 0xff9f43, node: Q(-6.5, 9) },
     { n: 'Sala de profesores', r: O([3, 6, 11, 12]), ft: 'cwhite', a: 0x5ab8ff, node: Q(7, 7) },
     { n: 'Jefatura de estudios', r: O([12, 6, 22, 12]), ft: 'cwhite', a: 0xd8344a, node: Q(17, 7) },
     { n: 'Dirección', r: O([23, 6, 30.5, 12]), ft: 'wood', a: 0xd9a441, node: Q(28.5, 7) },
@@ -1015,12 +1015,11 @@ function coleData() {
   C([[25.5, 21.5], [35, 21.5], [38, 21.5]], -1, 'Ascensor sur', 3); C([[35, 21.5], [35, 27]], -1, 'Escalera oeste', 3);
   // ---- planta 0
   const F = pts => pts.map(([x, z]) => [x + SUB_OFF, z]);
-  C(F([[-36.4, 3], [-33, 3], [-30.6, 3], [-18, 3], [-13.75, 3], [-6.5, 3], [4.25, 3], [7, 3], [17, 3], [25.6, 3], [28.5, 3], [32.5, 3]]), -1, -1, 3.6); // pasillo principal
+  C(F([[-36.4, 3], [-33, 3], [-30.6, 3], [-18, 3], [-13.75, 3], [-11, 3]]), -1, 'Recepción', 3.6); C(F([[-2, 3], [4.25, 3], [7, 3], [17, 3], [25.6, 3], [28.5, 3], [32.5, 3]]), 'Recepción', -1, 3.6); // pasillos a los lados del vestíbulo
   C(F([[-30.6, 3], [-30.6, -5], [-30.6, -14.5]]), -1, 'Escalera noroeste', 3); C(F([[-32.6, -5], [-30.6, -5]]), 'Enfermería', -1, 2.2);
   C(F([[-33, 3], [-33, 7.6], [-33, 13]]), -1, 'Escalera suroeste', 3); C(F([[-35.5, 7.6], [-33, 7.6]]), 'Ascensor oeste', -1, 2.4);
   C(F([[-18, 3], [-18, 7]]), -1, 'Administración', 2.2);
-  C(F([[-6.5, -3.5], [-6.5, 3]]), 'Iglesia', -1, 4);
-  C(F([[-6.5, 3], [-6.5, 5.6]]), -1, 'Recepción', 5);
+  C(F([[-6.5, -3.5], [-6.5, -3]]), 'Iglesia', 'Recepción', 4);
   C(F([[-13.75, .6], [-13.75, 3]]), 'Escalera iglesia oeste', -1, 2.6); C(F([[4.25, .6], [4.25, 3]]), 'Escalera iglesia este', -1, 2.6);
   C(F([[7, 3], [7, 6]]), -1, 'Sala de profesores', 2.2); C(F([[17, 3], [17, 6]]), -1, 'Jefatura de estudios', 2.2); C(F([[28.5, 3], [28.5, 6]]), -1, 'Dirección', 2.2);
   C(F([[25.6, 3], [25.6, -14.7], [25.6, -20]]), -1, 'Escalera noreste', 3); C(F([[25.6, -14.7], [28, -14.7]]), -1, 'Biblioteca', 2.2);
@@ -1039,20 +1038,20 @@ function coleData() {
   S0([-37.55, -5], 'scan', 'Revisión médica'); S0([-35.3, -9.25], 'samples', 'Analizar muestras');
   S0([-23.15, 9.5], 'numbers', 'Abrir la caja fuerte'); S0([-14.85, 9.5], 'download', 'Imprimir certificados');
   S0([-12.5, -3.95], 'sort', 'Ordenar los cantorales'); S0([0, -3.95], 'plants', 'Cambiar las flores del altar');
-  S0([-9.55, 8], 'swipe', 'Registrar visitas'); S0([-3.45, 8], 'dial', 'Atender el teléfono');
+  S0([-10.55, 6], 'swipe', 'Registrar visitas'); S0([-10.55, 15], 'dial', 'Atender el teléfono');
   S0([10.55, 7.5], 'dial', 'Hacer café'); S0([3.45, 7.5], 'trash', 'Vaciar la papelera');
   S0([12.45, 8], 'sort', 'Ordenar los horarios'); S0([21.55, 8], 'upload', 'Enviar las notas');
   S0([23.45, 8], 'upload', 'Firmar los permisos');
   S0([31, -17.05], 'sort', 'Ordenar libros'); S0([28.45, -11], 'upload', 'Registrar préstamos');
   FIX.length = 0; FIX.push({ k: 0, c: [-17, 13.45], t: 'levers', n: 'Cuadro eléctrico' }, { k: 1, c: [10, -9.15], t: 'hand', n: 'Caldera A' }, { k: 2, c: [-37.45, -1.5], t: 'hand', n: 'Caldera B' },
     { k: 3, c: [35, 2.25], t: 'dial', n: 'Router del wifi' }, { k: 4, c: [-29.55, 22.2], t: 'power', n: 'Motor del ascensor' });
-  CAMS.length = 0; CAMS.push({ n: 'Comedor', p: [-43.4, 2.85, 17.9], t: [-37, .4, 9] }, { n: 'El Túnel', p: [-14.4, 2.75, 15], t: [6, .4, 16] }, { n: 'Pasillo', p: [27, 2.85, -8], t: [25.5, .4, 10] }, { n: 'Recepción', p: [SUB_OFF - 9.6, 2.85, 14.1], t: [SUB_OFF - 6.5, .4, 6] });
+  CAMS.length = 0; CAMS.push({ n: 'Comedor', p: [-43.4, 2.85, 17.9], t: [-37, .4, 9] }, { n: 'El Túnel', p: [-14.4, 2.75, 15], t: [6, .4, 16] }, { n: 'Pasillo', p: [27, 2.85, -8], t: [25.5, .4, 10] }, { n: 'Recepción', p: [SUB_OFF - 10.5, 2.85, 16.5], t: [SUB_OFF - 6.5, .4, 3] });
   CAM_DESK.p = [-20.5, 15.1];
   VENTS.length = 0; VENTS.push({ p: [-39, 16.6], net: 0 }, { p: [-39.3, .5], net: 0 }, { p: [-27.6, -18.2], net: 0 },
     { p: [-20.5, 18.2], net: 1 }, { p: [12.3, 22.2], net: 1 }, { p: [21.2, 10.6], net: 1 },
     { p: [9.8, -17.6], net: 2 }, { p: [32, -6.5], net: 2 }, { p: [12.4, -26.2], net: 2 },
     { p: [30.7, 13.4], net: 3 }, { p: [30.7, 2.6], net: 3 }, { p: [34, 27.6], net: 3 },
-    { p: Q(-34, -2), net: 4 }, { p: Q(-21.5, 8.2), net: 4 }, { p: Q(-4.5, 13.5), net: 4 },
+    { p: Q(-34, -2), net: 4 }, { p: Q(-21.5, 8.2), net: 4 }, { p: Q(-3.3, 13.8), net: 4 },
     { p: Q(4, 9.8), net: 5 }, { p: Q(13.2, 11.2), net: 5 }, { p: Q(29.3, -5), net: 5 }, { p: Q(-9.5, -4.5), net: 5 });
 }
 const floorName = x => IS_COLE ? (subFloor(x) ? 'la planta 0' : 'la planta -1') : (subFloor(x) ? 'la cubierta inferior' : 'la cubierta superior');
@@ -2183,7 +2182,7 @@ function coleTex() {
   const grid = (g, n, c, lw) => { g.strokeStyle = c; g.lineWidth = lw; for (let k = 0; k <= 256; k += 256 / n) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 256); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(256, k); g.stroke(); } };
   SUBT.cfloor = mk(256, 256, g => { [[0, 0, '#fbfbf7'], [128, 0, '#d4d2c8'], [0, 128, '#d4d2c8'], [128, 128, '#fbfbf7']].forEach(([x, y, c]) => { g.fillStyle = c; g.fillRect(x, y, 128, 128); }); noise(g, 256, 256, 900, .025); grid(g, 2, '#c9c7bd', 3); });
   SUBT.cfloor2 = mk(256, 256, g => { for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) { g.fillStyle = (x + y) % 2 ? '#e6e6e0' : '#fdfdfb'; g.fillRect(x * 64, y * 64, 64, 64); } grid(g, 4, '#c4c2b8', 2); });
-  SUBT.cwhite = mk(256, 256, g => { g.fillStyle = '#fbfbf9'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 600, .02); grid(g, 2, '#dcdad2', 2); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(20, 20, 60, 6); g.fillRect(150, 150, 60, 6); });
+  SUBT.cwhite = mk(256, 256, g => { g.fillStyle = '#fbfbf9'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 600, .02); grid(g, 2, '#cbc8bd', 3); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(20, 20, 60, 6); g.fillRect(150, 150, 60, 6); });
   SUBT.cmarble = mk(256, 256, g => { g.fillStyle = '#f7f6f2'; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(160,160,170,.25)'; g.lineWidth = 2; for (let k = 0; k < 9; k++) { g.beginPath(); let x = Math.random() * 256, y = Math.random() * 256; g.moveTo(x, y); for (let j = 0; j < 5; j++) { x += (Math.random() - .5) * 90; y += (Math.random() - .3) * 60; g.lineTo(x, y); } g.stroke(); } grid(g, 2, '#e2e0d8', 2); });
   SUBT.cconc = mk(256, 256, g => { g.fillStyle = '#c9c9c4'; g.fillRect(0, 0, 256, 256); noise(g, 256, 256, 2600, .06); g.strokeStyle = 'rgba(90,90,85,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, 254, 254); });
   SUBT.cplate = mk(128, 128, g => { g.fillStyle = '#b8bec6'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d8dde2'; for (let x = 0; x < 128; x += 16) for (let y = 0; y < 128; y += 16) { g.save(); g.translate(x + ((y / 16) % 2 ? 8 : 0) + 4, y + 8); g.rotate((y / 16) % 2 ? .6 : -.6); g.fillRect(-5, -1.5, 10, 3); g.restore(); } });
@@ -2225,12 +2224,16 @@ function coleWall(e, isRoom, room) {
     const m = new THREE.Mesh(g, mat); m.rotation.y = rot; const [px, pz] = at((a + b) / 2, 0); m.position.set(px, (y0 + y1) / 2, pz); world.add(m); };
   const along = (s0, s1, y, h, d, mat, q) => { const [px, pz] = at((s0 + s1) / 2, q); return box(e.ax === 'z' ? s1 - s0 : d, h, e.ax === 'z' ? d : s1 - s0, mat, px, y, pz, null, false); };
   const win = isRoom && e.ax === 'z' ? COLE_WIN.find(w => w.rooms.includes(room.n)) : null;
+  const facade = isRoom && room.n === 'Recepción' && e.ax === 'z' && e.out > 0;
   const hiWin = !isRoom && !fl && e.ax === 'x' && Math.abs(e.v - 27.3) < .05 && e.out > 0 && e.b > -9 && e.a < 15;
   if (win && ((room.n === win.rooms[0] && e.out < 0) || (room.n === win.rooms[1] && e.out > 0))) {
     piece(e.a, e.b, 0, win.y0, wm); piece(e.a, e.b, win.y1, WALL_H, wm); piece(e.a, win.a, win.y0, win.y1, wm); piece(win.b, e.b, win.y0, win.y1, wm); piece(win.a, win.b, win.y0, win.y1, SUBT.cglassM);
     const FR = toon(0xf4f4f0), t = .08; along(win.a - t, win.b + t, win.y0 - t / 2, t, .12, FR, .03); along(win.a - t, win.b + t, win.y1 + t / 2, t, .12, FR, .03); along(win.a - t, win.a, (win.y0 + win.y1) / 2, win.y1 - win.y0, .12, FR, .03); along(win.b, win.b + t, (win.y0 + win.y1) / 2, win.y1 - win.y0, .12, FR, .03);
     along((win.a + win.b) / 2 - .03, (win.a + win.b) / 2 + .03, (win.y0 + win.y1) / 2, win.y1 - win.y0, .06, FR, .02); along(win.a, win.b, win.y0 + .02, .05, .25, FR, .1);
     if (room.n === win.rooms[0]) { const gap = .3, mid = e.v - gap / 2; const fill = (x0, x1, y0, y1) => box(x1 - x0, y1 - y0, gap + .02, toon(0xe8e6de), (x0 + x1) / 2, (y0 + y1) / 2, mid, null, false); fill(win.a - .1, win.b + .1, win.y0 - .1, win.y0); fill(win.a - .1, win.b + .1, win.y1, win.y1 + .1); fill(win.a - .1, win.a, win.y0, win.y1); fill(win.b, win.b + .1, win.y0, win.y1); }
+  } else if (facade) { // gran fachada de cristal con la entrada principal
+    const FR = toon(0x4a5058), y1 = 2.95; piece(e.a, e.b, 0, .12, toon(0x4a5058)); piece(e.a, e.b, .12, y1, SUBT.cglassM); piece(e.a, e.b, y1, WALL_H, wm);
+    for (let s2 = e.a; s2 <= e.b + .01; s2 += (e.b - e.a) / 6) along(s2 - .05, s2 + .05, WALL_H / 2, WALL_H, .14, FR, .04); along(e.a, e.b, 1.1, .06, .1, FR, .04); along(e.a, e.b, y1, .1, .16, FR, .05);
   } else if (hiWin) { // ventanas altas en el pasillo de las aulas
     const y0 = 2.2, y1 = 2.95, spans = []; for (let s = e.a + .45; s + 1.5 <= e.b - .3; s += 1.95) spans.push([s, s + 1.5]);
     piece(e.a, e.b, 0, y0, wm); piece(e.a, e.b, y1, WALL_H, wm); let c = e.a; const WM = basic(0xffffff, { map: SUBT.cwin }), FR = toon(0xf0f0ea);
@@ -2242,7 +2245,7 @@ function coleWall(e, isRoom, room) {
 }
 function buildColeHull() {
   const allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], E = .14, H = WALL_H + E, HM = toon(0xffffff, { map: SUBT.cstucco }), HB = toon(0xffffff, { map: SUBT.cbrick }), RM = toon(0xb8b2a4, { map: SUBT.cconc });
-  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const rm = ROOMS[e.ri], wn = rm && e.ax === 'z' ? COLE_WIN.find(w => (rm.n === w.rooms[0] && e.out < 0) || (rm.n === w.rooms[1] && e.out > 0)) : null; if (wn) return; const L = e.b - e.a, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, H + .3); scaleUV(g, L / 4, 1); const m = new THREE.Mesh(g, subFloor(e.ax === 'z' ? mid : e.v) ? HB : HM);
+  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const rm = ROOMS[e.ri], wn = rm && e.ax === 'z' ? COLE_WIN.find(w => (rm.n === w.rooms[0] && e.out < 0) || (rm.n === w.rooms[1] && e.out > 0)) : null; if (wn || (rm && rm.n === 'Recepción' && e.ax === 'z' && e.out > 0)) return; const L = e.b - e.a, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, H + .3); scaleUV(g, L / 4, 1); const m = new THREE.Mesh(g, subFloor(e.ax === 'z' ? mid : e.v) ? HB : HM);
     m.rotation.y = e.ax === 'z' ? (e.out > 0 ? 0 : Math.PI) : (e.out > 0 ? Math.PI / 2 : -Math.PI / 2); if (e.ax === 'z') m.position.set(mid, H / 2 - .15, e.v + e.out * E); else m.position.set(e.v + e.out * E, H / 2 - .15, mid); world.add(m); });
   allR.forEach(r => { const w = r[2] - r[0] + 2 * E, d = r[3] - r[1] + 2 * E, g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); scaleUV(g, w / 4, d / 4); const m = new THREE.Mesh(g, RM); m.position.set((r[0] + r[2]) / 2, H, (r[1] + r[3]) / 2); world.add(m); });
   const gr = new THREE.Mesh(new THREE.PlaneGeometry(440, 220), toon(0xffffff, { map: SUBT.cgrass })); gr.rotation.x = -Math.PI / 2; gr.position.set(SUB_OFF / 2, -.06, 0); scaleUV(gr.geometry, 66, 33); world.add(gr);
@@ -2325,7 +2328,7 @@ function decorateCole() {
     const sg = sprText('SILENCIO', { size: 40, color: '#c9a0ff', w: 1.4 }); sg.position.set(x1 - .3, 2.85, cz - 2); world.add(sg); }
   // ---- Baños
   { const [x0, z0, x1, z1] = R('Baños'); for (let k = 0; k < 3; k++) { const x = x0 + 1 + k * 1.6; box(.06, 2.0, 1.5, toon(0x5ab8ff), x, 1.05, z0 + .75); if (k === 2) box(.06, 2.0, 1.5, toon(0x5ab8ff), x + 1.6, 1.05, z0 + .75);
-      const door = box(.7, 1.8, .05, toon(0x3d7bff), x + .45, 1.0, z0 + 1.5 + .25); door.rotation.y = .6; box(.45, .4, .5, W, x + .8, .2, z0 + .35); obs(x + .8, z0 + .6, .75); }
+      box(.6, 2.0, .05, toon(0x5ab8ff), x + .3, 1.05, z0 + 1.5); const hg = grp(x + .62, z0 + 1.5, -.7); box(.94, 1.85, .05, toon(0x3d7bff), .48, 1.0, 0, hg); box(.04, .04, .1, toon(0xd9a441), .85, 1.0, .04, hg, false); box(.45, .4, .5, W, x + .8, .2, z0 + .35); obs(x + .8, z0 + .6, .75); }
     [16, 19.3, 21.3].forEach(x => { box(.7, .18, .45, W, x, .85, z1 - .25); cyl(.03, .03, .2, M, x, 1.0, z1 - .12, null, 6); const mr = new THREE.Mesh(new THREE.PlaneGeometry(.7, .8), basic(0xcfeeff)); mr.position.set(x, 1.6, z1 - .02); mr.rotation.y = Math.PI; world.add(mr); box(.12, .2, .08, W, x + .45, 1.3, z1 - .06, null, false); }); obs(16, z1 - .25, .45); obs(20.3, z1 - .25, .5);
     box(.35, .45, .2, toon(0xdde2e8), 23.38, 1.35, 13.6, null, false); const wc = sprText('WC', { size: 60, bg: '#3d7bff', w: .8 }); wc.position.set(23.3, 2.5, 10.4); world.add(wc); bin(22.9, 13.9, 0x9aa4b0); }
   // ---- Taller
@@ -2383,13 +2386,24 @@ function decorateCole() {
     for (let z = z0 + 4; z < z1 - 2; z += 4) [x0, x1].forEach((x, i) => { wallP(SUBT.cglass, x + (i ? -.02 : .02), 2.0, z, i ? -Math.PI / 2 : Math.PI / 2, .9, 2.0); });
     [z0 + 6, z0 + 11].forEach(z => { cyl(.015, .015, .8, D, ax, Y - .4, z, null, 6); cyl(.5, .3, .25, toon(0xd9a441), ax, Y - .9, z, null, 12); for (let k = 0; k < 6; k++) sph(.05, glow(0xfff0b0), ax + Math.cos(k) * .45, Y - .78, z + Math.sin(k) * .45, null, 6); });
     const sg = sprText('IGLESIA', { size: 50, bg: '#8a3a1a', w: 1.6 }); sg.position.set(ax, 2.9, z1 - .3); world.add(sg); }
-  // ---- Recepción: mostrador, ordenador, teléfono, sala de espera y entrada principal
-  { const [x0, z0, x1, z1] = R('Recepción'); box(3.6, 1.05, .7, toon(0x8a5a34), x0 + 2.2, .53, z0 + 5.2); box(3.7, .06, .8, toon(0xf4ece0), x0 + 2.2, 1.08, z0 + 5.2, null, false); box(.7, 1.05, 1.6, toon(0x8a5a34), x0 + 3.7, .53, z0 + 6.0); [0, 1.2, 2.4].forEach(o => obs(x0 + 1 + o, z0 + 5.2, .55)); obs(x0 + 3.7, z0 + 6.2, .6);
-    box(.5, .35, .05, D, x0 + 1.5, 1.35, z0 + 5.4, null, false); box(.12, .3, .08, M, x0 + 1.5, 1.15, z0 + 5.45, null, false); box(.22, .08, .14, toon(0xd8344a), x0 + 2.6, 1.15, z0 + 5.3, null, false); chair(x0 + 1.8, z0 + 6.1, Math.PI, 0x2a2a3a);
-    [z0 + 5, z0 + 5.9, z0 + 6.8].forEach(z => { chair(x1 - .45, z, -Math.PI / 2, 0xd8344a); obs(x1 - .45, z, .3); }); plant(x1 - .5, z1 - .5);
-    [-1, 1].forEach(s => { const gd = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.4), basic(0xffffff, { map: SUBT.cwin })); gd.position.set((x0 + x1) / 2 + s * .62, 1.2, z1 - .02); gd.rotation.y = Math.PI; world.add(gd); box(.05, 2.4, .08, toon(0x5a6370), (x0 + x1) / 2 + s * .62, 1.2, z1 - .04, null, false); });
-    box(2.6, .1, .1, toon(0x5a6370), (x0 + x1) / 2, 2.42, z1 - .04, null, false); const en = sprText('ENTRADA PRINCIPAL', { size: 42, bg: '#2f9a4a', w: 2.4 }); en.position.set((x0 + x1) / 2, 2.85, z1 - .3); world.add(en);
-    const rc = sprText('RECEPCIÓN', { size: 50, bg: '#8a3a1a', w: 1.7 }); rc.position.set(x0 + 2.2, 1.9, z0 + 5.2); world.add(rc); }
+  // ---- Recepción: gran vestíbulo de entrada (mostrador a la izquierda, iglesia al fondo, pasillos a los lados)
+  { const [x0, z0, x1, z1] = R('Recepción'), cx = (x0 + x1) / 2;
+    const run = new THREE.Mesh(new THREE.PlaneGeometry(2.4, z1 - z0 - .4), basic(0xb8323f)); run.rotation.x = -Math.PI / 2; run.position.set(cx, .016, (z0 + z1) / 2); world.add(run); [-1, 1].forEach(sd => { const b = new THREE.Mesh(new THREE.PlaneGeometry(.12, z1 - z0 - .4), basic(0xd9a441)); b.rotation.x = -Math.PI / 2; b.position.set(cx + sd * 1.14, .018, (z0 + z1) / 2); world.add(b); });
+    const dk = toon(0x8a5a34), top = toon(0xf4ece0), dx = x0 + 1.7; box(.8, 1.05, 3.2, dk, dx, .53, 10); box(.95, .06, 3.35, top, dx, 1.08, 10, null, false); box(1.4, 1.05, .8, dk, dx - .3, .53, 8.0); box(1.55, .06, .95, top, dx - .3, 1.08, 8.0, null, false); box(.82, .5, 3.0, toon(0xd9a441), dx + .02, .55, 10, null, false);
+    [8.9, 10, 11.1].forEach(z => obs(dx, z, .6)); obs(dx - .4, 8.0, .65);
+    box(.05, .35, .5, D, dx - .2, 1.35, 10.4, null, false); box(.08, .3, .12, M, dx - .2, 1.15, 10.4, null, false); box(.22, .08, .14, toon(0xd8344a), dx - .1, 1.15, 9.4, null, false); sph(.07, toon(0xd9a441), dx + .1, 1.14, 11.2, null, 10); chair(dx - .85, 10, -Math.PI / 2, 0x2a2a3a);
+    const rc = sprText('RECEPCIÓN', { size: 50, bg: '#8a3a1a', w: 1.7 }); rc.position.set(dx, 2.0, 10); world.add(rc);
+    [[x0 + .7, z1 - .7], [x1 - .7, z1 - .7], [x0 + .7, z0 + .7], [x1 - .7, z0 + .7]].forEach(([x, z]) => plant(x, z, 1.15));
+    [7, 11].forEach(z => { box(.5, .08, 1.8, WD, x1 - .4, .45, z); box(.08, .5, 1.8, WD2, x1 - .15, .7, z); [-.8, .8].forEach(o => box(.45, .45, .06, M, x1 - .4, .22, z + o, null, false)); obs(x1 - .4, z - .5, .35); obs(x1 - .4, z + .5, .35); });
+    const tv = box(.06, .9, 1.6, D, x1 - .05, 2.0, 15, null, false); const sc = new THREE.Mesh(new THREE.PlaneGeometry(1.5, .8), basic(0xffffff, { map: SUBT.ctime })); sc.position.set(x1 - .09, 2.0, 15); sc.rotation.y = -Math.PI / 2; world.add(sc);
+    [[x1 - .03, 9, 0xd8344a], [x1 - .03, 13, 0x2a5ad8], [x0 + .03, 13.5, 0x4fa84a]].forEach(([x, z, c], i) => { const bn = new THREE.Mesh(new THREE.PlaneGeometry(.8, 1.6), basic(c)); bn.position.set(x + (i < 2 ? -.01 : .01), 2.0, z); bn.rotation.y = i < 2 ? -Math.PI / 2 : Math.PI / 2; world.add(bn); const st = sprText('★', { size: 90, color: '#ffd93d', w: .6 }); st.position.set(x + (i < 2 ? -.05 : .05), 2.1, z); world.add(st); });
+    const wl = sprText('¡BIENVENIDOS AL COLEGIO!', { size: 44, bg: '#2a5ad8', w: 4.2 }); wl.position.set(cx, 2.75, 14); world.add(wl);
+    const l1 = sprText('← ADMINISTRACIÓN · ENFERMERÍA', { size: 34, bg: '#5a6370', w: 2.6 }); l1.position.set(x0 + 1.5, 2.75, 3); world.add(l1); const l2 = sprText('PROFESORES · DIRECCIÓN · BIBLIOTECA →', { size: 30, bg: '#5a6370', w: 2.8 }); l2.position.set(x1 - 1.5, 2.75, 3); world.add(l2);
+    const ig = sprText('↑ IGLESIA', { size: 44, bg: '#8a3a1a', w: 1.6 }); ig.position.set(cx, 2.75, z0 + .4); world.add(ig);
+    for (let z = z0 + 3; z < z1 - 2; z += 4.5) { box(2.6, .05, 1.4, toon(0xf4f4f0), cx, Y - .03, z, null, false); const sk = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), basic(0xeaf6ff)); sk.rotation.x = Math.PI / 2; sk.position.set(cx, Y - .06, z); world.add(sk); }
+    // en el exterior: marquesina, escalones y farolas
+    box(6, .2, 3, toon(0x4a5058), cx, Y - .1, z1 + 1.6); [-2.8, 2.8].forEach(o => cyl(.1, .1, Y - .2, toon(0x4a5058), cx + o, (Y - .2) / 2, z1 + 2.9, null, 10)); [0, 1, 2].forEach(k => box(6.5 - k * .4, .12, 1.0 - k * .3, toon(0xd8d4c8), cx, -.0 - k * .1 + .02, z1 + .55 + k * .35, null, false));
+    const en = sprText('ENTRADA PRINCIPAL', { size: 42, bg: '#2f9a4a', w: 2.6 }); en.position.set(cx, 2.6, z1 - .4); world.add(en); }
   // ---- Enfermería
   { const [x0, z0, x1, z1] = R('Enfermería'); box(2.0, .5, .9, W, x0 + 1.4, .45, z1 - .7); box(2.0, .12, .9, toon(0x9fd8ff), x0 + 1.4, .76, z1 - .7, null, false); box(.5, .1, .7, W, x0 + .55, .87, z1 - .7, null, false); obs(x0 + .9, z1 - .7, .55); obs(x0 + 1.9, z1 - .7, .55);
     box(.04, .04, 2.2, M, x0 + 2.6, 2.3, z1 - .9, null, false); const cu = box(.02, 1.6, 1.4, toon(0x9fe8ff), x0 + 2.6, 1.4, z1 - .7, null, false);
@@ -2422,10 +2436,25 @@ function decorateCole() {
   { const z = 1.45; box(2.2, 1.8, .5, toon(0x8a5a34), q(-24), .9, z); const gl = box(2.0, 1.0, .02, toon(0xcfeeff, { op: .4 }), q(-24), 1.3, z + .26, null, false); [-.6, 0, .6].forEach((o, i) => { cyl(.12, .07, .25, toon(0xd9a441, { e: 0x8a6a10, ei: .2 }), q(-24) + o, 1.0 + (i % 2) * .5, z, null, 10); sph(.11, toon(0xd9a441), q(-24) + o, 1.18 + (i % 2) * .5, z, null, 10); }); obs(q(-24.7), z + .1, .45); obs(q(-23.3), z + .1, .45);
     const tr = sprText('TROFEOS', { size: 40, bg: '#8a3a1a', w: 1.3 }); tr.position.set(q(-24), 2.2, z + .3); world.add(tr); }
   [[-26, 4.55], [12, 4.55], [21, 4.55]].forEach(([x, z]) => { box(1.6, .08, .45, WD, q(x), .45, z); [-.7, .7].forEach(o => box(.06, .45, .4, M, q(x) + o, .22, z, null, false)); obs(q(x) - .5, z, .32); obs(q(x) + .5, z, .32); });
-  [[-28.5, 1.6], [-1, 4.4], [31.5, 4.4]].forEach(([x, z]) => plant(q(x), z, .9));
+  [[-28.5, 1.6], [31.5, 4.4]].forEach(([x, z]) => plant(q(x), z, .9));
   wallP(SUBT.cpost[1], q(-20), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[3], q(10), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[2], q(20), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[5], q(-28), 1.6, 4.78, Math.PI, .6, .75);
-  { const cr = sprText('★ COLEGIO ★', { size: 50, bg: '#2a5ad8', w: 2.2 }); cr.position.set(q(-6.5), 2.6, 1.3); world.add(cr); } clock(q(0), 2.6, 1.22, 0); clock(q(25.6), 2.6, -19.97, 0);
+  clock(q(0), 2.6, 1.22, 0); clock(q(25.6), 2.6, -19.97, 0);
   [[q(-30.4), 3.5], [q(32.3), 3.2]].forEach(([x, z]) => { cyl(.12, .12, .5, toon(0xd8344a), x, .7, z, null, 10); });
+  coleDoors();
+}
+function coleDoors() {
+  const fr0 = toon(0xb07a46), fr1 = toon(0x6a3a1e), leaf0 = toon(0xc8955a), leaf1 = toon(0x7a4a2a), knob = toon(0xd9a441), wW = toon(0xfbfaf6), wB = toon(0xc0603c), wT = toon(0x8a8680);
+  const drawn = []; DOORS.forEach(d => { if (drawn.some(o => o.vert === d.vert && Math.hypot(o.pt[0] - d.pt[0], o.pt[1] - d.pt[1]) < 1.2)) return; drawn.push(d); const r = ROOMS[d.room], fl = subFloor(d.pt[0]), big = r.elev || r.n.startsWith('Escalera'), top = r.elev ? 2.75 : 2.45, w = d.w, pt = d.pt, FR = fl ? fr1 : fr0;
+    const tunD = r.n === 'Almacén' && Math.abs(pt[0] + 15) < .1 || r.n === 'Capilla' && Math.abs(pt[1] - 17.6) < .1, WM = tunD ? wT : fl ? wB : wW;
+    if (d.vert) { box(w, WALL_H - top, .22, WM, pt[0], (WALL_H + top) / 2, pt[1], null, false); [d.x0 + .05, d.x1 - .05].forEach(x => box(.1, top, .28, FR, x, top / 2, pt[1], null, false)); box(w, .1, .28, FR, pt[0], top - .05, pt[1], null, false); }
+    else { box(.22, WALL_H - top, w, WM, pt[0], (WALL_H + top) / 2, pt[1], null, false); [d.z0 + .05, d.z1 - .05].forEach(z => box(.28, top, .1, FR, pt[0], top / 2, z, null, false)); box(.28, .1, w, FR, pt[0], top - .05, pt[1], null, false); }
+    if (big || ['Comedor', 'Cocina', 'Almacén', 'Recepción', 'Iglesia'].includes(r.n) || w > 2.7) return;
+    const c = r.ctr, sx = d.vert ? 0 : Math.sign(c[0] - pt[0]), sz = d.vert ? Math.sign(c[1] - pt[1]) : 0, lw = (w - .24) / 2;
+    [-1, 1].forEach(side => { const hx = d.vert ? pt[0] + side * (w / 2 - .12) : pt[0], hz = d.vert ? pt[1] : pt[1] + side * (w / 2 - .12);
+      const pts = [.3, .6, .9].map(f => [hx + sx * lw * f, hz + sz * lw * f]);
+      if (pts.some(([x, z]) => OBS.some(o => Math.hypot(o.x - x, o.z - z) < o.r + .25) || [...ST, ...FIX].some(t => Math.hypot(t.p[0] - x, t.p[1] - z) < 1.0) || VENTS.some(v => Math.hypot(v.p[0] - x, v.p[1] - z) < .9))) return;
+      const mx = hx + sx * lw / 2, mz = hz + sz * lw / 2; box(d.vert ? .05 : lw, 2.3, d.vert ? lw : .05, fl ? leaf1 : leaf0, mx, 1.15, mz); if (d.vert) box(.12, .05, .05, knob, mx - side * .06, 1.05, hz + sz * (lw - .1), null, false); else box(.05, .05, .12, knob, hx + sx * (lw - .1), 1.05, mz - side * .06, null, false);
+      pts.forEach(([x, z]) => OBS.push({ x, z, r: .16 })); }); });
 }
 function coleTick(dt, t) { }
 function decorateSub2() {
@@ -2879,7 +2908,7 @@ function buildShip() {
     const inX = e.ax === 'x' ? -e.out * q : 0, inZ = e.ax === 'z' ? -e.out * q : 0, sx = e.ax === 'z' ? L : .07, sz = e.ax === 'z' ? .07 : L;
     const px = e.ax === 'z' ? mid : e.v + inX, pz = e.ax === 'z' ? e.v + inZ : mid;
     box(sx, hA + ax2, sz, accM, px, 1.2, pz, null, false); box(sx, hB + ax2, sz, baseM, px, (hB + ax2) / 2, pz, null, false); });
-  DOORS.forEach(d => { const room = ROOMS[d.room], frM = IS_COLE ? toon(0x8a5a34) : IS_SUB ? toon(0x3a4a52) : toon(room.a), glow = basic(lighter(room.l, .3)), w = d.w, pt = d.pt;
+  DOORS.forEach(d => { if (IS_COLE) return; const room = ROOMS[d.room], frM = IS_COLE ? toon(0x8a5a34) : IS_SUB ? toon(0x3a4a52) : toon(room.a), glow = basic(lighter(room.l, .3)), w = d.w, pt = d.pt;
     if (d.vert) { box(.36, WALL_H, .6, frM, d.x0 + .18, WALL_H / 2, pt[1]); box(.36, WALL_H, .6, frM, d.x1 - .18, WALL_H / 2, pt[1]); box(w, .5, .6, frM, pt[0], WALL_H - .25, pt[1]); box(w - .8, .07, .45, glow, pt[0], WALL_H - .54, pt[1], null, false); }
     else { box(.6, WALL_H, .36, frM, pt[0], WALL_H / 2, d.z0 + .18); box(.6, WALL_H, .36, frM, pt[0], WALL_H / 2, d.z1 - .18); box(.6, .5, w, frM, pt[0], WALL_H - .25, pt[1]); box(.45, .07, w - .8, glow, pt[0], WALL_H - .54, pt[1], null, false); } });
   // puertas (sabotaje)
@@ -2902,7 +2931,7 @@ function buildShip() {
   (IS_PLANET || IS_SUB || IS_COLE ? [] : [[0, -12, 5, 5, 0xff9f43], [...XF[12].f(0, -42), 4, 6, 0x5b6cff]]).forEach(([x, z, w, d, c]) => { const sky = new THREE.Mesh(new THREE.PlaneGeometry(w, d), winM); sky.rotation.x = Math.PI / 2; sky.position.set(x, WALL_H - .02, z); world.add(sky);
     const F = toon(c); box(w + .4, .2, .3, F, x, WALL_H - .1, z - d / 2 - .1); box(w + .4, .2, .3, F, x, WALL_H - .1, z + d / 2 + .1); box(.3, .2, d + .4, F, x - w / 2 - .1, WALL_H - .1, z); box(.3, .2, d + .4, F, x + w / 2 + .1, WALL_H - .1, z); });
   ROOMS.forEach(r => { if (r.out) return; const L = new THREE.PointLight(r.l, .42, 20, 1.6); L.position.set((r.ctr || r.node)[0], 2.7, (r.ctr || r.node)[1]); L.userData.base = .42; world.add(L); LIGHTS.push(L);
-    if (r.hall) return; const s = sprText(r.n, { size: 58, bg: hex(darker(r.a, .15)), w: 2.5 }); s.position.set((r.ctr || r.node)[0], 2.78, (r.ctr || r.node)[1]); world.add(s); });
+    if (r.hall || IS_COLE) return; const s = sprText(r.n, { size: 58, bg: hex(darker(r.a, .15)), w: 2.5 }); s.position.set((r.ctr || r.node)[0], 2.78, (r.ctr || r.node)[1]); world.add(s); });
   const s0 = world.children.length; if (!IS_PLANET && !IS_SUB && !IS_COLE) { decorate(); decorate2(); }
   world.children.slice(s0).forEach(o => { const i = origRoomAt(o.position.x, o.position.z, 1); if (i < 0) return;
     if (!XF[i]) { world.remove(o); return; }
