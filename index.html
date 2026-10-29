@@ -900,7 +900,7 @@ const CORR = [
 // ================== BASE SUBMARINA: dos cubiertas unidas por ascensores ==================
 // La cubierta inferior se construye desplazada en X: los ascensores te llevan de una a otra
 const SUB_OFF = 170, SUB_ELEV = [];
-const subFloor = x => x > SUB_OFF / 2 ? 1 : 0;
+const subFloor = x => x > SUB_OFF * 1.5 ? 2 : x > SUB_OFF / 2 ? 1 : 0;
 function subData() {
   const L = (x, z) => [x + SUB_OFF, z], LR = r => [r[0] + SUB_OFF, r[1], r[2] + SUB_OFF, r[3]];
   BTN.x = 0; BTN.z = 0;
@@ -959,7 +959,9 @@ function subData() {
     { p: L(17.5, -4.5), net: 3 }, { p: L(30, 4.5), net: 3 }, { p: L(-4, -14.5), net: 3 }, { p: L(8, 16.5), net: 3 });
 }
 // ================== COLEGIO · Planta -1 y Planta 0 (desplazada SUB_OFF en X) ==================
-const COLE_LINKS = [], COLE_STAIRS = {}, COLE_TUN = 4;
+const COLE_LINKS = [], COLE_STAIRS = {}, COLE_TUN = 4, COLE_AULAS = [], COLE_RES = [];
+const RULETA = { ang: 0, vel: 0, names: ['Een', 'Matija', 'Goypi', 'Borea', 'Reymarito', 'Bellot', 'Valde', 'Caños', 'Paco'], cv: null, tex: null, wh: null, pt: null };
+const inRc = (r, x, z, m = 0) => x >= r[0] - m && x <= r[2] + m && z >= r[1] - m && z <= r[3] + m;
 function coleData() {
   BTN.x = -37.25; BTN.z = 10.5;
   const O = r => [r[0] + SUB_OFF, r[1], r[2] + SUB_OFF, r[3]], Q = (x, z) => [x + SUB_OFF, z];
@@ -981,7 +983,7 @@ function coleData() {
     { n: 'Ascensor sur', r: [38, 19.5, 42, 23.5], ft: 'cplate', a: 0xffcc33, elev: 2 },
     // ---- planta 0
     { n: 'Enfermería', r: O([-38, -9.7, -32.6, -.8]), ft: 'cwhite', a: 0x5ad8ff, node: Q(-33.6, -5) },
-    { n: 'Escalera noroeste', r: O([-32.6, -18.5, -28.6, -14.5]), ft: 'cwhite', a: 0x9aa4b0, node: Q(-30.6, -15) },
+    { n: 'Escalera noroeste', r: O([-32.6, -18.5, -28.6, -14.5]), ft: 'cwhite', a: 0x9aa4b0, node: Q(-30.6, -15), sl: 4 },
     { n: 'Ascensor oeste', r: O([-39.5, 5.6, -35.5, 9.6]), ft: 'cplate', a: 0xffcc33, elev: 1 },
     { n: 'Escalera suroeste', r: O([-35, 13, -31, 16.5]), ft: 'cwhite', a: 0x9aa4b0, node: Q(-33, 13.6), sl: 1 },
     { n: 'Administración', r: O([-23.6, 7, -14.4, 12]), ft: 'cwhite', a: 0x4fa84a, node: Q(-18, 8) },
@@ -992,14 +994,12 @@ function coleData() {
     { n: 'Sala de profesores', r: O([3, 6, 11, 12]), ft: 'cwhite', a: 0x5ab8ff, node: Q(7, 7) },
     { n: 'Jefatura de estudios', r: O([12, 6, 22, 12]), ft: 'cwhite', a: 0xd8344a, node: Q(17, 7) },
     { n: 'Dirección', r: O([23, 6, 30.5, 12]), ft: 'wood', a: 0xd9a441, node: Q(28.5, 7) },
-    { n: 'Escalera noreste', r: O([23.6, -24, 27.6, -20]), ft: 'cwhite', a: 0x9aa4b0, node: Q(25.6, -20.5) },
+    { n: 'Escalera noreste', r: O([23.6, -24, 27.6, -20]), ft: 'cwhite', a: 0x9aa4b0, node: Q(25.6, -20.5), sl: 5 },
     { n: 'Biblioteca', r: O([28, -17.5, 36, -2]), ft: 'wood', a: 0x8a5a34, node: Q(29.5, -14.7) },
     { n: 'Ascensor este', r: O([34, -.75, 38, 3.25]), ft: 'cplate', a: 0xffcc33, elev: 2 },
-    { n: 'Escalera sureste', r: O([34, 5, 38, 9]), ft: 'cwhite', a: 0x9aa4b0, node: Q(34.6, 7) }];
+    { n: 'Escalera sureste', r: O([34, 5, 38, 9]), ft: 'cwhite', a: 0x9aa4b0, node: Q(34.6, 7), sl: 6 }];
   ROOMS.length = 0;
   B.forEach(b => { const c = [(b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2]; ROOMS.push({ n: b.n, r: b.r, f: 0xffffff, ft: b.ft, a: b.a, l: 0xfff6e0, node: b.ring ? b.ring[0] : (b.node || c), ctr: c, ch: null, hall: 0, ring: b.ring || null, elev: b.elev || 0, sl: b.sl || 0, gf: 0 }); });
-  SUB_ELEV.length = 0; COLE_LINKS.length = 0; [1, 2].forEach(k => { const ids = ROOMS.map((r, i) => r.elev === k ? i : -1).filter(i => i >= 0); SUB_ELEV.push(ids); COLE_LINKS.push(ids); });
-  [1, 2, 3].forEach(k => { const ids = ROOMS.map((r, i) => r.sl === k ? i : -1).filter(i => i >= 0); COLE_LINKS.push(ids); COLE_STAIRS[ids[0]] = ids[1]; COLE_STAIRS[ids[1]] = ids[0]; });
   const ri = n => ROOMS.findIndex(r => r.n === n);
   CORR.length = 0; const C = (p, a, b, w = 3) => CORR.push({ p, a: typeof a === 'string' ? ri(a) : a, b: typeof b === 'string' ? ri(b) : b, w });
   // ---- planta -1
@@ -1024,6 +1024,33 @@ function coleData() {
   C(F([[7, 3], [7, 6]]), -1, 'Sala de profesores', 2.2); C(F([[17, 3], [17, 6]]), -1, 'Jefatura de estudios', 2.2); C(F([[28.5, 3], [28.5, 6]]), -1, 'Dirección', 2.2);
   C(F([[25.6, 3], [25.6, -14.7], [25.6, -20]]), -1, 'Escalera noreste', 3); C(F([[25.6, -14.7], [28, -14.7]]), -1, 'Biblioteca', 2.2);
   C(F([[32.5, 3], [32.5, 1.25], [34, 1.25]]), -1, 'Ascensor este', 2.4); C(F([[32.5, 3], [32.5, 7], [34, 7]]), -1, 'Escalera sureste', 2.6);
+  // ---- planta 1 (desplazada 2·SUB_OFF): pasillos alrededor de un patio interior
+  { const O2 = r => [r[0] + 2 * SUB_OFF, r[1], r[2] + 2 * SUB_OFF, r[3]], Q2 = (x, z) => [x + 2 * SUB_OFF, z], F2 = pts => pts.map(([x, z]) => [x + 2 * SUB_OFF, z]);
+    const add = (n, r, o = {}) => { const rr = O2(r), c = [(rr[0] + rr[2]) / 2, (rr[1] + rr[3]) / 2]; ROOMS.push(Object.assign({ n, r: rr, f: 0xffffff, ft: 'cwhite', a: 0x5ab8ff, l: 0xfff6e0, node: c, ctr: c, ch: null, hall: 0, ring: null, elev: 0, sl: 0, gf: 0 }, o, o.node ? { node: Q2(o.node[0], o.node[1]) } : {})); };
+    add('Escalera A', [-36.5, 12.7, -32.5, 16.7], { a: 0x9aa4b0, node: [-33.2, 14.7], sl: 4 }); add('Escalera B', [-32.5, 17.4, -28.5, 21.4], { a: 0x9aa4b0, node: [-30.5, 18], sl: 5 });
+    add('Escalera C', [26, 17.6, 30, 21.6], { a: 0x9aa4b0, node: [28, 18.2], sl: 6 });
+    add('Ascensor A', [-27.5, 17.4, -23.5, 21.4], { ft: 'cplate', a: 0xffcc33, elev: 1 }); add('Ascensor B', [31, 12.7, 35, 16.7], { ft: 'cplate', a: 0xffcc33, elev: 2 });
+    COLE_AULAS.length = 0;
+    const aula = (n, r, side, dz, col) => { const [x0, z0, x1, z1] = r, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2; let node, door;
+      if (side === 'n') { door = [dz, z0]; node = [dz, z0 + .8]; } else if (side === 'e') { door = [x1, dz]; node = [x1 - .8, dz]; } else { door = [x0, dz]; node = [x0 + .8, dz]; }
+      add(n, r, { a: col, node }); COLE_AULAS.push({ n, side, door: Q2(door[0], door[1]) }); };
+    [['1ºD', [-22, 17.6, -15.5, 23.6], -18.75, 0xff7a5a], ['2ºA', [-12.5, 17.6, -6, 23.4], -9.25, 0x3d7bff], ['2ºB', [-4.5, 17.6, 1, 23], -1.75, 0x7dff5a], ['2ºC', [2.5, 17.6, 8, 23], 5.25, 0xffd93d], ['2ºD', [9.5, 17.6, 16.5, 23.6], 13, 0xc98aff], ['3ºA', [18, 17.6, 24, 23], 21.5, 0xff7ac6]].forEach(([n, r, dx, c]) => aula(n, r, 'n', dx, c));
+    [['1ºC', [-30, -.5, -23.2, 5.5], 2.5, 0x5ad8ff], ['1ºB', [-30, -8.5, -23.2, -2.5], -5.5, 0xffb347], ['1ºA', [-30, -16.5, -23.2, -10.5], -13.5, 0x4fa84a]].forEach(([n, r, dz, c]) => aula(n, r, 'e', dz, c));
+    [['3ºB', [24, 4.5, 30.5, 10.5], 7.5, 0xd8344a], ['3ºC', [24, -3.5, 30.5, 2.5], -.5, 0x2fd0c0], ['3ºD', [24, -11.5, 30.5, -5.5], -8.5, 0xc8834a]].forEach(([n, r, dz, c]) => aula(n, r, 'w', dz, c));
+    add('Baños norte', [-15.5, -14.2, -9, -9], { ft: 'cfloor2', a: 0x5ad8ff, node: [-12.25, -13.4] }); add('Baños sur', [11.5, -15.6, 17, -10.5], { ft: 'cfloor2', a: 0x5ad8ff, node: [14.25, -14.8] });
+    add('Sala de ordenadores', [-16, -27, -3, -20], { a: 0x3d7bff, node: [-9.5, -20.8] }); add('Laboratorio', [3.5, -22.5, 10.5, -14.5], { a: 0x7dff5a, node: [9.7, -18.5] });
+    add('Coordinación', [15.5, -28.5, 23, -21.5], { ft: 'wood', a: 0xd9a441, node: [19, -22.2] });
+    C(F2([[-32.5, 14.7], [-30.5, 14.7], [-25.5, 14.7], [-20, 14.7], [-18.75, 14.7], [-9.25, 14.7], [-1.75, 14.7], [5.25, 14.7], [13, 14.7], [20.6, 14.7], [21.5, 14.7], [28, 14.7], [31, 14.7]]), 'Escalera A', 'Ascensor B', 3.8);
+    C(F2([[-30.5, 14.7], [-30.5, 17.4]]), -1, 'Escalera B', 2.6); C(F2([[-25.5, 14.7], [-25.5, 17.4]]), -1, 'Ascensor A', 2.4); C(F2([[28, 14.7], [28, 17.6]]), -1, 'Escalera C', 2.6);
+    [['1ºD', -18.75], ['2ºA', -9.25], ['2ºB', -1.75], ['2ºC', 5.25], ['2ºD', 13], ['3ºA', 21.5]].forEach(([n, x]) => C(F2([[x, 14.7], [x, 17.6]]), -1, n, 2.2));
+    C(F2([[-20, 14.7], [-20, 2.5], [-20, -5.5], [-20, -13.5], [-20, -16.5]]), -1, -1, 4.4); C(F2([[-20, -16.5], [-12.25, -16.5], [-9.5, -16.5], [-8, -16.5]]), -1, -1, 3);
+    [['1ºC', 2.5], ['1ºB', -5.5], ['1ºA', -13.5]].forEach(([n, z]) => C(F2([[-23.2, z], [-20, z]]), n, -1, 2.2));
+    C(F2([[-12.25, -16.5], [-12.25, -14.2]]), -1, 'Baños norte', 2.2); C(F2([[-9.5, -16.5], [-9.5, -20]]), -1, 'Sala de ordenadores', 2.2);
+    C(F2([[20.6, 14.7], [20.6, 7.5], [20.6, -.5], [20.6, -8.5], [20.6, -18.5]]), -1, -1, 4); C(F2([[20.6, -18.5], [19, -18.5], [14.25, -18.5], [10.5, -18.5]]), -1, 'Laboratorio', 3);
+    [['3ºB', 7.5], ['3ºC', -.5], ['3ºD', -8.5]].forEach(([n, z]) => C(F2([[20.6, z], [24, z]]), -1, n, 2.2));
+    C(F2([[19, -18.5], [19, -21.5]]), -1, 'Coordinación', 2.2); C(F2([[14.25, -18.5], [14.25, -15.6]]), -1, 'Baños sur', 2.2); }
+  SUB_ELEV.length = 0; COLE_LINKS.length = 0; [1, 2].forEach(k => { const ids = ROOMS.map((r, i) => r.elev === k ? i : -1).filter(i => i >= 0); SUB_ELEV.push(ids); ids.forEach((a, i) => ids.slice(i + 1).forEach(b => COLE_LINKS.push([a, b]))); });
+  [1, 2, 3, 4, 5, 6].forEach(k => { const ids = ROOMS.map((r, i) => r.sl === k ? i : -1).filter(i => i >= 0); COLE_LINKS.push(ids); COLE_STAIRS[ids[0]] = ids[1]; COLE_STAIRS[ids[1]] = ids[0]; });
   OBS.length = 0; OBS.push({ x: BTN.x, z: BTN.z, r: 1.75 });
   ST.length = 0; const S2 = (c, t, n) => ST.push({ c, t, n }), S0 = (c, t, n) => ST.push({ c: Q(c[0], c[1]), t, n });
   S2([-43.55, 10.5], 'sort', 'Poner la mesa'); S2([-37.25, 18.05], 'plants', 'Regar las plantas'); S2([-37.6, 2.95], 'swipe', 'Fichar la entrada');
@@ -1043,6 +1070,14 @@ function coleData() {
   S0([12.45, 8], 'sort', 'Ordenar los horarios'); S0([21.55, 8], 'upload', 'Enviar las notas');
   S0([23.45, 8], 'upload', 'Firmar los permisos');
   S0([31, -17.05], 'sort', 'Ordenar libros'); S0([28.45, -11], 'upload', 'Registrar préstamos');
+  { const Q2 = (x, z) => [x + 2 * SUB_OFF, z], S1 = (c, t, n) => ST.push({ c: Q2(c[0], c[1]), t, n });
+    const AT = { '1ºA': ['sort', 'Ordenar los libros de texto'], '1ºB': ['upload', 'Pasar las notas'], '1ºC': ['plants', 'Regar las plantas del aula'], '1ºD': ['wipe', 'Limpiar las ventanas'], '2ºA': ['numbers', 'Abrir el armario de clase'], '2ºB': ['download', 'Imprimir fichas'], '2ºC': ['align', 'Colocar las mesas'], '2ºD': ['sort', 'Recoger los cuadernos'], '3ºA': ['trash', 'Vaciar la papelera'], '3ºB': ['dial', 'Ajustar el proyector'], '3ºC': ['swipe', 'Pasar lista'], '3ºD': ['cables', 'Conectar la pizarra digital'] };
+    COLE_RES.length = 0;
+    COLE_AULAS.forEach(A => { const R2 = ROOMS.find(q => q.n === A.n).r, x0 = R2[0] - 2 * SUB_OFF, z0 = R2[1], x1 = R2[2] - 2 * SUB_OFF, z1 = R2[3], cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, [t, n] = AT[A.n];
+      if (A.side === 'n') { S1([x0 + .45, z0 + 1.3], t, n); COLE_RES.push(Q2(x1, cz + .4)); } else if (A.side === 'e') { S1([x1 - 1.3, z0 + .45], t, n); COLE_RES.push(Q2(cx - .8, z0)); } else { S1([x0 + 1.3, z0 + .45], t, n); COLE_RES.push(Q2(cx + .8, z0)); } });
+    S1([-15.55, -21.2], 'upload', 'Actualizar los ordenadores'); S1([-3.45, -21.2], 'cables', 'Arreglar la red'); S1([8.5, -22.05], 'samples', 'Mirar al microscopio'); S1([8.5, -14.95], 'fuel', 'Rellenar el mechero Bunsen');
+    S1([15.95, -22.7], 'numbers', 'Archivar expedientes'); S1([-15.05, -12.6], 'dial', 'Arreglar la cisterna'); S1([11.95, -14], 'download', 'Reponer el jabón');
+    [[-9.5, -27], [5.9, -14.5], [3.5, -20.9], [3.5, -16.5], [19.25, -28.5], [23, -25.3], [-9, -12.4], [-9, -11], [17, -13.85], [17, -12.45]].forEach(([x, z]) => COLE_RES.push(Q2(x, z))); }
   FIX.length = 0; FIX.push({ k: 0, c: [-17, 13.45], t: 'levers', n: 'Cuadro eléctrico' }, { k: 1, c: [10, -9.15], t: 'hand', n: 'Caldera A' }, { k: 2, c: [-37.45, -1.5], t: 'hand', n: 'Caldera B' },
     { k: 3, c: [35, 2.25], t: 'dial', n: 'Router del wifi' }, { k: 4, c: [-29.55, 22.2], t: 'power', n: 'Motor del ascensor' });
   CAMS.length = 0; CAMS.push({ n: 'Comedor', p: [-43.4, 2.85, 17.9], t: [-37, .4, 9] }, { n: 'El Túnel', p: [-14.4, 2.75, 15], t: [6, .4, 16] }, { n: 'Pasillo', p: [27, 2.85, -8], t: [25.5, .4, 10] }, { n: 'Recepción', p: [SUB_OFF - 10.5, 2.85, 16.5], t: [SUB_OFF - 6.5, .4, 3] });
@@ -1052,9 +1087,19 @@ function coleData() {
     { p: [9.8, -17.6], net: 2 }, { p: [32, -6.5], net: 2 }, { p: [12.4, -26.2], net: 2 },
     { p: [30.7, 13.4], net: 3 }, { p: [30.7, 2.6], net: 3 }, { p: [34, 27.6], net: 3 },
     { p: Q(-34, -2), net: 4 }, { p: Q(-21.5, 8.2), net: 4 }, { p: Q(-3.3, 13.8), net: 4 },
-    { p: Q(4, 9.8), net: 5 }, { p: Q(13.2, 11.2), net: 5 }, { p: Q(29.3, -5), net: 5 }, { p: Q(-9.5, -4.5), net: 5 });
+    { p: Q(4, 9.8), net: 5 }, { p: Q(13.2, 11.2), net: 5 }, { p: Q(29.3, -5), net: 5 }, { p: Q(-9.5, -4.5), net: 5 },
+    { p: [-24.2 + 2 * SUB_OFF, -3.6], net: 6 }, { p: [.3 + 2 * SUB_OFF, 18.5], net: 6 }, { p: [-7.5 + 2 * SUB_OFF, -20.8], net: 6 }, { p: [24.8 + 2 * SUB_OFF, 1.3], net: 7 }, { p: [9.9 + 2 * SUB_OFF, -20.2], net: 7 }, { p: [15 + 2 * SUB_OFF, 18.4], net: 7 });
 }
-const floorName = x => IS_COLE ? (subFloor(x) ? 'la planta 0' : 'la planta -1') : (subFloor(x) ? 'la cubierta inferior' : 'la cubierta superior');
+const floorName = x => IS_COLE ? ['la planta -1', 'la planta 0', 'la planta 1'][subFloor(x)] : (subFloor(x) ? 'la cubierta inferior' : 'la cubierta superior');
+function coleElevAt(x, z) { const r = roomAt(x, z); if (r < 0 || !ROOMS[r].elev) return null; const tos = ROOMS.map((q, i) => q.elev === ROOMS[r].elev && i !== r ? i : -1).filter(i => i >= 0).sort((a, b) => subFloor(ROOMS[a].ctr[0]) - subFloor(ROOMS[b].ctr[0])); return { from: r, to: tos[0], tos }; }
+function elevPick(e) { openPick('Ascensor · ¿A qué planta vas?', e.tos.map(i => { const tx = ROOMS[i].ctr[0], up = mlUp(P.x, tx), nm = floorName(tx); return { id: i, lab: nm.charAt(3).toUpperCase() + nm.slice(4), sub: up ? 'Subir' : 'Bajar', ic: `<b style="font-size:30px;color:#ffcc33">${up ? '▲' : '▼'}</b>` }; }), id => startElev({ from: e.from, to: id })); }
+const COLE_RISE = .3; let COLE_Z = null;
+function coleZ() { if (!COLE_Z) { const R = n => ROOMS.find(r => r.n === n).r, h = R('Recepción'), ig = R('Iglesia'); COLE_Z = { h, ig, con: [h[0], ig[3] - .05, h[2], h[1] + .05], all: [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)] }; } return COLE_Z; }
+function raisedAt(x, z) { if (!IS_COLE || subFloor(x) !== 1) return false; const Z = coleZ(); if (inRc(Z.h, x, z) || inRc(Z.ig, x, z, .25) || inRc(Z.con, x, z)) return false; return Z.all.some(r => inRc(r, x, z, .25)); }
+function groundY(x, z) { if (!IS_COLE || subFloor(x) !== 1) return 0; const Z = coleZ(), h = Z.h; if (inRc(h, x, z)) { if (z > 1.2 && z < 4.8) { if (x < h[0] + 1.05) return COLE_RISE * (1 - (x - h[0]) / 1.05); if (x > h[2] - 1.05) return COLE_RISE * (1 - (h[2] - x) / 1.05); } return 0; } return raisedAt(x, z) ? COLE_RISE : 0; }
+function coleRaise() { world.children.forEach(o => { if (raisedAt(o.position.x, o.position.z)) o.position.y += COLE_RISE; }); DOORS.forEach(d => { d.gy = raisedAt(d.pt[0], d.pt[1]) ? COLE_RISE : 0; }); }
+function coleSpin() { if (RULETA.vel > .01) return; RULETA.vel = 10 + Math.random() * 6; RULETA.done = 0; snd('click'); toast('🎡 ¡Gira la ruleta!', '#c98aff'); }
+function ruletaName(t) { const g = RULETA.cv.getContext('2d'); g.clearRect(0, 0, 256, 96); g.fillStyle = 'rgba(20,30,70,.85)'; g.fillRect(0, 0, 256, 96); g.textAlign = 'center'; g.fillStyle = '#9fd8ff'; g.font = 'bold 18px sans-serif'; g.fillText(t ? '¡Le toca a…!' : 'Pulsa E para girar', 128, 26); if (t) { g.fillStyle = '#ffd93d'; g.font = 'bold 44px sans-serif'; g.fillText(t, 128, 76); } RULETA.tex.needsUpdate = true; }
 const mlUp = (fx, tx) => IS_COLE ? subFloor(tx) > subFloor(fx) : subFloor(fx) === 1;
 function mlHint(e) { const tx = ROOMS[e.to].ctr[0]; return `E · ${mlUp(P.x, tx) ? 'Subir' : 'Bajar'} a ${floorName(tx)}`; }
 function mlArrive(to) { const r = ROOMS[to], c = r.ctr, d = DOORS.find(q => q.room === to); const yaw = d ? Math.atan2(-(d.pt[0] - c[0]), -(d.pt[1] - c[1])) : P.yaw; return { tx: r.node[0], tz: r.node[1], tyaw: yaw }; }
@@ -2210,6 +2255,17 @@ function coleTex() {
   const POST = (bg, t1, t2, fg = '#fff') => mk(128, 160, g => { g.fillStyle = bg; g.fillRect(0, 0, 128, 160); g.fillStyle = 'rgba(255,255,255,.25)'; g.beginPath(); g.arc(96, 40, 30, 0, 7); g.fill(); g.font = 'bold 22px sans-serif'; g.fillStyle = fg; g.textAlign = 'center'; g.fillText(t1, 64, 100); g.font = 'bold 15px sans-serif'; g.fillText(t2, 64, 126); g.strokeStyle = '#fff'; g.lineWidth = 6; g.strokeRect(3, 3, 122, 154); });
   SUBT.cpost = [POST('#4fa84a', '¡RECICLA!', 'papel y plástico'), POST('#3d7bff', 'FERIA DE', 'CIENCIAS'), POST('#ff7a3a', '¡LEE!', 'biblioteca'), POST('#c98aff', 'TEATRO', 'viernes 17h'), POST('#d8344a', 'NO CORRER', 'por el pasillo'), POST('#ffd93d', 'CORO', 'ensayo lunes', '#5a3a00')];
   const gm = new THREE.MeshBasicMaterial({ color: 0xcfeeff, transparent: true, opacity: .28, depthWrite: false, side: THREE.DoubleSide }); SUBT.cglassM = gm;
+  SUBT.chalf = mk(256, 256, g => { g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, 256, 128); noise(g, 256, 128, 500, .02); g.fillStyle = '#e8dccb'; g.fillRect(0, 128, 256, 128);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) { const x = c * 32 + 1.5, y = 130 + r * 31.5; g.fillStyle = ['#c25a36', '#cc6640', '#b8553a', '#c96a44'][(r * 5 + c * 3) % 4]; g.fillRect(x, y, 29, 28.5); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x, y, 29, 3); }
+    g.fillStyle = '#8a3a22'; g.fillRect(0, 122, 256, 8); g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(0, 122, 256, 2); noise(g, 256, 128, 400, .03); });
+  SUBT.cpatio = mk(128, 128, g => { g.fillStyle = '#d8d0c0'; g.fillRect(0, 0, 128, 128); noise(g, 128, 128, 600, .05); g.strokeStyle = '#b8ae9a'; g.lineWidth = 3; g.strokeRect(1, 1, 126, 126); g.beginPath(); g.moveTo(64, 0); g.lineTo(64, 128); g.moveTo(0, 64); g.lineTo(128, 64); g.stroke(); });
+  SUBT.cperiod = mk(256, 144, g => { g.fillStyle = '#fbfdff'; g.fillRect(0, 0, 256, 144); const cols = ['#ff9f43', '#5ab8ff', '#7dff5a', '#ff7ac6', '#ffd93d', '#c98aff']; for (let r = 0; r < 6; r++) for (let c = 0; c < 18; c++) { if (r === 0 && c > 0 && c < 17) continue; if (r < 3 && c > 1 && c < 12) continue; g.fillStyle = cols[(c + r) % 6]; g.fillRect(6 + c * 13.6, 22 + r * 19, 12, 17); } g.fillStyle = '#333'; g.font = 'bold 12px sans-serif'; g.fillText('TABLA PERIÓDICA', 80, 14); });
+  { const N = RULETA.names.length, cols = ['#ff5a6e', '#ffb347', '#ffd93d', '#7dff5a', '#2fd0c0', '#5ab8ff', '#7a6bff', '#c98aff', '#ff7ac6'];
+    SUBT.crule = mk(512, 512, g => { for (let i = 0; i < N; i++) { const a0 = i / N * Math.PI * 2, a1 = (i + 1) / N * Math.PI * 2; g.fillStyle = cols[i % cols.length]; g.beginPath(); g.moveTo(256, 256); g.arc(256, 256, 252, a0, a1); g.closePath(); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 4; g.stroke();
+        g.save(); g.translate(256, 256); g.rotate((a0 + a1) / 2); g.fillStyle = '#1d1640'; g.font = 'bold 34px sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle'; g.fillText(RULETA.names[i], 236, 2); g.restore(); }
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(256, 256, 30, 0, 7); g.fill(); g.fillStyle = '#1d1640'; g.beginPath(); g.arc(256, 256, 14, 0, 7); g.fill(); });
+    SUBT.cruleBg = mk(512, 288, g => { const gr = g.createLinearGradient(0, 0, 0, 288); gr.addColorStop(0, '#1a2a6a'); gr.addColorStop(1, '#0c1440'); g.fillStyle = gr; g.fillRect(0, 0, 512, 288); g.fillStyle = '#ffd93d'; g.font = 'bold 30px sans-serif'; g.fillText('RULETA · 2ºD', 290, 52); g.fillStyle = '#9fd8ff'; g.font = '18px sans-serif'; g.fillText('Pizarra digital', 300, 82); g.strokeStyle = '#5ab8ff'; g.lineWidth = 6; g.strokeRect(3, 3, 506, 282); });
+    RULETA.cv = cvs(256, 96, () => {}); RULETA.tex = new THREE.CanvasTexture(RULETA.cv); ruletaName(''); }
   subGlassTex(); // cristales y hueco de los ascensores
 }
 // ventana entre las dos aulas de inglés
@@ -2217,7 +2273,7 @@ const COLE_WIN = [{ rooms: ['Aula de Inglés 2', 'Aula de Inglés 1'], a: 32, b:
 function coleWall(e, isRoom, room) {
   const L = e.b - e.a, rot = e.ax === 'z' ? (e.out > 0 ? Math.PI : 0) : (e.out > 0 ? -Math.PI / 2 : Math.PI / 2), dir = Math.round(e.ax === 'z' ? Math.cos(rot) : -Math.sin(rot));
   const fl = subFloor(e.ax === 'z' ? (e.a + e.b) / 2 : e.v), NR = ROOMS.length, tun = !isRoom && CRECTS[e.ri - NR] && CRECTS[e.ri - NR].k === COLE_TUN;
-  const tex = tun ? SUBT.ctun : room && room.n === 'Baños' ? SUBT.ctile : fl ? SUBT.cbrick : SUBT.cwall, wm = toon(0xffffff, { map: tex }), BASE = toon(fl ? 0x6a3a24 : 0xc8c4b8);
+  const tex = tun ? SUBT.ctun : room && room.n.startsWith('Baños') ? SUBT.ctile : fl ? SUBT.chalf : SUBT.cwall, wm = toon(0xffffff, { map: tex }), BASE = toon(fl ? 0x6a3a24 : 0xc8c4b8);
   const at = (s, q) => e.ax === 'z' ? [s, e.v - e.out * q] : [e.v - e.out * q, s];
   const piece = (a, b, y0, y1, mat) => { if (b - a < .01 || y1 - y0 < .01) return; const g = new THREE.PlaneGeometry(b - a, y1 - y0), uv = g.attributes.uv;
     for (let i = 0; i < uv.count; i++) { const ux = uv.getX(i) > .5, uy = uv.getY(i) > .5; uv.setXY(i, ((dir > 0) === ux ? b : a) / 3, (uy ? y1 : y0) / WALL_H); }
@@ -2225,6 +2281,7 @@ function coleWall(e, isRoom, room) {
   const along = (s0, s1, y, h, d, mat, q) => { const [px, pz] = at((s0 + s1) / 2, q); return box(e.ax === 'z' ? s1 - s0 : d, h, e.ax === 'z' ? d : s1 - s0, mat, px, y, pz, null, false); };
   const win = isRoom && e.ax === 'z' ? COLE_WIN.find(w => w.rooms.includes(room.n)) : null;
   const facade = isRoom && room.n === 'Recepción' && e.ax === 'z' && e.out > 0;
+  const ext2 = fl === 2 && L > 2.2 && (() => { const mid = (e.a + e.b) / 2, ox = e.ax === 'z' ? mid : e.v + e.out * 2.5, oz = e.ax === 'z' ? e.v + e.out * 2.5 : mid; return !ROOMS.some(r => inRc(r.r, ox, oz)) && !CRECTS.some(c => inRc(c.r, ox, oz)); })();
   const hiWin = !isRoom && !fl && e.ax === 'x' && Math.abs(e.v - 27.3) < .05 && e.out > 0 && e.b > -9 && e.a < 15;
   if (win && ((room.n === win.rooms[0] && e.out < 0) || (room.n === win.rooms[1] && e.out > 0))) {
     piece(e.a, e.b, 0, win.y0, wm); piece(e.a, e.b, win.y1, WALL_H, wm); piece(e.a, win.a, win.y0, win.y1, wm); piece(win.b, e.b, win.y0, win.y1, wm); piece(win.a, win.b, win.y0, win.y1, SUBT.cglassM);
@@ -2234,6 +2291,12 @@ function coleWall(e, isRoom, room) {
   } else if (facade) { // gran fachada de cristal con la entrada principal
     const FR = toon(0x4a5058), y1 = 2.95; piece(e.a, e.b, 0, .12, toon(0x4a5058)); piece(e.a, e.b, .12, y1, SUBT.cglassM); piece(e.a, e.b, y1, WALL_H, wm);
     for (let s2 = e.a; s2 <= e.b + .01; s2 += (e.b - e.a) / 6) along(s2 - .05, s2 + .05, WALL_H / 2, WALL_H, .14, FR, .04); along(e.a, e.b, 1.1, .06, .1, FR, .04); along(e.a, e.b, y1, .1, .16, FR, .05);
+  } else if (ext2) { // planta 1: ventanas al exterior y al patio interior
+    const y0 = .95, y1 = 2.55, FR = toon(0xf4f4f0), P2 = sv => e.ax === 'z' ? [sv, e.v] : [e.v, sv], spans = [];
+    for (let s2 = e.a + .55; s2 + 1.6 <= e.b - .45; s2 += 2.25) { const c2 = P2(s2 + .8); if ([...ST, ...FIX].some(t => Math.hypot(t.c[0] - c2[0], t.c[1] - c2[1]) < 1.5) || COLE_RES.some(r => Math.hypot(r[0] - c2[0], r[1] - c2[1]) < 2.2)) continue; spans.push([s2, s2 + 1.6]); }
+    piece(e.a, e.b, 0, y0, wm); piece(e.a, e.b, y1, WALL_H, wm); let c = e.a;
+    spans.forEach(([a, b]) => { piece(c, a, y0, y1, wm); piece(a, b, y0, y1, SUBT.cglassM); along(a - .06, b + .06, y0 - .03, .06, .2, FR, .07); along(a - .06, b + .06, y1 + .03, .06, .12, FR, .05); along(a - .06, a, (y0 + y1) / 2, y1 - y0, .12, FR, .05); along(b, b + .06, (y0 + y1) / 2, y1 - y0, .12, FR, .05); along((a + b) / 2 - .025, (a + b) / 2 + .025, (y0 + y1) / 2, y1 - y0, .08, FR, .04); c = b; });
+    piece(c, e.b, y0, y1, wm);
   } else if (hiWin) { // ventanas altas en el pasillo de las aulas
     const y0 = 2.2, y1 = 2.95, spans = []; for (let s = e.a + .45; s + 1.5 <= e.b - .3; s += 1.95) spans.push([s, s + 1.5]);
     piece(e.a, e.b, 0, y0, wm); piece(e.a, e.b, y1, WALL_H, wm); let c = e.a; const WM = basic(0xffffff, { map: SUBT.cwin }), FR = toon(0xf0f0ea);
@@ -2241,17 +2304,16 @@ function coleWall(e, isRoom, room) {
     piece(c, e.b, y0, y1, wm);
   } else piece(e.a, e.b, 0, WALL_H, wm);
   along(e.a, e.b, .06, .12, .04, BASE, .02); // rodapié
-  if (fl && !isRoom) along(e.a, e.b, 1.05, .05, .05, toon(0xf4ece0), .03); // moldura blanca en el pasillo de ladrillo
 }
 function buildColeHull() {
   const allR = [...ROOMS.map(r => r.r), ...CRECTS.map(c => c.r)], E = .14, H = WALL_H + E, HM = toon(0xffffff, { map: SUBT.cstucco }), HB = toon(0xffffff, { map: SUBT.cbrick }), RM = toon(0xb8b2a4, { map: SUBT.cconc });
-  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const rm = ROOMS[e.ri], wn = rm && e.ax === 'z' ? COLE_WIN.find(w => (rm.n === w.rooms[0] && e.out < 0) || (rm.n === w.rooms[1] && e.out > 0)) : null; if (wn || (rm && rm.n === 'Recepción' && e.ax === 'z' && e.out > 0)) return; const L = e.b - e.a, mid = (e.a + e.b) / 2, g = new THREE.PlaneGeometry(L, H + .3); scaleUV(g, L / 4, 1); const m = new THREE.Mesh(g, subFloor(e.ax === 'z' ? mid : e.v) ? HB : HM);
-    m.rotation.y = e.ax === 'z' ? (e.out > 0 ? 0 : Math.PI) : (e.out > 0 ? Math.PI / 2 : -Math.PI / 2); if (e.ax === 'z') m.position.set(mid, H / 2 - .15, e.v + e.out * E); else m.position.set(e.v + e.out * E, H / 2 - .15, mid); world.add(m); });
+  wallSegs(allR, ROOMS.map(r => r.ch)).forEach(e => { const rm = ROOMS[e.ri], wn = rm && e.ax === 'z' ? COLE_WIN.find(w => (rm.n === w.rooms[0] && e.out < 0) || (rm.n === w.rooms[1] && e.out > 0)) : null; if (wn || (rm && rm.n === 'Recepción' && e.ax === 'z' && e.out > 0)) return; const L = e.b - e.a, mid = (e.a + e.b) / 2, fx = subFloor(e.ax === 'z' ? mid : e.v), ex = fx === 2 ? 3.1 : 0, g = new THREE.PlaneGeometry(L, H + .3 + ex); scaleUV(g, L / 4, 1 + ex / 3); const m = new THREE.Mesh(g, fx ? HB : HM);
+    m.rotation.y = e.ax === 'z' ? (e.out > 0 ? 0 : Math.PI) : (e.out > 0 ? Math.PI / 2 : -Math.PI / 2); if (e.ax === 'z') m.position.set(mid, (H - .3 - ex) / 2, e.v + e.out * E); else m.position.set(e.v + e.out * E, (H - .3 - ex) / 2, mid); world.add(m); });
   allR.forEach(r => { const w = r[2] - r[0] + 2 * E, d = r[3] - r[1] + 2 * E, g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); scaleUV(g, w / 4, d / 4); const m = new THREE.Mesh(g, RM); m.position.set((r[0] + r[2]) / 2, H, (r[1] + r[3]) / 2); world.add(m); });
-  const gr = new THREE.Mesh(new THREE.PlaneGeometry(440, 220), toon(0xffffff, { map: SUBT.cgrass })); gr.rotation.x = -Math.PI / 2; gr.position.set(SUB_OFF / 2, -.06, 0); scaleUV(gr.geometry, 66, 33); world.add(gr);
+  [[60, 390, -.06], [342.5, 175, -3.4]].forEach(([cx, w, y]) => { const gr = new THREE.Mesh(new THREE.PlaneGeometry(w, 220), toon(0xffffff, { map: SUBT.cgrass })); gr.rotation.x = -Math.PI / 2; gr.position.set(cx, y, 0); scaleUV(gr.geometry, w / 6.7, 33); world.add(gr); });
   let sd = 31; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; const clear = (x, z, m) => !allR.some(r => x > r[0] - m && x < r[2] + m && z > r[1] - m && z < r[3] + m);
-  for (let k = 0; k < 130; k++) { const x = -90 + rnd() * 350, z = -70 + rnd() * 140; if (!clear(x, z, 4)) continue; const s = .8 + rnd() * .7; cyl(.18 * s, .25 * s, 2 * s, toon(0x8a5a34), x, s, z, null, 8); const c = sph(1.3 * s, toon([0x4fa84a, 0x5cbf4f, 0x3f9a46][k % 3]), x, 2.4 * s, z, null, 12); c.scale.y = 1.15; }
-  [[0, 16, 'COLEGIO · PLANTA -1'], [SUB_OFF, 22, 'COLEGIO · PLANTA 0']].forEach(([x, z, t]) => { const sg = sprText(t, { size: 60, bg: '#2a5ad8', w: 12 }); sg.position.set(x, WALL_H + 3, z); world.add(sg); });
+  for (let k = 0; k < 190; k++) { const x = -90 + rnd() * 520, z = -70 + rnd() * 140; if (!clear(x, z, 4) || (x > 300 && x < 360 && z > -15 && z < 12.8)) continue; const s = .8 + rnd() * .7, by = subFloor(x) === 2 ? -3.4 : 0; cyl(.18 * s, .25 * s, 2 * s, toon(0x8a5a34), x, by + s, z, null, 8); const c = sph(1.3 * s, toon([0x4fa84a, 0x5cbf4f, 0x3f9a46][k % 3]), x, by + 2.4 * s, z, null, 12); c.scale.y = 1.15; }
+  [[0, 16, 'COLEGIO · PLANTA -1'], [SUB_OFF, 22, 'COLEGIO · PLANTA 0'], [2 * SUB_OFF, 26, 'COLEGIO · PLANTA 1']].forEach(([x, z, t]) => { const sg = sprText(t, { size: 60, bg: '#2a5ad8', w: 12 }); sg.position.set(x, WALL_H + 3, z); world.add(sg); });
 }
 function decorateCole() {
   const Y = WALL_H, D = toon(0x3a3a48), W = toon(0xf4f4f0), WD = toon(0xb07a46), WD2 = toon(0x8a5a34), M = toon(0x9aa4b0), glow = c => toon(c, { e: c, ei: .8 }), q = x => x + SUB_OFF;
@@ -2307,14 +2369,14 @@ function decorateCole() {
   ROOMS.forEach(r => { if (!r.elev) return; const [x0, z0, x1, z1] = r.r, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, d = DOORS.find(q2 => q2.room === ROOMS.indexOf(r)); if (!d) return;
     const fx = d.vert ? 0 : Math.sign(d.pt[0] - cx), fz = d.vert ? Math.sign(d.pt[1] - cz) : 0, bx = cx - fx * ((x1 - x0) / 2 - .06), bz = cz - fz * ((z1 - z0) / 2 - .06), ry = Math.atan2(fx, fz);
     const g = grp(bx, bz, ry); box(1.4, 2.2, .04, toon(0xdfe4ea), 0, 1.2, 0, g, false); box(1.4, .05, .06, toon(0xffcc33), 0, .95, .03, g, false); box(.22, .5, .04, D, .5, 1.3, .03, g, false); [1.42, 1.3, 1.18].forEach((y, i) => sph(.035, glow([0xffcc33, 0x7dff5a, 0xffffff][i]), .5, y, .06, g, 8));
-    const sg = sprText(subFloor(cx) ? 'PLANTA 0  ▲▼' : 'PLANTA -1  ▲▼', { size: 40, bg: '#8a6a10', w: 1.8 }); sg.position.set(bx + fx * .3, 2.75, bz + fz * .3); world.add(sg); });
-  const stairs = (name, dir, mode) => { const [x0, z0, x1, z1] = R(name), cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = (dir[0] ? z1 - z0 : x1 - x0) - .2, back = dir[0] > 0 ? x1 : dir[0] < 0 ? x0 : dir[1] > 0 ? z1 : z0, s = dir[0] || dir[1], fl = subFloor(cx);
+    const sg = sprText(['PLANTA -1', 'PLANTA 0', 'PLANTA 1'][subFloor(cx)] + '  ▲▼', { size: 40, bg: '#8a6a10', w: 1.8 }); sg.position.set(bx + fx * .3, 2.75, bz + fz * .3); world.add(sg); });
+  const stairs = (name, dir, mode, label) => { const [x0, z0, x1, z1] = R(name), cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = (dir[0] ? z1 - z0 : x1 - x0) - .2, back = dir[0] > 0 ? x1 : dir[0] < 0 ? x0 : dir[1] > 0 ? z1 : z0, s = dir[0] || dir[1], fl = subFloor(cx);
     const ST2 = toon(fl ? 0xf2efe8 : 0xd8d4c8), RAIL = toon(0x5a6370), WOODR = toon(0x8a5a34), bar = back - s * 1.75;
     if (mode === 'down') { const hole = new THREE.Mesh(new THREE.PlaneGeometry(dir[0] ? 1.6 : w, dir[0] ? w : 1.6), basic(0xffffff, { map: SUBT.cstair })); hole.rotation.x = -Math.PI / 2; if (dir[0]) hole.rotation.z = s > 0 ? -Math.PI / 2 : Math.PI / 2; else if (s > 0) hole.rotation.z = Math.PI; hole.position.set(dir[0] ? back - s * .85 : cx, .02, dir[0] ? cz : back - s * .85); world.add(hole); }
     else for (let k = 0; k < 5; k++) { const along = back - s * (1.45 - k * .3), h = .22 * (k + 1); if (dir[0]) box(.32, h, w, ST2, along, h / 2, cz); else box(w, h, .32, ST2, cx, h / 2, along); }
     [-1, 1].forEach(sd => { if (dir[0]) { box(1.7, .06, .06, WOODR, back - s * .85, 1.0 + (mode === 'down' ? 0 : .5), cz + sd * w / 2, null, false); cyl(.03, .03, 1.0, RAIL, bar, .5, cz + sd * w / 2, null, 6); } else { box(.06, .06, 1.7, WOODR, cx + sd * w / 2, 1.0 + (mode === 'down' ? 0 : .5), back - s * .85, null, false); cyl(.03, .03, 1.0, RAIL, cx + sd * w / 2, .5, bar, null, 6); } });
     if (mode === 'soon') { if (dir[0]) box(.05, .12, w, toon(0xffcc33), bar, .9, cz, null, false); else box(w, .12, .05, toon(0xffcc33), cx, .9, bar, null, false); for (let k = 0; k < 4; k++) { const o = -w / 2 + (k + .5) * w / 4; if (dir[0]) box(.06, .12, .2, D, bar, .9, cz + o, null, false); else box(.2, .12, .06, D, cx + o, .9, bar, null, false); } }
-    const txt = mode === 'up' ? '▲ PLANTA 0' : mode === 'down' ? '▼ PLANTA -1' : 'PLANTA 1 · PRÓXIMAMENTE';
+    const txt = label || (mode === 'up' ? '▲ PLANTA 0' : mode === 'down' ? '▼ PLANTA -1' : 'PRÓXIMAMENTE');
     const sg = sprText(txt, { size: 40, bg: mode === 'soon' ? '#5a6370' : '#2f9a4a', w: mode === 'soon' ? 2.6 : 1.8 }); sg.position.set(dir[0] ? bar : cx, 1.7, dir[0] ? cz : bar); world.add(sg);
     const n = Math.ceil(w / 1.1); for (let k = 0; k < n; k++) { const o = -w / 2 + (k + .5) * w / n; obs(dir[0] ? bar + s * .5 : cx + o, dir[0] ? cz + o : bar + s * .5, .6); } };
   stairs('Escalera norte', [0, -1], 'up'); stairs('Escalera este', [0, -1], 'up'); stairs('Escalera oeste', [0, 1], 'up');
@@ -2377,7 +2439,7 @@ function decorateCole() {
   [-5, 3, 11].forEach(z => radiator(23.75, z + .2, Math.PI / 2, 1.0));
   // =================== PLANTA 0 (ladrillo y suelo blanco) ===================
   stairs('Escalera suroeste', [0, 1], 'down'); stairs('Escalera iglesia oeste', [0, -1], 'down'); stairs('Escalera iglesia este', [0, -1], 'down');
-  stairs('Escalera noroeste', [0, -1], 'soon'); stairs('Escalera noreste', [0, -1], 'soon'); stairs('Escalera sureste', [1, 0], 'soon');
+  stairs('Escalera noroeste', [0, -1], 'up', '▲ PLANTA 1'); stairs('Escalera noreste', [0, -1], 'up', '▲ PLANTA 1'); stairs('Escalera sureste', [1, 0], 'up', '▲ PLANTA 1');
   // ---- Iglesia: altar sobre tarima, cruz, velas, bancos, vidrieras altas y lámparas
   { const [x0, z0, x1, z1] = R('Iglesia'), ax = q(-6.5); box(7, .25, 2.8, toon(0xd8d0c0), ax, .13, z0 + 1.4); box(2.4, .95, .9, toon(0xfbfbf8), ax, .73, z0 + 1.2); box(2.5, .06, 1.0, toon(0xd9a441), ax, 1.22, z0 + 1.2, null, false); obs(ax - 2.4, z0 + 1.4, 1.2); obs(ax, z0 + 1.4, 1.2); obs(ax + 2.4, z0 + 1.4, 1.2);
     box(.25, 3.0, .15, toon(0xd9a441), ax, 1.9, z0 + .1, null, false); box(1.4, .25, .15, toon(0xd9a441), ax, 2.6, z0 + .1, null, false);
@@ -2397,6 +2459,7 @@ function decorateCole() {
     [7, 11].forEach(z => { box(.5, .08, 1.8, WD, x1 - .4, .45, z); box(.08, .5, 1.8, WD2, x1 - .15, .7, z); [-.8, .8].forEach(o => box(.45, .45, .06, M, x1 - .4, .22, z + o, null, false)); obs(x1 - .4, z - .5, .35); obs(x1 - .4, z + .5, .35); });
     const tv = box(.06, .9, 1.6, D, x1 - .05, 2.0, 15, null, false); const sc = new THREE.Mesh(new THREE.PlaneGeometry(1.5, .8), basic(0xffffff, { map: SUBT.ctime })); sc.position.set(x1 - .09, 2.0, 15); sc.rotation.y = -Math.PI / 2; world.add(sc);
     [[x1 - .03, 9, 0xd8344a], [x1 - .03, 13, 0x2a5ad8], [x0 + .03, 13.5, 0x4fa84a]].forEach(([x, z, c], i) => { const bn = new THREE.Mesh(new THREE.PlaneGeometry(.8, 1.6), basic(c)); bn.position.set(x + (i < 2 ? -.01 : .01), 2.0, z); bn.rotation.y = i < 2 ? -Math.PI / 2 : Math.PI / 2; world.add(bn); const st = sprText('★', { size: 90, color: '#ffd93d', w: .6 }); st.position.set(x + (i < 2 ? -.05 : .05), 2.1, z); world.add(st); });
+    [[x0, 1], [x1, -1]].forEach(([ex, sd]) => { for (let k = 0; k < 3; k++) { const h2 = COLE_RISE - k * .1, sx = ex + sd * (.175 + k * .35); box(.35, h2, 3.7, toon(0xe8e4dc), sx, h2 / 2, 3, null, false); box(.37, .03, 3.72, toon(0x9a8a74), sx, h2 - .012, 3, null, false); } [-1, 1].forEach(o => cyl(.03, .03, .9, toon(0xd9a441), ex + sd * .6, .45 + .15, 3 + o * 1.95, null, 6)); });
     const wl = sprText('¡BIENVENIDOS AL COLEGIO!', { size: 44, bg: '#2a5ad8', w: 4.2 }); wl.position.set(cx, 2.75, 14); world.add(wl);
     const l1 = sprText('← ADMINISTRACIÓN · ENFERMERÍA', { size: 34, bg: '#5a6370', w: 2.6 }); l1.position.set(x0 + 1.5, 2.75, 3); world.add(l1); const l2 = sprText('PROFESORES · DIRECCIÓN · BIBLIOTECA →', { size: 30, bg: '#5a6370', w: 2.8 }); l2.position.set(x1 - 1.5, 2.75, 3); world.add(l2);
     const ig = sprText('↑ IGLESIA', { size: 44, bg: '#8a3a1a', w: 1.6 }); ig.position.set(cx, 2.75, z0 + .4); world.add(ig);
@@ -2440,14 +2503,67 @@ function decorateCole() {
   wallP(SUBT.cpost[1], q(-20), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[3], q(10), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[2], q(20), 1.6, 1.22, 0, .6, .75); wallP(SUBT.cpost[5], q(-28), 1.6, 4.78, Math.PI, .6, .75);
   clock(q(0), 2.6, 1.22, 0); clock(q(25.6), 2.6, -19.97, 0);
   [[q(-30.4), 3.5], [q(32.3), 3.2]].forEach(([x, z]) => { cyl(.12, .12, .5, toon(0xd8344a), x, .7, z, null, 10); });
+  // =================== PLANTA 1: aulas alrededor de un patio interior ===================
+  { const q2 = x => x + 2 * SUB_OFF;
+    stairs('Escalera A', [-1, 0], 'down', '▼ PLANTA 0'); stairs('Escalera B', [0, 1], 'down', '▼ PLANTA 0'); stairs('Escalera C', [0, 1], 'down', '▼ PLANTA 0');
+    // aulas: pizarra, pupitres con mochilas, mesa del profe y reloj
+    COLE_AULAS.forEach(A => { const rm = ROOMS.find(q => q.n === A.n), [x0, z0, x1, z1] = rm.r, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2; let bi = A.n.charCodeAt(2);
+      if (A.side === 'n') { if (A.n !== '2ºD') board(x1 - .03, cz + .4, -Math.PI / 2, A.n.startsWith('3') ? SUBT.cwboard : SUBT.cboard);
+        for (let x = x0 + 1.4; x <= x1 - 2.2; x += 1.45) for (let z = z0 + 2.6; z <= z1 - .9; z += 1.35) desk(x, z, -Math.PI / 2, BAGS[bi++ % 6]);
+        box(1.2, .75, .6, WD, x1 - 1.0, .38, z1 - .9); obs(x1 - 1.0, z1 - .9, .75); clock(x0 + .03, 2.75, cz + 1, Math.PI / 2); bin(x0 + .5, z1 - .5, 0x3d7bff); }
+      else { const s = A.side === 'e' ? 1 : -1, bx = cx - s * .8; board(bx, z0 + .03, 0, A.n.startsWith('3') ? SUBT.cwboard : SUBT.cboard);
+        for (let x = (s > 0 ? x0 + 1.2 : x0 + 2.4); x <= (s > 0 ? x1 - 2.4 : x1 - 1.2) + .01; x += 1.45) for (let z = z0 + 2.4; z <= z1 - .9; z += 1.35) desk(x, z, 0, BAGS[bi++ % 6]);
+        const tx = bx - s * 1.8; box(1.2, .75, .6, WD, tx, .38, z0 + 1.1); obs(tx, z0 + 1.1, .75); clock(s > 0 ? x1 - .03 : x0 + .03, 2.75, z1 - 1, s > 0 ? -Math.PI / 2 : Math.PI / 2); bin(s > 0 ? x1 - .5 : x0 + .5, z1 - .5, 0x3d7bff); } });
+    // 2ºD: pizarra digital con la ruleta de nombres
+    { const rm = ROOMS.find(q => q.n === '2ºD'), [x0, z0, x1, z1] = rm.r, cz = (z0 + z1) / 2 + .4; const g = grp(x1 - .06, cz, -Math.PI / 2); box(2.9, 1.7, .08, D, 0, 1.65, 0, g, false);
+      const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.72, 1.52), basic(0xffffff, { map: SUBT.cruleBg })); scr.position.set(0, 1.65, .05); g.add(scr);
+      const wh = new THREE.Mesh(new THREE.CircleGeometry(.62, 48), new THREE.MeshBasicMaterial({ map: SUBT.crule })); wh.position.set(-.62, 1.58, .07); wh.userData.dyn = 1; g.add(wh);
+      const nm2 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .5), new THREE.MeshBasicMaterial({ map: RULETA.tex, transparent: true })); nm2.position.set(.6, 1.45, .07); nm2.userData.dyn = 1; g.add(nm2);
+      const ptr = new THREE.Mesh(new THREE.ConeGeometry(.08, .18, 3), basic(0xffffff)); ptr.rotation.z = Math.PI; ptr.position.set(-.62, 2.28, .09); g.add(ptr); box(.15, .3, .1, D, 0, .7, .05, g, false);
+      RULETA.wh = wh; RULETA.pt = [x1 - 1.3, cz]; }
+    // sala de ordenadores
+    { const [x0, z0, x1, z1] = R('Sala de ordenadores'); [z0 + 1.5, z0 + 3.9].forEach(z => { box(x1 - x0 - 2.4, .05, .8, toon(0xe8e4dc), (x0 + x1) / 2, .75, z); [x0 + 1.25, x1 - 1.25].forEach(x => box(.06, .72, .7, M, x, .36, z, null, false));
+        for (let x = x0 + 1.8; x < x1 - 1.4; x += 1.4) { box(.55, .38, .04, D, x, 1.05, z - .2, null, false); const s = new THREE.Mesh(new THREE.PlaneGeometry(.5, .32), basic([0x5ab8ff, 0x7dff5a, 0xffd93d][Math.round(x) % 3 < 0 ? 0 : Math.round(x) % 3])); s.position.set(x, 1.05, z - .175); world.add(s); box(.06, .2, .06, D, x, .86, z - .2, null, false); box(.4, .02, .14, toon(0x2a2a3a), x, .78, z + .1, null, false); chair(x, z + .7, Math.PI, 0x2a2a3a); }
+        for (let x = x0 + 1.6; x <= x1 - 1.6; x += 1.2) obs(x, z + .15, .55); });
+      box(.7, 2.0, .7, D, x0 + .45, 1.0, z0 + .45); for (let k = 0; k < 6; k++) sph(.03, glow([0x7dff5a, 0xffcc33][k % 2]), x0 + .45, .5 + k * .25, z0 + .82, null, 6); obs(x0 + .5, z0 + .5, .55);
+      wallP(SUBT.cwboard, (x0 + x1) / 2, 1.9, z0 + .03, 0, 2.6, 1.3); clock(x1 - .03, 2.6, z0 + 2.5, -Math.PI / 2); }
+    // laboratorio
+    { const [x0, z0, x1, z1] = R('Laboratorio'), cz = (z0 + z1) / 2, bx = x0 + 2.5; box(1.4, .9, 4.2, toon(0xe8ecf2), bx, .45, cz); box(1.5, .06, 4.3, toon(0x2a2a3a), bx, .93, cz, null, false); [-1.4, 0, 1.4].forEach(o => obs(bx, cz + o, .9));
+      [[-1.5, 0xff5a6e], [-.8, 0x7dff5a], [-.1, 0x5ab8ff], [.6, 0xffd93d], [1.3, 0xc98aff]].forEach(([o, c]) => { cyl(.07, .12, .25, toon(c, { op: .75 }), bx + .3, 1.08, cz + o, null, 10); cyl(.03, .03, .12, toon(0xe8ecf2, { op: .6 }), bx + .3, 1.27, cz + o, null, 6); });
+      box(.25, .45, .3, D, bx - .3, 1.15, cz + 1.2, null, false); cyl(.05, .05, .3, D, bx - .3, 1.45, cz + 1.12, null, 6); cyl(.12, .12, .05, toon(0x5a6370), bx - .3, .97, cz - 1.2, null, 12);
+      box(.9, 2.3, 1.7, toon(0xd8dde2), x0 + .45, 1.15, cz - 2.4); const gl = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .8), basic(0xcfeeff, { op: .5 })); gl.position.set(x0 + .91, 1.5, cz - 2.4); gl.rotation.y = Math.PI / 2; world.add(gl); obs(x0 + .5, cz - 2.4, .8);
+      box(.35, .04, 2.0, WD, x0 + .2, 1.7, cz + 2, null, false); for (let k = 0; k < 6; k++) cyl(.09, .09, .25, toon([0x7dff5a, 0xff9f43, 0x5ab8ff][k % 3], { op: .7 }), x0 + .22, 1.85, cz + 1.2 + k * .3, null, 10);
+      wallP(SUBT.cperiod, x0 + 2.4, 1.85, z1 - .03, Math.PI, 2.0, 1.1); const sg = sprText('⚗ LABORATORIO', { size: 44, bg: '#2f9a4a', w: 2.0 }); sg.position.set(bx, 2.8, cz); world.add(sg); }
+    // coordinación
+    { const [x0, z0, x1, z1] = R('Coordinación'), cx = (x0 + x1) / 2; box(3.0, .08, 1.4, toon(0x8a5a34), cx + .5, .76, z0 + 2.8); [[-1.4, -.6], [1.4, -.6], [-1.4, .6], [1.4, .6]].forEach(([a, b]) => box(.07, .74, .07, D, cx + .5 + a, .37, z0 + 2.8 + b, null, false)); obs(cx - .4, z0 + 2.8, .9); obs(cx + 1.4, z0 + 2.8, .9);
+      [-.6, .5, 1.6].forEach(o => { chair(cx + o, z0 + 1.8, 0, 0xd8344a); chair(cx + o, z0 + 3.8, Math.PI, 0xd8344a); }); board(cx, z0 + .03, 0, SUBT.ctime, 2.4);
+      box(.45, 1.9, 2.0, WD2, x1 - .25, .95, z0 + 3.2); for (let k = 0; k < 9; k++) box(.3, .34, .14, toon([0xd8344a, 0x3d7bff, 0xffcc33][k % 3]), x1 - .3, 1.3, z0 + 2.4 + k * .2, null, false); obs(x1 - .3, z0 + 3.2, .7); plant(x0 + .5, z0 + .5, .9); }
+    // baños de la planta 1
+    const banos = n => { const [x0, z0, x1, z1] = R(n), cz = (z0 + z1) / 2; for (let k = 0; k < 3; k++) { const x = x0 + .6 + k * 1.5; box(.05, 2.0, 1.5, toon(0x5ab8ff), x, 1.05, z1 - .75); if (k === 2) box(.05, 2.0, 1.5, toon(0x5ab8ff), x + 1.5, 1.05, z1 - .75);
+        box(.55, 2.0, .05, toon(0x5ab8ff), x + .28, 1.05, z1 - 1.5); const hg = grp(x + .56, z1 - 1.5, Math.PI + .7); box(.9, 1.85, .05, toon(0x3d7bff), -.46, 1.0, 0, hg); box(.45, .4, .5, W, x + .75, .2, z1 - .35); obs(x + .75, z1 - .6, .7); }
+      [cz - .8, cz + .6].forEach(z => { box(.45, .18, .7, W, x1 - .25, .85, z); const mr = new THREE.Mesh(new THREE.PlaneGeometry(.7, .8), basic(0xcfeeff)); mr.position.set(x1 - .02, 1.6, z); mr.rotation.y = -Math.PI / 2; world.add(mr); obs(x1 - .25, z, .4); }); };
+    banos('Baños norte'); banos('Baños sur');
+    // patio interior (en la planta baja, se ve desde las ventanas)
+    { const X0 = q2(-17.8), X1 = q2(18.6), Z0 = -15, Z1 = 12.8, GY = -3.4; const pv = new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, Z1 - Z0), toon(0xffffff, { map: SUBT.cpatio })); pv.rotation.x = -Math.PI / 2; pv.position.set((X0 + X1) / 2, GY + .03, (Z0 + Z1) / 2); scaleUV(pv.geometry, (X1 - X0) / 2, (Z1 - Z0) / 2); world.add(pv);
+      const fx = q2(.4), fz = -1; cyl(1.8, 1.9, .5, toon(0xd8d4c8), fx, GY + .25, fz, null, 24); const wt = new THREE.Mesh(new THREE.CircleGeometry(1.65, 24), basic(0x5ab8ff)); wt.rotation.x = -Math.PI / 2; wt.position.set(fx, GY + .46, fz); world.add(wt); cyl(.25, .3, 1.4, toon(0xd8d4c8), fx, GY + .9, fz, null, 12); cyl(.6, .4, .2, toon(0xd8d4c8), fx, GY + 1.6, fz, null, 16); EMIT.push({ k: 'glow', p: [fx, GY + 1.8, fz], c: 0xbfe8ff });
+      [[-10, -8], [10, -7], [-10, 6], [11, 6]].forEach(([x, z]) => { const bed = new THREE.Mesh(new THREE.CircleGeometry(1.6, 18), toon(0x6fbf4f)); bed.rotation.x = -Math.PI / 2; bed.position.set(q2(x), GY + .05, z); world.add(bed); cyl(.22, .3, 3, toon(0x8a5a34), q2(x), GY + 1.5, z, null, 8); sph(1.8, toon(0x4fa84a), q2(x), GY + 3.6, z, null, 14); sph(1.3, toon(0x5cbf4f), q2(x) + .8, GY + 4.4, z + .3, null, 12); });
+      [[-4, 6.5], [4.5, 6.5], [-4, -8.5], [4.5, -8.5]].forEach(([x, z]) => { box(1.8, .1, .5, WD, q2(x), GY + .45, z); box(1.8, .5, .08, WD2, q2(x), GY + .75, z + .25); [-.8, .8].forEach(o => box(.08, .45, .45, D, q2(x) + o, GY + .22, z, null, false)); });
+      cyl(.08, .08, 3.2, toon(0x5a6370), q2(15.5), GY + 1.6, 9.5, null, 8); box(1.2, .8, .05, W, q2(15.5), GY + 3.3, 9.2); const hoop = new THREE.Mesh(new THREE.TorusGeometry(.25, .025, 6, 16), toon(0xff5a3a)); hoop.rotation.x = Math.PI / 2; hoop.position.set(q2(15.5), GY + 3.0, 8.85); world.add(hoop); }
+    // pasillos de la planta 1: radiadores bajo las ventanas, macetas, bancos, papeleras y extintores
+    for (let x = -15; x <= 17; x += 4.5) radiator(q2(x), 12.85, 0, 1.2);
+    for (let z = -12; z <= 10; z += 4.5) { radiator(q2(-17.85), z, -Math.PI / 2, 1.2); radiator(q2(18.65), z, Math.PI / 2, 1.2); }
+    [[-14, 16.15], [9.1, 16.15], [1.75, 16.15]].forEach(([x, z]) => { box(1.5, .08, .42, WD, q2(x), .45, z); [-.65, .65].forEach(o => box(.06, .45, .38, M, q2(x) + o, .22, z, null, false)); obs(q2(x) - .45, z, .3); obs(q2(x) + .45, z, .3); });
+    [[-22, 16.1], [22.1, 13.2], [-21.7, -15.6]].forEach(([x, z]) => plant(q2(x), z, .9)); bin(q2(17.3), 16.2); bin(q2(-21.8), 8); clock(q2(-1.5), 2.8, 16.58, Math.PI);
+    [[q2(-17.9), -1], [q2(22.5), 3]].forEach(([x, z]) => { cyl(.12, .12, .5, toon(0xd8344a), x, .7, z, null, 10); }); }
+
   coleDoors();
 }
 function coleDoors() {
-  const fr0 = toon(0xb07a46), fr1 = toon(0x6a3a1e), leaf0 = toon(0xc8955a), leaf1 = toon(0x7a4a2a), knob = toon(0xd9a441), wW = toon(0xfbfaf6), wB = toon(0xc0603c), wT = toon(0xf4f2ec);
-  const drawn = []; DOORS.forEach(d => { if (drawn.some(o => o.vert === d.vert && Math.hypot(o.pt[0] - d.pt[0], o.pt[1] - d.pt[1]) < 1.2)) return; drawn.push(d); const r = ROOMS[d.room], fl = subFloor(d.pt[0]), big = r.elev || r.n.startsWith('Escalera'), top = r.elev ? 2.75 : 2.45, w = d.w, pt = d.pt, FR = fl ? fr1 : fr0;
+  const fr0 = toon(0xb07a46), fr1 = toon(0x6a3a1e), leaf0 = toon(0xc8955a), leaf1 = toon(0x7a4a2a), knob = toon(0xd9a441), wW = toon(0xfbfaf6), wB = toon(0xfbfaf6), wT = toon(0xf4f2ec);
+  const drawn = []; DOORS.forEach(d => { if (drawn.some(o => o.vert === d.vert && Math.hypot(o.pt[0] - d.pt[0], o.pt[1] - d.pt[1]) < 1.2)) return; drawn.push(d); const r = ROOMS[d.room], fl = subFloor(d.pt[0]), big = r.elev || r.n.startsWith('Escalera'), top = (r.elev ? 2.75 : 2.45) + (r.n === 'Recepción' && Math.abs(d.pt[1] - 3) < .1 ? COLE_RISE : 0), w = d.w, pt = d.pt, FR = fl ? fr1 : fr0, TOP = WALL_H + (r.n === 'Recepción' && Math.abs(d.pt[1] - 3) < .1 ? COLE_RISE : 0);
     const tunD = r.n === 'Almacén' && Math.abs(pt[0] + 15) < .1 || r.n === 'Capilla' && Math.abs(pt[1] - 17.6) < .1, WM = tunD ? wT : fl ? wB : wW;
-    if (d.vert) { box(w, WALL_H - top, .22, WM, pt[0], (WALL_H + top) / 2, pt[1], null, false); [d.x0 + .05, d.x1 - .05].forEach(x => box(.1, top, .28, FR, x, top / 2, pt[1], null, false)); box(w, .1, .28, FR, pt[0], top - .05, pt[1], null, false); }
-    else { box(.22, WALL_H - top, w, WM, pt[0], (WALL_H + top) / 2, pt[1], null, false); [d.z0 + .05, d.z1 - .05].forEach(z => box(.28, top, .1, FR, pt[0], top / 2, z, null, false)); box(.28, .1, w, FR, pt[0], top - .05, pt[1], null, false); }
+    if (d.vert) { box(w, TOP - top, .22, WM, pt[0], (TOP + top) / 2, pt[1], null, false); [d.x0 + .05, d.x1 - .05].forEach(x => box(.1, top, .28, FR, x, top / 2, pt[1], null, false)); box(w, .1, .28, FR, pt[0], top - .05, pt[1], null, false); }
+    else { box(.22, TOP - top, w, WM, pt[0], (TOP + top) / 2, pt[1], null, false); [d.z0 + .05, d.z1 - .05].forEach(z => box(.28, top, .1, FR, pt[0], top / 2, z, null, false)); box(.28, .1, w, FR, pt[0], top - .05, pt[1], null, false); }
     if (big || ['Comedor', 'Cocina', 'Almacén', 'Recepción', 'Iglesia'].includes(r.n) || w > 2.7) return;
     const c = r.ctr, sx = d.vert ? 0 : Math.sign(c[0] - pt[0]), sz = d.vert ? Math.sign(c[1] - pt[1]) : 0, lw = (w - .24) / 2;
     [-1, 1].forEach(side => { const hx = d.vert ? pt[0] + side * (w / 2 - .12) : pt[0], hz = d.vert ? pt[1] : pt[1] + side * (w / 2 - .12);
@@ -2456,7 +2572,8 @@ function coleDoors() {
       const mx = hx + sx * lw / 2, mz = hz + sz * lw / 2; box(d.vert ? .05 : lw, 2.3, d.vert ? lw : .05, fl ? leaf1 : leaf0, mx, 1.15, mz); if (d.vert) box(.12, .05, .05, knob, mx - side * .06, 1.05, hz + sz * (lw - .1), null, false); else box(.05, .05, .12, knob, hx + sx * (lw - .1), 1.05, mz - side * .06, null, false);
       pts.forEach(([x, z]) => OBS.push({ x, z, r: .16 })); }); });
 }
-function coleTick(dt, t) { }
+function coleTick(dt, t) { if (RULETA.wh && RULETA.vel > 0) { RULETA.ang += RULETA.vel * dt; RULETA.vel = Math.max(0, RULETA.vel - 3.5 * dt); RULETA.wh.rotation.z = RULETA.ang;
+    if (RULETA.vel === 0) { const N = RULETA.names.length, a = ((RULETA.ang - Math.PI / 2) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI), nm = RULETA.names[Math.floor(a / (2 * Math.PI / N)) % N]; ruletaName(nm); toast(`🎡 ¡Le toca a ${nm}!`, '#c98aff'); snd('win'); } } }
 function decorateSub2() {
   const Y = WALL_H, BR = toon(0xd9a441), RIB = toon(0x3a5a64), glow = c => toon(c, { e: c, ei: .9 });
   // cáusticas del agua sobre el suelo (luz que se mueve)
@@ -2528,7 +2645,7 @@ function alienInteract(me) {
   if (local.ufo) return;
   if (false) { if (me.xc <= 0) { let bd = 10; AIRLOCKS.forEach(a => { const d = Math.hypot(P.x - a.out[0], P.ey - a.out[1], P.z - a.out[2]); if (d < bd) { bd = d; interact.use = { k: 'aenter', id: a.id }; } }); }
     if (!interact.use && me.xb <= 0) { let bd = 10; S.pl.forEach(v => { if (!v.al || !v.ev || v.xa) return; const d = Math.hypot(P.x - v.x, P.ey - (v.ey || 1.2), P.z - v.z); if (d < bd) { bd = d; interact.use = { k: 'abduct', i: v.i }; } }); } return; }
-  if ((IS_SUB || IS_COLE) && me.xin && !local.elev && !local.stair) { const e = elevAt(P.x, P.z) || (IS_COLE ? coleStairAt(P.x, P.z) : null); if (e) interact.use = { k: e.stairs ? 'stairs' : 'elev', e, h: mlHint(e) }; }
+  if ((IS_SUB || IS_COLE) && me.xin && !local.elev && !local.stair) { const e = (IS_COLE ? coleElevAt(P.x, P.z) : elevAt(P.x, P.z)) || (IS_COLE ? coleStairAt(P.x, P.z) : null); if (e) interact.use = { k: e.stairs ? 'stairs' : 'elev', e, h: e.tos && e.tos.length > 1 ? 'E · Usar el ascensor' : mlHint(e) }; }
   if (me.xin && !me.xk) { let kb = KILL_R; S.pl.forEach(p => { if (p.i === ME || !p.al || p.xa || p.v >= 0 || p.ev) return; const a = AV[p.i]; const x = a ? a.rx : p.x, z = a ? a.rz : p.z; const d = Math.hypot(x - P.x, z - P.z); if (d < kb) { kb = d; interact.kill = p.i; } }); }
 }
 function alienModes(me) {
@@ -2941,6 +3058,7 @@ function buildShip() {
   ST.forEach(s => { if (!s.ext) consoleAt(s, false); }); FIX.forEach(s => consoleAt(s, true)); buildExterior();
   CAMS.forEach(buildCam); VENTS.forEach(buildVent); buildDucts();
   [...ANIM.rings.map(r => r.m), ...ANIM.pulse, ...ANIM.leds, ...ANIM.camLeds].forEach(m => m.userData.dyn = 1);
+  if (IS_COLE) coleRaise();
   mergeStatic();
 }
 // ---- partículas: chispas, vapor, brillo y confeti
@@ -3357,7 +3475,7 @@ function petsTick(dt, t) { if (!S || !S.pl) return;
     const tx = a.rx + bx * .8 + sx * .5 * side, tz = a.rz + bz * .8 + sz * .5 * side; const d = Math.hypot(tx - m.x, tz - m.z);
     if (d > 7) { m.x = tx; m.z = tz; } const k = 1 - Math.exp(-(d > .25 ? 5 : 1.5) * dt), ox = m.x, oz = m.z; m.x += (tx - m.x) * k; m.z += (tz - m.z) * k;
     const mv = Math.hypot(m.x - ox, m.z - oz) / Math.max(dt, 1e-3); const face = mv > .3 ? Math.atan2(m.x - ox, m.z - oz) : Math.atan2(-bx, -bz); m.ry = (m.ry ?? face) + wrapA(face - (m.ry ?? face)) * Math.min(1, dt * 8);
-    m.g.position.set(m.x, a.g.position.y > .3 && !m.fly ? a.g.position.y : 0, m.z); m.g.rotation.y = m.ry; petPose(m, t, mv); });
+    { const gy = groundY(m.x, m.z), ay = a.g.position.y - groundY(a.rx, a.rz); m.g.position.set(m.x, gy + (ay > .3 && !m.fly ? ay : 0), m.z); } m.g.rotation.y = m.ry; petPose(m, t, mv); });
   Object.keys(PETM).forEach(k => { if (!S.pl[k]) { scene.remove(PETM[k].g); delete PETM[k]; } }); }
 // ---- vestidor (pantalla Personalizar)
 let WR = null; const WP = { tab: 0 };
@@ -3907,7 +4025,7 @@ function updateAvatars(dt, t) {
     const up = a.cl > .02; if (a.ns === undefined) a.ns = a.g.children.find(c => c.isSprite) || null; if (a.ns) a.ns.visible = !up; if (a.shadow) a.shadow.visible = !up;
     // pegada al techo boca abajo: solo se ve mirando claramente hacia arriba
     if (a.cl > .5 && p.i !== ME && P.pitch < CEIL_LOOK) a.g.visible = false;
-    a.g.rotation.order = 'YXZ'; a.g.position.set(a.rx, a.cl * (CEIL_Y - .5), a.rz); a.g.rotation.set(a.cl * Math.PI / 2, a.ry + Math.PI, 0);
+    a.g.rotation.order = 'YXZ'; a.g.position.set(a.rx, a.cl * (CEIL_Y - .5) + groundY(a.rx, a.rz), a.rz); a.g.rotation.set(a.cl * Math.PI / 2, a.ry + Math.PI, 0);
     const gzOn = crisisKey() === 'grav' && p.al && !p.ev && !(p.ce > 0) && v < 0; a.gf = (a.gf || 0) + ((gzOn ? 1 : 0) - (a.gf || 0)) * Math.min(1, dt * (gzOn ? 1.5 : 4));
     if (a.gf > .01 && !p.ev) { a.g.position.y += a.gf * (.55 + Math.sin(t * .9 + p.i * 1.7) * .35); a.g.rotation.x = a.gf * Math.sin(t * .6 + p.i) * .5; a.g.rotation.z = a.gf * Math.cos(t * .5 + p.i * 2) * .4; }
     const beamOn = crisisKey() === 'black' && p.al && !p.ev && p.i !== ME && S.ph === 'play';
@@ -3920,8 +4038,8 @@ function updateAvatars(dt, t) {
   Object.keys(ROPES).forEach(k => { if (k[0] === 'p') { const q = S.pl[+k.slice(1)]; if (!q || !q.ev || !AV[q.i] || !AV[q.i].g.visible) dropRope(k); } });
   const bids = new Set((S.b || []).map(b => b.id));
   (S.b || []).forEach(b => { const B0 = BODIES[b.id], pp = S.pl[b.id]; if (B0 && pp && (B0.cc !== pp.c || !!B0.sup !== !!b.sup)) { scene.remove(B0.g); delete BODIES[b.id]; if (b.sup) burst('glow', b.x, .6, b.z, 18, 0xb04aff); } });
-  const gzB = crisisKey() === 'grav'; (S.b || []).forEach(b => { if (BODIES[b.id]) { const B = BODIES[b.id]; B.gf = (B.gf || 0) + ((gzB ? 1 : 0) - (B.gf || 0)) * Math.min(1, dt * 1.5); B.g.position.y = B.gf * (.6 + Math.sin(t * .8 + b.id) * .3); B.g.rotation.x = B.gf * Math.sin(t * .4 + b.id) * .6; }
-    if (!BODIES[b.id]) { const p = S.pl[b.id]; const c = deadBody(p ? p.c : 0); c.cc = p ? p.c : 0; c.sup = !!b.sup; if (b.sk) addCard(c.g); if (b.sup) addSupMarks(c.g); c.g.position.set(b.x, 0, b.z); c.g.rotation.y = (b.id * 1.7) % 6.28; scene.add(c.g); BODIES[b.id] = c; } BODIES[b.id].stars.rotation.y += dt * 3; });
+  const gzB = crisisKey() === 'grav'; (S.b || []).forEach(b => { if (BODIES[b.id]) { const B = BODIES[b.id]; B.gf = (B.gf || 0) + ((gzB ? 1 : 0) - (B.gf || 0)) * Math.min(1, dt * 1.5); B.g.position.y = groundY(b.x, b.z) + B.gf * (.6 + Math.sin(t * .8 + b.id) * .3); B.g.rotation.x = B.gf * Math.sin(t * .4 + b.id) * .6; }
+    if (!BODIES[b.id]) { const p = S.pl[b.id]; const c = deadBody(p ? p.c : 0); c.cc = p ? p.c : 0; c.sup = !!b.sup; if (b.sk) addCard(c.g); if (b.sup) addSupMarks(c.g); c.g.position.set(b.x, groundY(b.x, b.z), b.z); c.g.rotation.y = (b.id * 1.7) % 6.28; scene.add(c.g); BODIES[b.id] = c; } BODIES[b.id].stars.rotation.y += dt * 3; });
   Object.keys(BODIES).forEach(k => { if (!bids.has(+k)) { scene.remove(BODIES[k].g); delete BODIES[k]; } });
 }
 function buildMenuBlobs() {
@@ -4037,6 +4155,7 @@ function gameFrame(dt, t) {
   if (local.land > 0) { local.land -= dt; ey -= Math.sin(local.land / .25 * Math.PI) * .12; }
   local.ceil = (local.ceil || 0) + ((onCeil ? 1 : 0) - (local.ceil || 0)) * Math.min(1, dt * 5); if (!inD) ey += (CEIL_Y - .3 - EYE) * local.ceil;
   if (onCeil !== !!local.wasCeil) { local.wasCeil = onCeil; local.pT = .7; P.pitch = onCeil ? -1.5 : 0; snd(onCeil ? 'vent' : 'click'); if (onCeil) toast('¡Estás en el techo! ' + CEIL_T + ' s', '#a8f07a'); }
+  if (IS_COLE) { local.gy = (local.gy ?? 0) + (groundY(P.x, P.z) - (local.gy ?? 0)) * Math.min(1, dt * 14); ey += local.gy; }
   if (local.shake > 0) { local.shake -= dt; const k = Math.min(1, local.shake) * .09; camera.position.set(P.x + (Math.random() - .5) * k, ey + (Math.random() - .5) * k, P.z + (Math.random() - .5) * k); } else camera.position.set(P.x, ey, P.z); if (local.pT > 0) { local.pT -= dt; local.cp += (P.pitch - local.cp) * Math.min(1, dt * 7); } else local.cp = P.pitch;
   camera.rotation.set(local.cp, P.yaw, Math.sin((local.ceil || 0) * Math.PI) * .25 + (zeroG ? Math.sin(t * .7) * .07 : 0));
   { const v = local.ufo ? local.ufo.v : null, vm = v ? Math.hypot(...v) : 0;
@@ -4065,13 +4184,13 @@ function gameFrame(dt, t) {
   if (IS_PLANET && !!S.storm !== !!local.storm) { local.storm = !!S.storm; if (S.storm && S.ph === 'play') { toast('¡Tormenta de polvo! Fuera casi no se ve', '#d9b8ff'); snd('alarm'); } }
   if (ANIM.reactorLight) { ANIM.reactorLight.color.setHex(crisis === 'reactor' ? 0xff3b4f : 0x7fe6ff); }
   // puertas
-  DOORS.forEach(d => { const target = DOOR_ON.has(d.room) ? 0 : 1; d.o += (target - d.o) * Math.min(1, dt * 7); d.mesh.position.y = d.h / 2 + d.o * WALL_H; d.mesh.visible = d.o < .985; });
+  DOORS.forEach(d => { const target = DOOR_ON.has(d.room) ? 0 : 1; d.o += (target - d.o) * Math.min(1, dt * 7); d.mesh.position.y = d.h / 2 + d.o * WALL_H + (d.gy || 0); d.mesh.visible = d.o < .985; });
   const dk = [...DOOR_ON].sort().join(','); if (dk !== local.lastDoors) { const added = [...DOOR_ON].filter(r => !local.lastDoors.split(',').includes(String(r))); if (added.length) { const near = DOORS.some(d => added.includes(d.room) && Math.hypot(d.pt[0] - P.x, d.pt[1] - P.z) < 14); if (near) snd('door'); } local.lastDoors = dk; }
   // alcantarillas
   animHatches(dt);
   VENTS.forEach(v => { if (v.pop > 0) v.pop = Math.max(0, v.pop - dt * 2.2); v.lid.rotation.z = Math.sin(Math.min(1, v.pop) * Math.PI) * 1.1; });
   ANIM.camLeds.forEach(l => l.material.emissiveIntensity = S.cams > 0 ? (Math.sin(t * 6) > 0 ? 1.2 : .3) : .05);
-  updateAvatars(dt, t); petsTick(dt, t); updateUfos(dt, t); miniTick(dt, t, me); updateDrones(dt, t); meteorTick(dt, t, me); aseTick(dt, t, me); if (me && local.myC !== undefined && local.myC !== me.c && S.ph === 'play') toast(me.al ? `¡Ahora eres ${me.n}!` : 'El suplantador te ha robado la identidad', '#d58aff'); local.myC = me ? me.c : undefined; if (IS_SUB) { subTick(dt, t); subTick2(t); elevDoorsTick(dt); } if (IS_COLE) elevDoorsTick(dt); if (SKY && SKY.visible) SKY.position.copy(camera.position);
+  updateAvatars(dt, t); petsTick(dt, t); updateUfos(dt, t); miniTick(dt, t, me); updateDrones(dt, t); meteorTick(dt, t, me); aseTick(dt, t, me); if (me && local.myC !== undefined && local.myC !== me.c && S.ph === 'play') toast(me.al ? `¡Ahora eres ${me.n}!` : 'El suplantador te ha robado la identidad', '#d58aff'); local.myC = me ? me.c : undefined; if (IS_SUB) { subTick(dt, t); subTick2(t); elevDoorsTick(dt); } if (IS_COLE) { elevDoorsTick(dt); coleTick(dt, t); } if (SKY && SKY.visible) SKY.position.copy(camera.position);
   if (local.flash > 0) { local.flash -= dt; irisSet(Math.min(1, 1.2 - local.flash * 1.6)); if (local.flash <= 0) irisSet(1); }
   const comms = crisis === 'comms';
   const myTasks = (me && !me.im) ? me.tk : [];
@@ -4092,7 +4211,8 @@ function gameFrame(dt, t) {
       if (!interact.use && Math.hypot(CAM_DESK.p[0] - P.x, CAM_DESK.p[1] - P.z) < 1.4) interact.use = { k: 'cams' };
       if (!interact.use && me && me.al && !me.xa && (alienP() || {}).al && Math.hypot(CANNON.p[0] - P.x, CANNON.p[1] - P.z) < 1.6) interact.use = { k: 'cannon' };
       if (!IS_PLANET && !IS_SUB && !IS_COLE && !interact.use && me && !me.xa && performance.now() > (local.evaCd || 0)) AIRLOCKS.forEach(a => { if (!interact.use && Math.hypot(a.in[0] - P.x, a.in[1] - P.z) < 1.5) interact.use = { k: 'eva', id: a.id }; });
-      if (!interact.use && (IS_SUB || IS_COLE) && !local.elev && !local.stair) { const e = elevAt(P.x, P.z) || (IS_COLE ? coleStairAt(P.x, P.z) : null); if (e) interact.use = { k: e.stairs ? 'stairs' : 'elev', e, h: mlHint(e) }; }
+      if (!interact.use && (IS_SUB || IS_COLE) && !local.elev && !local.stair) { const e = (IS_COLE ? coleElevAt(P.x, P.z) : elevAt(P.x, P.z)) || (IS_COLE ? coleStairAt(P.x, P.z) : null); if (e) interact.use = { k: e.stairs ? 'stairs' : 'elev', e, h: e.tos && e.tos.length > 1 ? 'E · Usar el ascensor' : mlHint(e) }; }
+      if (!interact.use && IS_COLE && RULETA.pt && Math.hypot(RULETA.pt[0] - P.x, RULETA.pt[1] - P.z) < 1.8) interact.use = { k: 'ruleta', h: RULETA.vel > 0 ? '' : 'E · Girar la ruleta de nombres' };
       if (!interact.use && me && me.al && me.em > 0 && Math.hypot(BTN.x - P.x, BTN.z - P.z) < 2.3) interact.use = { k: 'btn' };
       if (!interact.use && me && me.al && canVent(me)) { let vb = 1.3; VENTS.forEach(v => { const d = Math.hypot(v.p[0] - P.x, v.p[1] - P.z); if (d < vb) { vb = d; interact.use = { k: 'vent', id: v.id }; } }); }
       if (me && me.al) { let rb = REPORT_R; (S.b || []).forEach(b => { const d = Math.hypot(b.x - P.x, b.z - P.z); if (d < rb) { rb = d; interact.rep = b.id; } }); }
@@ -4161,7 +4281,7 @@ function footTick(me, t) {
   const show = on && local.detT > 0 && local.vent < 0; let n = 0;
   if (show) for (let i = FOOT.length - 1; i >= 0 && n < 260; i--) { const f = FOOT[i]; if (Math.abs(f.x - P.x) + Math.abs(f.z - P.z) > 30) continue; let m = FOOT_POOL[n];
     if (!m) { m = new THREE.Mesh(FOOT_G, basic(0xffffff)); m.rotation.x = -Math.PI / 2; m.scale.set(1, 1.6, 1); scene.add(m); FOOT_POOL.push(m); }
-    m.material = basic(COLORS[f.c].h, { op: .9 }); const k = 1 - (t - f.t) / 12; m.scale.set(.6 + .5 * k, (.6 + .5 * k) * 1.6, 1); m.position.set(f.x, .035, f.z); m.rotation.z = -f.y; m.visible = true; n++; }
+    m.material = basic(COLORS[f.c].h, { op: .9 }); const k = 1 - (t - f.t) / 12; m.scale.set(.6 + .5 * k, (.6 + .5 * k) * 1.6, 1); m.position.set(f.x, .035 + groundY(f.x, f.z), f.z); m.rotation.z = -f.y; m.visible = true; n++; }
   for (let i = n; i < FOOT_POOL.length; i++) FOOT_POOL[i].visible = false;
 }
 function floatMove(dt, f, s) {
@@ -4193,7 +4313,7 @@ function npcSeparate(p, dt) {
 function doUse() { const u = interact.use; if (!u) return;
   if (u.k === 'task') openTask(u.sid); else if (u.k === 'fix') openFix(u.id); else if (u.k === 'btn') act('e'); else if (u.k === 'cams') openCams();
   else if (u.k === 'eva') enterEVA(u.id);
-  else if (u.k === 'elev') startElev(u.e); else if (u.k === 'stairs') startStairs(u.e);
+  else if (u.k === 'elev') { if (u.e.tos && u.e.tos.length > 1) elevPick(u.e); else startElev(u.e); } else if (u.k === 'stairs') startStairs(u.e); else if (u.k === 'ruleta') coleSpin();
   else if (u.k === 'm_pilot') { const me0 = S.pl[ME]; if (me0) startPilot(me0); }
   else if (u.k === 'm_tele') { if (u.ok) { act('x', 10 + u.a); snd('vent'); local.flash = .9; } else snd('bad'); }
   else if (u.k === 'm_tractor') { if (u.ok) { act('x', 100 + u.i); snd('zap'); toast('¡Rayo tractor activado!', '#5cff9a'); } else snd('bad'); }
@@ -4400,7 +4520,7 @@ function updateHUD(t) {
     const lab = st ? st.lab : ROLES[me.xa ? 'ali' : me.ro].n; if (qs('#abLab').textContent !== lab) qs('#abLab').textContent = lab;
     qs('#aCd').textContent = me.ro === 'ase' ? '' : me.xa ? (me.xr > 0 ? Math.ceil(me.xr) : '') : me.ro === 'det' && local.detT > 0 ? '' : (me.ac > 0 && !(me.ro === 'cam' && me.sh >= 0) && !(me.ro === 'tre' && me.ce > 0)) ? Math.ceil(me.ac) : ''; }
   sb.hidden = !isImp || !!S.inf; sb.classList.toggle('off', S.ph !== 'play'); qs('#sCd').textContent = isAl ? (!S.sab && me.xs > 0 ? Math.ceil(me.xs) : '') : !S.sab && S.sabCd > 0 ? Math.ceil(S.sabCd) : '';
-  qs('#useLab').textContent = interact.use ? ({ m_pilot: 'Pilotar', m_tele: 'Infiltrar', m_tractor: 'Abducir', m_sab: 'Sabotear', m_ram: 'Embestir', aenter: 'Entrar', abduct: 'Abducir', cannon: 'Cañón', eva: 'Salir', vent: 'Entrar', ventExit: 'Salir', elev: 'Ascensor', stairs: 'Escalera', cams: 'Cámaras', fix: 'Arreglar', btn: 'Reunión', task: 'Usar' })[interact.use.k] : (canVent(me) && me.al ? 'Alcantarilla' : 'Usar');
+  qs('#useLab').textContent = interact.use ? ({ m_pilot: 'Pilotar', m_tele: 'Infiltrar', m_tractor: 'Abducir', m_sab: 'Sabotear', m_ram: 'Embestir', aenter: 'Entrar', abduct: 'Abducir', cannon: 'Cañón', eva: 'Salir', vent: 'Entrar', ventExit: 'Salir', elev: 'Ascensor', stairs: 'Escalera', ruleta: 'Ruleta', cams: 'Cámaras', fix: 'Arreglar', btn: 'Reunión', task: 'Usar' })[interact.use.k] : (canVent(me) && me.al ? 'Alcantarilla' : 'Usar');
   const hint = qs('#hint'); let ht = '';
   { const kt = [...k.childNodes].find(n => n.nodeType === 3 && n.textContent.trim()), kl = S.inf ? 'Infectar' : 'Eliminar'; if (kt && kt.textContent !== kl) kt.textContent = kl; }
   if (interact.kill != null) ht = `Q · ${S.inf ? 'Infectar' : 'Eliminar'} a ${dispN(S.pl[interact.kill])}`; else if (interact.rep != null) ht = `R · Reportar a ${nm(interact.rep)}`;
@@ -4421,7 +4541,7 @@ function mapXf(cv, big) { const W = cv.width, Hh = cv.height; const sc = Math.mi
 function mapInv(cv, x, y) { const { sc, ox, oz } = mapXf(cv, true); return { x: (x - ox) / sc + MB.x0, z: (y - oz) / sc + MB.z0 }; }
 function drawMap(cv, big, opt = {}) {
   if (IS_SUB) MB.x0 = subFloor(P.x) * SUB_OFF - 37;
-  if (IS_COLE) Object.assign(MB, subFloor(P.x) ? { x0: SUB_OFF - 42, z0: -26, w: 84, h: 44 } : { x0: -46, z0: -32, w: 90, h: 64 });
+  if (IS_COLE) Object.assign(MB, [{ x0: -46, z0: -32, w: 90, h: 64 }, { x0: SUB_OFF - 42, z0: -26, w: 84, h: 44 }, { x0: 2 * SUB_OFF - 39, z0: -30, w: 78, h: 56 }][subFloor(P.x)]);
   const g = cv.getContext('2d'), W = cv.width, Hh = cv.height; const { sc, ox, oz } = mapXf(cv, big);
   const X = x => ox + (x - MB.x0) * sc, Z = z => oz + (z - MB.z0) * sc; const t = performance.now() / 1000;
   g.clearRect(0, 0, W, Hh);
@@ -4441,8 +4561,8 @@ function drawMap(cv, big, opt = {}) {
   if (me && canVent(me)) VENTS.forEach(v => { g.fillStyle = local.vent === v.id ? '#ffffff' : '#36e0ad'; g.fillRect(X(v.p[0]) - sc * .6, Z(v.p[1]) - sc * .6, sc * 1.2, sc * 1.2); });
   g.fillStyle = '#ff3b4f'; g.beginPath(); g.arc(X(BTN.x), Z(BTN.z), sc * .7, 0, 7); g.fill();
   AIRLOCKS.forEach(a => { g.fillStyle = '#ffd966'; g.strokeStyle = '#1d1640'; g.lineWidth = 1.5; const w = sc * (big ? 1.4 : 2); g.fillRect(X(a.w[0]) - w / 2, Z(a.w[1]) - w / 2, w, w); g.strokeRect(X(a.w[0]) - w / 2, Z(a.w[1]) - w / 2, w, w); });
-  if (IS_COLE) { const fl = subFloor(P.x), me2 = S && S.pl ? S.pl[ME] : null; g.fillStyle = '#ffcc33'; g.font = `${big ? 18 : 11}px "Lilita One", sans-serif`; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(fl ? 'PLANTA 0' : 'PLANTA -1', 6, 4);
-    if (big && me2 && !me2.im && me2.tk) { const other = me2.tk.filter(sid => !local.done.has(sid) && subFloor(ST[sid].p[0]) !== fl).length; if (other) { g.fillStyle = '#9fd8ff'; g.fillText(`${other} ${other === 1 ? 'tarea' : 'tareas'} en la otra planta`, 6, 26); } } }
+  if (IS_COLE) { const fl = subFloor(P.x), me2 = S && S.pl ? S.pl[ME] : null; g.fillStyle = '#ffcc33'; g.font = `${big ? 18 : 11}px "Lilita One", sans-serif`; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(['PLANTA -1', 'PLANTA 0', 'PLANTA 1'][fl], 6, 4);
+    if (big && me2 && !me2.im && me2.tk) { const other = me2.tk.filter(sid => !local.done.has(sid) && subFloor(ST[sid].p[0]) !== fl).length; if (other) { g.fillStyle = '#9fd8ff'; g.fillText(`${other} ${other === 1 ? 'tarea' : 'tareas'} en otras plantas`, 6, 26); } } }
   if (IS_SUB) { const fl = subFloor(P.x), me2 = S && S.pl ? S.pl[ME] : null; g.fillStyle = '#ffcc33'; g.font = `${big ? 18 : 11}px "Lilita One", sans-serif`; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(fl ? 'CUBIERTA INFERIOR' : 'CUBIERTA SUPERIOR', 6, 4);
     if (big && me2 && !me2.im && me2.tk) { const other = me2.tk.filter(sid => !local.done.has(sid) && subFloor(ST[sid].p[0]) !== fl).length; if (other) { g.fillStyle = '#9fd8ff'; g.fillText(`${other} ${other === 1 ? 'tarea' : 'tareas'} en la otra cubierta`, 6, 26); } } }
   if (opt.sabo) return;
